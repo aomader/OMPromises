@@ -14,7 +14,7 @@
 		A1691F7F17FBF1FA00C7FE5E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1691F7E17FBF1FA00C7FE5E /* UIKit.framework */; };
 		A1691F8217FBF1FA00C7FE5E /* libOMPromises.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A1691F6A17FBF1FA00C7FE5E /* libOMPromises.a */; };
 		A1691F8817FBF1FA00C7FE5E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1691F8617FBF1FA00C7FE5E /* InfoPlist.strings */; };
-		A1691F8A17FBF1FA00C7FE5E /* OMPromisesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F8917FBF1FA00C7FE5E /* OMPromisesTests.m */; };
+		A1691F8A17FBF1FA00C7FE5E /* OMPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F8917FBF1FA00C7FE5E /* OMPromiseTests.m */; };
 		A1691F9717FBF2AF00C7FE5E /* OMDeferred.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9417FBF2AF00C7FE5E /* OMDeferred.m */; };
 		A1691F9817FBF2AF00C7FE5E /* OMPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9617FBF2AF00C7FE5E /* OMPromise.m */; };
 		A1691F9917FBF2BE00C7FE5E /* OMDeferred.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9417FBF2AF00C7FE5E /* OMDeferred.m */; };
@@ -23,6 +23,7 @@
 		A1691FA017FC3BD400C7FE5E /* OMPromise+Combinators.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9E17FC3BD400C7FE5E /* OMPromise+Combinators.m */; };
 		A1691FA317FC3D1D00C7FE5E /* OMDeferred+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691FA217FC3D1D00C7FE5E /* OMDeferred+Helpers.m */; };
 		A1691FA417FC3D1D00C7FE5E /* OMDeferred+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691FA217FC3D1D00C7FE5E /* OMDeferred+Helpers.m */; };
+		A1691FA817FC611300C7FE5E /* OMDeferredTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691FA717FC611300C7FE5E /* OMDeferredTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,7 +59,7 @@
 		A1691F7E17FBF1FA00C7FE5E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		A1691F8517FBF1FA00C7FE5E /* OMPromisesTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OMPromisesTests-Info.plist"; sourceTree = "<group>"; };
 		A1691F8717FBF1FA00C7FE5E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A1691F8917FBF1FA00C7FE5E /* OMPromisesTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMPromisesTests.m; sourceTree = "<group>"; };
+		A1691F8917FBF1FA00C7FE5E /* OMPromiseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OMPromiseTests.m; sourceTree = "<group>"; };
 		A1691F9317FBF2AF00C7FE5E /* OMDeferred.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMDeferred.h; sourceTree = "<group>"; };
 		A1691F9417FBF2AF00C7FE5E /* OMDeferred.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMDeferred.m; sourceTree = "<group>"; };
 		A1691F9517FBF2AF00C7FE5E /* OMPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMPromise.h; sourceTree = "<group>"; };
@@ -68,6 +69,7 @@
 		A1691F9E17FC3BD400C7FE5E /* OMPromise+Combinators.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OMPromise+Combinators.m"; sourceTree = "<group>"; };
 		A1691FA117FC3D1D00C7FE5E /* OMDeferred+Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OMDeferred+Helpers.h"; sourceTree = "<group>"; };
 		A1691FA217FC3D1D00C7FE5E /* OMDeferred+Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OMDeferred+Helpers.m"; sourceTree = "<group>"; };
+		A1691FA717FC611300C7FE5E /* OMDeferredTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMDeferredTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,7 +153,8 @@
 		A1691F8317FBF1FA00C7FE5E /* OMPromisesTests */ = {
 			isa = PBXGroup;
 			children = (
-				A1691F8917FBF1FA00C7FE5E /* OMPromisesTests.m */,
+				A1691F8917FBF1FA00C7FE5E /* OMPromiseTests.m */,
+				A1691FA717FC611300C7FE5E /* OMDeferredTests.m */,
 				A1691F8417FBF1FA00C7FE5E /* Supporting Files */,
 			);
 			path = OMPromisesTests;
@@ -259,9 +262,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1691FA817FC611300C7FE5E /* OMDeferredTests.m in Sources */,
 				A1691F9917FBF2BE00C7FE5E /* OMDeferred.m in Sources */,
 				A1691FA017FC3BD400C7FE5E /* OMPromise+Combinators.m in Sources */,
-				A1691F8A17FBF1FA00C7FE5E /* OMPromisesTests.m in Sources */,
+				A1691F8A17FBF1FA00C7FE5E /* OMPromiseTests.m in Sources */,
 				A1691FA417FC3D1D00C7FE5E /* OMDeferred+Helpers.m in Sources */,
 				A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */,
 			);

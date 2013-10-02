@@ -11,6 +11,7 @@ static NSMutableArray *unfulfilledDeferreds;
 - (id)init {
     self = [super init];
     if (self) {
+        self.progress = @0.f;
         if (!unfulfilledDeferreds) {
             unfulfilledDeferreds = [NSMutableArray arrayWithCapacity:1];
         }
@@ -43,6 +44,8 @@ static NSMutableArray *unfulfilledDeferreds;
 }
 
 - (void)fail:(NSError *)error {
+    [self progress:@1.f];
+    
     self.state = OMPromiseStateFailed;
     self.error = error;
     
@@ -55,11 +58,13 @@ static NSMutableArray *unfulfilledDeferreds;
 
 - (void)progress:(NSNumber *)progress {
     NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
+    NSAssert(self.progress.floatValue <= progress.floatValue, @"Progress can only increase");
     
-    self.progress = progress;
-    
-    for (void (^cb)(NSNumber *) in self.progressCbs) {
-        cb(progress);
+    if (self.progress != progress) {
+        self.progress = progress;
+        for (void (^cb)(NSNumber *) in self.progressCbs) {
+            cb(progress);
+        }
     }
 }
 

@@ -22,4 +22,5 @@
 // combination of then and all, requires the first result to return an array
 - (OMPromise *)map:(id (^)(id result))f;
 
+
 @end
