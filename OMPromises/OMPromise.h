@@ -1,4 +1,3 @@
-
 /** Possible states of an @p OMPromise.
  */
 typedef enum OMPromiseState {
@@ -62,7 +61,7 @@ typedef enum OMPromiseState {
                fail:(void (^)(NSError *error))failCb
            progress:(void (^)(NSNumber *progress))progressCb;
 
-/** Creates a fulfiled promise.
+/** Create a fulfilled promise.
  
  Simply wraps the supplied value inside a fulfiled promise.
  
