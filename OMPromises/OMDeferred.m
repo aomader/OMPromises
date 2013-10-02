@@ -8,13 +8,19 @@ static NSMutableArray *unfulfilledDeferreds;
 
 #pragma mark - Init
 
-+ (OMDeferred *)deferred {
-    OMDeferred *deferred = [[OMDeferred alloc] init];
-    if (!unfulfilledDeferreds) {
-        unfulfilledDeferreds = [NSMutableArray arrayWithCapacity:1];
+- (id)init {
+    self = [super init];
+    if (self) {
+        if (!unfulfilledDeferreds) {
+            unfulfilledDeferreds = [NSMutableArray arrayWithCapacity:1];
+        }
+        [unfulfilledDeferreds addObject:self];
     }
-    [unfulfilledDeferreds addObject:deferred];
-    return deferred;
+    return self;
+}
+
++ (OMDeferred *)deferred {
+    return [[OMDeferred alloc] init];
 }
 
 #pragma mark - Public Methods
@@ -24,36 +30,37 @@ static NSMutableArray *unfulfilledDeferreds;
 }
 
 - (void)fulfil:(id)result {
-    NSAssert(self.state == OMPromiseStateUnfulfilled, @"");
     [self progress:@1.f];
+    
     self.state = OMPromiseStateFulfilled;
     self.result = result;
+    
     for (void (^cb)(id) in self.thenCbs) {
         cb(result);
     }
+    
     [unfulfilledDeferreds removeObject:self];
 }
 
 - (void)fail:(NSError *)error {
     self.state = OMPromiseStateFailed;
     self.error = error;
+    
     for (void (^cb)(NSError *) in self.failCbs) {
         cb(error);
     }
+    
     [unfulfilledDeferreds removeObject:self];
 }
 
 - (void)progress:(NSNumber *)progress {
-    NSAssert(self.state == OMPromiseStateUnfulfilled, @"");
+    NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
+    
+    self.progress = progress;
+    
     for (void (^cb)(NSNumber *) in self.progressCbs) {
         cb(progress);
     }
-}
-
-- (void (^)(NSError *error))failBlock {
-    return [(^(NSError *error) {
-        [self fail:error];
-    }) copy];
 }
 
 @end

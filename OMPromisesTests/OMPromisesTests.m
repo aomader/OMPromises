@@ -16,17 +16,7 @@
 
 @implementation OMPromisesTests
 
-- (void)setUp {
-    [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
-}
-
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
-
-- (void)testExample
+- (void)ASDtestExample
 {
     OMDeferred *deferred = [OMDeferred deferred];
     
@@ -84,6 +74,68 @@
             /*while ([[NSRunLoop currentRunLoop]  runMode:NSDefaultRunLoopMode beforeDate:twoSecondsFromNow]) {
                 twoSecondsFromNow = [NSDate dateWithTimeIntervalSinceNow:10.0];
             }*/
+}
+
+- (void)testReturn {
+    id result = @.1f;
+    OMPromise *promise = [OMDeferred return:result];
+    
+    XCTAssertEqual(promise.state, OMPromiseStateFulfilled, @"Promise should be fulfilled");
+    XCTAssertEqual(promise.result, result, @"Promise should have the supplied result");
+}
+
+- (void)testThenOnAlreadyFulfilledPromise {
+    id result = @.1f;
+    OMPromise *promise = [OMDeferred return:result];
+    
+    __block BOOL called = NO;
+    [promise then:^id(id result1) {
+        XCTAssertEqual(result1, result, @"The supplied result should be identical");
+        called = YES;
+        return nil;
+    }];
+    
+    XCTAssertTrue(called, @"then-block should have been called");
+}
+
+- (void)testThenOnNotAlreadyFulfilledPromise {
+    id result = @.1f;
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block BOOL called = NO;
+    [deferred.promise then:^id(id result1) {
+        XCTAssertEqual(result1, result, @"The supplied result should be identical");
+        called = YES;
+        return nil;
+    }];
+    
+    XCTAssertFalse(called, @"then-block should not have been called");
+    [deferred fulfil:result];
+    XCTAssertTrue(called, @"then-block should have been called");
+}
+
+- (void)testMultipleThenOnNotAlreadyFulfilledPromise {
+    id result = @.1f;
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block BOOL called1 = NO;
+    __block BOOL called2 = NO;
+    [deferred.promise then:^id(id result1) {
+        XCTAssertEqual(result1, result, @"The supplied result should be identical");
+        called1 = YES;
+        return nil;
+    }];
+    [deferred.promise then:^id(id result1) {
+        XCTAssertEqual(result1, result, @"The supplied result should be identical");
+        called2 = YES;
+        return nil;
+    }];
+    
+    XCTAssertFalse(called1, @"first then-block should not have been called");
+    XCTAssertFalse(called2, @"second then-block should not have been called");
+    [deferred fulfil:result];
+    XCTAssertTrue(called1, @"first then-block should have been called");
+    XCTAssertTrue(called2, @"first then-block should have been called");
 }
 
 @end
