@@ -32,12 +32,16 @@
 
 /** Finalizes the deferred by settings its state to @p OMPromiseStateFulfilled.
  
+ Implicitly sets the progress to 1.
+ 
  @param result Result to set and propagate.
  @see fail:
  */
 - (void)fulfil:(id)result;
 
 /** Finalizes the deferred by settings its state to @p OMPromiseStateFailed.
+ 
+ Implicitly sets the progress to 1.
  
  @param error Error to set and propagate.
  @see fulfil:
