@@ -100,16 +100,18 @@ typedef enum OMPromiseState {
 
  @param thenHandler Block to be called once the promise gets fulfilled.
  @return A new promise.
+ @see rescue:
  */
 - (OMPromise *)then:(id (^)(id result))thenHandler;
 
-/** Create a new promise bz binding the error reason to another promise.
+/** Create a new promise by binding the error reason to another promise.
 
  Similiar to then:, but the supplied block is called in case the promise fails. from
  which point on it behaves like then:. If the promise gets fulfilled the step is skipped.
 
  @param rescueHandler Block to be called once the promise failed.
  @return A new promise.
+ @see then:
  */
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
 
@@ -142,8 +144,17 @@ typedef enum OMPromiseState {
 /// @name Combinators
 ///---------------------------------------------------------------------------------------
 
-// chain promise generators, basically the same as calling multiple binds
-+ (OMPromise *)chain:(NSArray *)fs initial:(id)data;
+/** Create a promise chain as if you would do multiple then binds.
+
+ It also respects the progress of each chain step by assuming an equal distribution
+ of work over all items, such that it also updates the progress with respect to
+ each individual step.
+
+ @param thenHandlers Sequence of then: handler blocks.
+ @param initial Initial result supplied to the first then: handler block.
+ @return A new promise describing the whole chain.
+ */
++ (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result;
 
 // race for the first fulfiled promise in promises, yields the winning result
 + (OMPromise *)any:(NSArray *)promises;

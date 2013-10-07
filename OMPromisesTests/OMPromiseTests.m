@@ -43,6 +43,8 @@
     self.error = [NSError ];
 }
 
+#pragma mark - Return
+
 - (void)testFulfilledPromise {
     OMPromise *promise = [OMPromise promiseWithResult:self.result];
     
@@ -58,6 +60,8 @@
     XCTAssertEqual(promise.error, self.error, @"Promise should have the supplied error");
     XCTAssertEqualWithAccuracy(promise.progress.floatValue, 0.f, FLT_EPSILON, @"Progress should be 0");
 }
+
+#pragma mark - Callbacks
 
 - (void)testBindOnAlreadyFulfilledPromise {
     OMPromise *promise = [OMPromise promiseWithResult:self.result];
@@ -193,6 +197,8 @@
     XCTAssertEqual(called2, 1, @"second fulfilled-block should have been called once");
 }
 
+#pragma mark - Bind
+
 - (void)testThenReturnPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
@@ -305,6 +311,59 @@
     XCTAssertEqual(nextPromise.result, self.result, @"Final result should be the last returned one");
     XCTAssertEqual(called, 1, @"rescue-block should have been called exactly once");
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+}
+
+#pragma mark Combinators
+
+- (void)testChainEmptyArray {
+    OMPromise *chain = [OMPromise chain:@[] initial:self.result];
+    XCTAssertEqual(chain.state, OMPromiseStateFulfilled, @"Chain promise should be fulfilled");
+    XCTAssertEqual(chain.result, self.result, @"Chain promise should have the initial result");
+}
+
+- (void)testChainFulfil {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    OMPromise *chain = [OMPromise chain:@[
+        ^id(id result) {
+            return result;
+        }, ^id(id result) {
+            return deferred.promise;
+        }
+    ] initial:self.result];
+
+    XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should be unfulfilled");
+    XCTAssertEqualWithAccuracy(chain.progress.floatValue, .5f, FLT_EPSILON, @"Chain should be have way done");
+
+    [deferred progress:@.5f];
+    XCTAssertEqualWithAccuracy(chain.progress.floatValue, .75f, FLT_EPSILON, @"Assuming equal distribution of work load");
+
+    [deferred fulfil:self.result2];
+    XCTAssertEqual(chain.state, OMPromiseStateFulfilled, @"Chain should be fulfilled");
+    XCTAssertEqual(chain.result, self.result2, @"Chain should have result of last promise in chain");
+    XCTAssertEqualWithAccuracy(chain.progress.floatValue, .1f, FLT_EPSILON, @"Chain should be done");
+}
+
+- (void)testChainFail {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    OMPromise *chain = [OMPromise chain:@[
+        ^id(id result) {
+            return deferred.promise;
+        }, ^id(id result) {
+            XCTFail(@"Chain should short-circuit in case of failure");
+            return nil;
+        }
+    ] initial:self.result];
+
+    [deferred progress:@.5f];
+    XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should be unfulfilled");
+    XCTAssertEqualWithAccuracy(chain.progress.floatValue, .25f, FLT_EPSILON, @"Chain should be have way done");
+
+    [deferred fail:self.error];
+    XCTAssertEqual(chain.state, OMPromiseStateFailed, @"Chain should have failed");
+    XCTAssertEqual(chain.error, self.error, @"Chain error should be equal to promise error");
+    XCTAssertEqualWithAccuracy(chain.progress.floatValue, .25f, FLT_EPSILON, @"Chain should be have way done");
 }
 
 @end
