@@ -30,6 +30,7 @@
 @interface OMPromisesTests : XCTestCase
 
 @property id result;
+@property id result2;
 @property NSError *error;
 
 @end
@@ -38,6 +39,7 @@
 
 - (void)setUp {
     self.result = @.1337;
+    self.result2 = @.31337;
     self.error = [NSError ];
 }
 
@@ -191,11 +193,119 @@
     XCTAssertEqual(called2, 1, @"second fulfilled-block should have been called once");
 }
 
-- (void)testThenReturnTypes {
-    #warning add test content
+- (void)testThenReturnPromise {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    __block NSUInteger called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
+    OMDeferred *nextDeferred = [OMDeferred deferred];
+    OMPromise *nextPromise = [[[[[[deferred.promise then:^(id result) {
+        XCTAssertEqual(result, self.result, @"Supplied result should be identical to the one passed to fulfil:");
+        called += 1;
+        return nextDeferred.promise;
+    }] progressed:^(NSNumber *progress) {
+        calledProgress += 1;
+    }] fulfilled:^(id result) {
+        XCTAssertEqual(result, self.result2, @"Supplied result should be identical to the one passed to fulfil:");
+        calledFulfil += 1;
+    }] then:^(id result) {
+        return [OMPromise promiseWithError:self.error];
+    }] then:^(id result) {
+        XCTFail(@"On error then should short circuit");
+        return result;
+    }] failed:^(NSError *error) {
+        XCTAssertEqual(error, self.error, @"Supplied error should be identical to previous error in chain");
+        calledFail += 1;
+    }];
+
+    [deferred fulfil:self.result];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateUnfulfilled, @"Second promise should not be fulfilled yet");
+    XCTAssertEqual(called, 1, @"then-block should have been called exactly once");
+
+    [nextDeferred progress:@.5f];
+    [nextDeferred fulfil:self.result2];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateFulfilled, @"Second promise should be fulfilled");
+    XCTAssertEqual(calledProgress, 2, @"progressed-block should have been called exactly twice");
+    XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+    XCTAssertEqual(calledFail, 1, @"failed-block should have been called exactly once");
 }
-#warning add tests for then chaining, failed, successful, etc
-#warning add tests for combinators, BEFORE implementing them...
+
+- (void)testThenReturnValue {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    __block NSUInteger called = 0, calledFulfil = 0;
+    OMPromise *nextPromise = [[[deferred.promise then:^(id result) {
+        called += 1;
+        return self.result2;
+    }] fulfilled:^(id result) {
+        XCTAssertEqual(result, self.result2, @"Supplied result should be identical to the previously returned one");
+        calledFulfil += 1;
+    }] failed:^(NSError *error) {
+        XCTFail(@"failed-block shouldn't be called");
+    }];
+
+    [deferred fulfil:self.result];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateFulfilled, @"Second promise should be fulfilled");
+    XCTAssertEqual(nextPromise.result, self.result, @"Final result should be the last returned one");
+    XCTAssertEqual(called, 1, @"then-block should have been called exactly once");
+    XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+}
+
+- (void)testRescueReturnPromise {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    __block NSUInteger called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
+    OMDeferred *nextDeferred = [OMDeferred deferred];
+    OMPromise *nextPromise = [[[[[[deferred.promise rescue:^(NSError *error) {
+        XCTAssertEqual(error, self.error, @"Supplied error should be identical to the one passed to fail:");
+        called += 1;
+        return nextDeferred.promise;
+    }] progressed:^(NSNumber *progress) {
+        calledProgress += 1;
+    }] fulfilled:^(id result) {
+        XCTAssertEqual(result, self.result2, @"Supplied result should be identical to the one passed to fulfil:");
+        calledFulfil += 1;
+    }] then:^(id result) {
+        return [OMPromise promiseWithError:self.error];
+    }] then:^(id result) {
+        XCTFail(@"On error then should short circuit");
+        return result;
+    }] failed:^(NSError *error) {
+        XCTAssertEqual(error, self.error, @"Supplied error should be identical to previous error in chain");
+        calledFail += 1;
+    }];
+
+    [deferred fail:self.error];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateUnfulfilled, @"Second promise should not be fulfilled yet");
+    XCTAssertEqual(called, 1, @"rescue-block should have been called exactly once");
+
+    [nextDeferred progress:@.5f];
+    [nextDeferred fulfil:self.result2];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateFulfilled, @"Second promise should be fulfilled");
+    XCTAssertEqual(calledProgress, 2, @"progressed-block should have been called exactly twice");
+    XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+    XCTAssertEqual(calledFail, 1, @"failed-block should have been called exactly once");
+}
+
+- (void)testRescueReturnValue {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    __block NSUInteger called = 0, calledFulfil = 0;
+    OMPromise *nextPromise = [[[deferred.promise rescue:^(NSError *error) {
+        called += 1;
+        return self.result;
+    }] fulfilled:^(id result) {
+        XCTAssertEqual(result, self.result2, @"Supplied result should be identical to the previously returned one");
+        calledFulfil += 1;
+    }] failed:^(NSError *error) {
+        XCTFail(@"failed-block shouldn't be called");
+    }];
+
+    [deferred fail:self.error];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateFulfilled, @"Second promise should be fulfilled");
+    XCTAssertEqual(nextPromise.result, self.result, @"Final result should be the last returned one");
+    XCTAssertEqual(called, 1, @"rescue-block should have been called exactly once");
+    XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+}
 
 @end
 

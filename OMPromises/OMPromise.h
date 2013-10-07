@@ -67,7 +67,7 @@ typedef enum OMPromiseState {
 @property(readonly) NSNumber *progress;
 
 ///---------------------------------------------------------------------------------------
-/// @name Creation
+/// @name Return
 ///---------------------------------------------------------------------------------------
 
 /** Create a fulfilled promise.
@@ -87,20 +87,35 @@ typedef enum OMPromiseState {
 + (OMPromise *)promiseWithError:(NSError *)error;
 
 ///---------------------------------------------------------------------------------------
-/// @name Binds
+/// @name Bind
 ///---------------------------------------------------------------------------------------
 
-/** Create a new promise, its outcome depends on the promise and maybe on the supplied block.
+/** Create a new promise by binding the fulfilled result to another promise.
 
- The newly returned promise fails, if the current promise fails. If it instead gets fulfilled
- the thenHandler is called with the result as argument. The value returned from that block call
- is then used to either fulfil the newly returned promise or replace it, in case the value is
- a promise itself.
+ The supplied block gets called in case the promise gets fulfilled. The block can return
+ a simple value or another block, in both cases the promise returned by this method
+ is bound to the result of the block.
+
+ If the promise fails, the chain is short-circuited and the resulting promise fails too.
 
  @param thenHandler Block to be called once the promise gets fulfilled.
  @return A new promise.
  */
 - (OMPromise *)then:(id (^)(id result))thenHandler;
+
+/** Create a new promise bz binding the error reason to another promise.
+
+ Similiar to then:, but the supplied block is called in case the promise fails. from
+ which point on it behaves like then:. If the promise gets fulfilled the step is skipped.
+
+ @param rescueHandler Block to be called once the promise failed.
+ @return A new promise.
+ */
+- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
+
+///---------------------------------------------------------------------------------------
+/// @name Callbacks
+///---------------------------------------------------------------------------------------
 
 /** Register a block to be called when the promise gets fulfilled.
 

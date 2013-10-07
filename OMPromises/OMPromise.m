@@ -57,7 +57,7 @@
     _state = state;
 }
 
-#pragma mark - Creation
+#pragma mark - Return
 
 + (OMPromise *)promiseWithResult:(id)result {
     OMDeferred *deferred = [OMDeferred deferred];
@@ -71,7 +71,7 @@
     return deferred.promise;
 }
 
-#pragma mark - Bind and Return
+#pragma mark - Bind
 
 - (OMPromise *)then:(id (^)(id result))thenHandler {
     if (self.state == OMPromiseStateFailed) {
@@ -82,9 +82,41 @@
     } else {
         OMDeferred *deferred = [OMDeferred deferred];
 
-        [self fulfilled:^(id result) {
+        [[self fulfilled:^(id result) {
             #warning check blocks for self references
-            id next = thenHandler(self.result);
+            id next = thenHandler(result);
+            if ([next isKindOfClass:OMPromise.class]) {
+                [[[(OMPromise *)next fulfilled:^(id result) {
+                    [deferred fulfil:result];
+                }] failed:^(NSError *error) {
+                    [deferred fail:error];
+                }] progressed:^(NSNumber *progress) {
+                    [deferred progress:progress];
+                }];
+            } else {
+                [deferred fulfil:next];
+            }
+        }] failed:^(NSError *error) {
+            [deferred fail:error];
+        }];
+
+        return deferred.promise;
+    }
+}
+
+- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
+    if (self.state == OMPromiseStateFulfilled) {
+        return self;
+    } else if (self.state == OMPromiseStateFailed) {
+        id next = rescueHandler(self.error);
+        return [next isKindOfClass:OMPromise.class] ? next : [OMPromise promiseWithResult:next];
+    } else {
+        OMDeferred *deferred = [OMDeferred deferred];
+
+        [[self fulfilled:^(id result) {
+            [deferred fulfil:result];
+        }] self failed:^(NSError *error) {
+            id next = rescueHandler(error);
             if ([next isKindOfClass:OMPromise.class]) {
                 [[[(OMPromise *)next fulfilled:^(id result) {
                     [deferred fulfil:result];
@@ -98,13 +130,11 @@
             }
         }];
 
-        [self failed:^(NSError *error) {
-            [deferred fail:error];
-        }];
-
         return deferred.promise;
     }
 }
+
+#pragma mark - Callbacks
 
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler {
     if (self.state == OMPromiseStateFulfilled) {
