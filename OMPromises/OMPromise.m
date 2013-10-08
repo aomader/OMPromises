@@ -98,13 +98,7 @@
             #warning check blocks for self references
             id next = thenHandler(result);
             if ([next isKindOfClass:OMPromise.class]) {
-                [[[(OMPromise *)next fulfilled:^(id result) {
-                    [deferred fulfil:result];
-                }] failed:^(NSError *error) {
-                    [deferred fail:error];
-                }] progressed:^(NSNumber *progress) {
-                    [deferred progress:progress];
-                }];
+                [(OMPromise *)next control:deferred];
             } else {
                 [deferred fulfil:next];
             }
@@ -130,13 +124,7 @@
         }] self failed:^(NSError *error) {
             id next = rescueHandler(error);
             if ([next isKindOfClass:OMPromise.class]) {
-                [[[(OMPromise *)next fulfilled:^(id result) {
-                    [deferred fulfil:result];
-                }] failed:^(NSError *error) {
-                    [deferred fail:error];
-                }] progressed:^(NSNumber *progress) {
-                    [deferred progress:progress];
-                }];
+                [(OMPromise *)next control:deferred];
             } else {
                 [deferred fulfil:next];
             }
@@ -199,11 +187,11 @@
     } else {
         id (^f)(id) = [fs objectAtIndex:0];
         [[OMPromise promisify:f(result)] fulfilled:^(id nextResult) {
-            [[OMPromise chain:[fs subarrayWithRange:NSMakeRange(1, fs.count - 1)] initial:nextResult] fulfilled:^(id x) {
-                [deferred fulfil:x];
-            } failed:^(NSError *error) {
+            [[[[OMPromise chain:[fs subarrayWithRange:NSMakeRange(1, fs.count - 1)] initial:nextResult] fulfilled:^(id result) {
+                [deferred fulfil:result];
+            }] failed:^(NSError *error) {
                 [deferred fail:error];
-            } progressed:^(NSNumber *progress) {
+            }] progressed:^(NSNumber *progress) {
                 [deferred progress:@(progress.floatValue / fs.count * (fs.count - 1) + 1.f/fs.count)];
             }];
         } failed:^(NSError *error) {
@@ -218,11 +206,6 @@
 
 + (OMPromise *)any:(NSArray *)promises {
     OMDeferred *deferred = [OMDeferred deferred];
-
-    if (promises.count == 0) {
-#warning Add proper error reason
-        [deferred fail:nil];
-    }
 
     __block NSUInteger failed = 0;
 
@@ -243,6 +226,10 @@
         }];
     }
 
+    if (promises.count == 0) {
+#warning Add proper error reason
+        [deferred fail:nil];
+    }
 
     return deferred.promise;
 }
@@ -250,10 +237,6 @@
 + (OMPromise *)all:(NSArray *)promises {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    if (promises.count == 0) {
-        [deferred fulfil:@[]];
-    }
-    
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:promises.count];
     __block NSUInteger done = 0;
 
@@ -283,11 +266,25 @@
             }
         }];
     }
+
+    if (promises.count == 0) {
+        [deferred fulfil:results];
+    }
     
     return deferred.promise;
 }
 
 #pragma mark - Private Helper Methods
+
+- (void)control:(OMDeferred *)deferred {
+    [[[self fulfilled:^(id result) {
+        [deferred fulfil:result];
+    }] failed:^(NSError *error) {
+        [deferred fail:error];
+    }] progressed:^(NSNumber *progress) {
+        [deferred progress:progress];
+    }];
+}
 
 + (OMPromise *)promisify:(id)result {
     return [result isKindOfClass:OMPromise.class] ? result : [OMPromise promiseWithResult:result];
