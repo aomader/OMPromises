@@ -196,7 +196,7 @@
             }];
         } failed:^(NSError *error) {
             [deferred fail:error];
-        } progressCalled:^(NSNumber *progress) {
+        } progress:^(NSNumber *progress) {
             [deferred progress:@(progress.floatValue / fs.count)];
         }];
     }
@@ -205,7 +205,34 @@
 }
 
 + (OMPromise *)any:(NSArray *)promises {
-    return nil;
+    if (promises.count == 0) {
+#warning Add proper error reason
+        return [OMPromise promiseWithError:nil];
+    } else {
+        OMDeferred *deferred = [OMDeferred deferred];
+
+        __block NSUInteger failed = 0;
+
+        for (OMPromise *promise in promises) {
+            [[[promise fulfilled:^(id result) {
+                if (deferred.state == OMPromiseStateUnfulfilled) {
+                    [deferred fulfil:result];
+                }
+            }] failed:^(NSError *error) {
+                failed += 1;
+                if (failed == promises.count) {
+#warning Add proper error reason
+                    [deferred fail:nil];
+                }
+            }] progressed:^(NSNumber *number) {
+                if (number.floatValue > deferred.progress.floatValue) {
+                    [deferred progress:number];
+                }
+            }];
+        }
+
+        return deferred.promise;
+    }
 }
 
 + (OMPromise *)all:(NSArray *)promises {

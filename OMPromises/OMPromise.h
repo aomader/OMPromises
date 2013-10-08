@@ -156,13 +156,21 @@ typedef enum OMPromiseState {
  */
 + (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result;
 
-// race for the first fulfiled promise in promises, yields the winning result
+/** Race for the first fulfilled promise in parallel.
+
+ The new returned promise gets fulfilled if any of the supplied promises does.
+ If no promise gets fulfilled, the returned promise fails.
+
+ @param promises A sequence of promises.
+ @return A new promise.
+ */
 + (OMPromise *)any:(NSArray *)promises;
 
-// requires all promises to be fullfilled, yields an array containing all results
-+ (OMPromise *)all:(NSArray *)promises;
+/** Wait for all promises to get fulfilled.
 
-// combination of then and all, requires the first result to return an array
-- (OMPromise *)map:(id (^)(id result))f;
+ @param promises A sequence of promises.
+ @return A new promise.
+ */
++ (OMPromise *)all:(NSArray *)promises;
 
 @end

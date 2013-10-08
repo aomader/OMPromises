@@ -366,5 +366,50 @@
     XCTAssertEqualWithAccuracy(chain.progress.floatValue, .25f, FLT_EPSILON, @"Chain should be have way done");
 }
 
+- (void)testAnyEmptyArray {
+    OMPromise *any = [OMPromise any:@[]];
+    XCTAssertEqual(any.state, OMPromiseStateFailed, @"Any without any promise should have failed");
+}
+
+- (void)testAnyFulfil {
+    OMDeferred *deferred1 = [OMDeferred deferred];
+    OMDeferred *deferred2 = [OMDeferred deferred];
+    OMDeferred *deferred3 = [OMDeferred deferred];
+
+    OMPromise *any = [OMPromise any:@[deferred1.promise, deferred2.promise, deferred3.promise]];
+
+    [deferred1 progress:@.5f];
+    XCTAssertEqualWithAccuracy(any.progress.floatValue, .5f, FLT_EPSILON, @"Any should be have way done");
+
+    [deferred2 progress:@.75f];
+    XCTAssertEqualWithAccuracy(any.progress.floatValue, .75f, FLT_EPSILON, @"Any should be nearly done");
+
+    [deferred1 fail:self.error];
+    XCTAssertEqual(any.state, OMPromiseStateUnfulfilled, @"Any should be unfulfilled");
+
+    [deferred2 fulfil:self.result];
+    XCTAssertEqual(any.state, OMPromiseStateFulfilled, @"Any should be fulfilled");
+    XCTAssertEqual(any.result, self.result, @"Result should be identical to the ony supplied by the fulfilled promise");
+
+    XCTAssertNoThrow([deferred3 fulfil:self.result2], @"Another fulfilled promise should have no influence");
+    XCTAssertEqual(any.state, OMPromiseStateFulfilled, @"State should be unchanged");
+    XCTAssertEqual(any.result, self.result, @"Result should be unchanged");
+}
+
+- (void)testAnyFail {
+    OMDeferred *deferred1 = [OMDeferred deferred];
+    OMDeferred *deferred2 = [OMDeferred deferred];
+
+    OMPromise *any = [OMPromise any:@[deferred1.promise, deferred2.promise]];
+
+    [deferred1 progress:@.5f];
+    XCTAssertEqualWithAccuracy(any.progress.floatValue, .5f, FLT_EPSILON, @"Any should be have way done");
+
+    [deferred1 fail:self.error];
+    XCTAssertEqual(any.state, OMPromiseStateUnfulfilled, @"Any should be unfulfilled");
+    [deferred2 fail:self.error];
+    XCTAssertEqual(any.state, OMPromiseStateFailed, @"Any should have failed");
+}
+
 @end
 
