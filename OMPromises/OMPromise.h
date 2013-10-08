@@ -161,12 +161,22 @@ typedef enum OMPromiseState {
  The new returned promise gets fulfilled if any of the supplied promises does.
  If no promise gets fulfilled, the returned promise fails.
 
+ The progress aligns to the mostly progressed promise.
+
  @param promises A sequence of promises.
  @return A new promise.
  */
 + (OMPromise *)any:(NSArray *)promises;
 
 /** Wait for all promises to get fulfilled.
+
+ In case that all supplied promises get fulfilled, the promise itself returns
+ an array containing all results for the supplied promises while respecting the
+ correct order. Nil has been replaced by [NSNull null]. If any promise fails,
+ the returned promise fails also.
+
+ Similiar to chain: the workload of each promise is considered equal to
+ determine the overall progress.
 
  @param promises A sequence of promises.
  @return A new promise.

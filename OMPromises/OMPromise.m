@@ -196,7 +196,7 @@
             }];
         } failed:^(NSError *error) {
             [deferred fail:error];
-        } progress:^(NSNumber *progress) {
+        } progressed:^(NSNumber *progress) {
             [deferred progress:@(progress.floatValue / fs.count)];
         }];
     }
@@ -205,75 +205,72 @@
 }
 
 + (OMPromise *)any:(NSArray *)promises {
+    OMDeferred *deferred = [OMDeferred deferred];
+
     if (promises.count == 0) {
 #warning Add proper error reason
-        return [OMPromise promiseWithError:nil];
-    } else {
-        OMDeferred *deferred = [OMDeferred deferred];
-
-        __block NSUInteger failed = 0;
-
-        for (OMPromise *promise in promises) {
-            [[[promise fulfilled:^(id result) {
-                if (deferred.state == OMPromiseStateUnfulfilled) {
-                    [deferred fulfil:result];
-                }
-            }] failed:^(NSError *error) {
-                failed += 1;
-                if (failed == promises.count) {
-#warning Add proper error reason
-                    [deferred fail:nil];
-                }
-            }] progressed:^(NSNumber *number) {
-                if (number.floatValue > deferred.progress.floatValue) {
-                    [deferred progress:number];
-                }
-            }];
-        }
-
-        return deferred.promise;
+        [deferred fail:nil];
     }
+
+    __block NSUInteger failed = 0;
+
+    for (OMPromise *promise in promises) {
+        [[[promise fulfilled:^(id result) {
+            if (deferred.state == OMPromiseStateUnfulfilled) {
+                [deferred fulfil:result];
+            }
+        }] failed:^(NSError *error) {
+            if (++failed == promises.count) {
+#warning Add proper error reason
+                [deferred fail:nil];
+            }
+        }] progressed:^(NSNumber *number) {
+            if (number.floatValue > deferred.progress.floatValue) {
+                [deferred progress:number];
+            }
+        }];
+    }
+
+
+    return deferred.promise;
 }
 
 + (OMPromise *)all:(NSArray *)promises {
     OMDeferred *deferred = [OMDeferred deferred];
-    
-    __block NSMutableArray *results = [NSMutableArray arrayWithCapacity:promises.count];
-    __block NSUInteger done = 0;
-    
-    for (OMPromise *promise in promises) {
-        [results addObject:[NSNull null]];
-        NSUInteger idx = [promises indexOfObject:promise];
-        [promise then:^id(id result) {
-            if (deferred.state == OMPromiseStateUnfulfilled) {
-                results[idx] = result ? result : [NSNull null];
-                if (++done == results.count) {
-                    [deferred fulfil:results];
-                } else {
-                    [deferred progress:@((float)done/results.count)];
-                }
-            }
-            return nil;
-        } fail:^(NSError *error) {
-            [deferred fail:error];
-        } progress:^(NSNumber *progress) {
-            
-        }];
+
+    if (promises.count == 0) {
+        [deferred fulfil:@[]];
     }
     
-    return deferred.promise;
-}
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity:promises.count];
+    __block NSUInteger done = 0;
 
-- (OMPromise *)map:(id (^)(id))f {
-    OMDeferred *deferred = [OMDeferred deferred];
-    
-    [self then:^(NSArray *result) {
-        NSMutableArray *r = [NSMutableArray arrayWithCapacity:result.count];
-        for (id x in result) {
-            [r addObject:f(x)];
-        }
-        return [OMPromise all:r];
-    } fail:[deferred failBlock]];
+    for (NSUInteger i = 0; i < promises.count; ++i) {
+        [results addObject:[NSNull null]];
+        [[[(OMPromise *)promises[i] fulfilled:^(id result) {
+            if (deferred.state == OMPromiseStateUnfulfilled) {
+                if (result != nil) {
+                    results[i] = result;
+                }
+
+                if (++done == promises.count) {
+                    [deferred fulfil:results];
+                }
+            }
+        }] failed:^(NSError *error) {
+            if (deferred.state == OMPromiseStateUnfulfilled) {
+                [deferred fail:error];
+            }
+        }] progressed:^(NSNumber *number) {
+            if (deferred.state == OMPromiseStateUnfulfilled) {
+                CGFloat sum = 0;
+                for (OMPromise *promise in promises) {
+                    sum += promise.progress.floatValue;
+                }
+                [deferred progress:@(sum)];
+            }
+        }];
+    }
     
     return deferred.promise;
 }

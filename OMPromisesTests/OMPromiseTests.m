@@ -411,5 +411,48 @@
     XCTAssertEqual(any.state, OMPromiseStateFailed, @"Any should have failed");
 }
 
+- (void)testAllEmptyArray {
+    OMPromise *all = [OMPromise all:@[]];
+    XCTAssertEqual(all.state, OMPromiseStateFulfilled, @"An empty set of promises should lead to fulfilled");
+    XCTAssertTrue([@[] isEqualToArray:all.result], @"Result should be an empty array");
+}
+
+- (void)testAllFulfil {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    OMPromise *all = [OMPromise all:@[deferred.promise, [OMPromise promiseWithResult:self.result]]];
+
+    XCTAssertEqual(all.state, OMPromiseStateUnfulfilled, @"All should be unfulfilled");
+    XCTAssertEqualWithAccuracy(all.progress.floatValue, .5f, FLT_EPSILON, @"All should be have way done");
+
+    [deferred progress:@.75f];
+    XCTAssertEqualWithAccuracy(all.progress.floatValue, .75f, FLT_EPSILON, @"All should be nearly done");
+
+    [deferred fulfil:self.result2];
+    XCTAssertEqual(all.state, OMPromiseStateFulfilled, @"All should be fulfilled");
+    XCTAssertEqualWithAccuracy(all.progress.floatValue, 1.f, FLT_EPSILON, @"All should be done");
+    XCTAssertTrue([@[self.result2, self.result] isEqualToArray:all.result], @"Result should be an array containing all results");
+}
+
+- (void)testAllFail {
+    OMDeferred *deferred1 = [OMDeferred deferred];
+    OMDeferred *deferred2 = [OMDeferred deferred];
+
+    OMPromise *all = [OMPromise all:@[deferred1.promise, [OMPromise promiseWithResult:self.result], deferred2.promise]];
+
+    [deferred1 progress:@.5f];
+    XCTAssertEqualWithAccuracy(all.progress.floatValue, .5f, FLT_EPSILON, @"All should be half way done");
+    
+    [deferred1 fail:self.error];
+    XCTAssertEqual(all.state, OMPromiseStateFailed, @"All should have failed");
+    XCTAssertEqual(all.error, self.error, @"Error should be identical to first first failed promises one");
+
+    [deferred2 progress:@.5f];
+    XCTAssertEqualWithAccuracy(all.progress.floatValue, .5f, FLT_EPSILON, @"All progress shouldn't change anymore");
+
+    [deferred2 fulfil:self.result];
+    XCTAssertEqual(all.state, OMPromiseStateFailed, @"All should have failed");
+}
+
 @end
 
