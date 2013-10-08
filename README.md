@@ -12,12 +12,24 @@ Once all images are loaded, you might show them to the user.
 Here is how you would accomplish such task using OMPromises:
 
     OMPromise *(^get_gravatar)(NSString *email) = ^(NSString *email) {
-        // network related code that loads the image and fulfils the promise..
+        OMDeferred *deferred = [OMDeferred deferred];
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:
+            [NSString stringWithFormat:@"http://www.gravatar.com/avatar/%@?d=404", email]]];
+        [NSURLConnection sendAsynchronousRequest:request
+                                           queue:dispatch_get_main_queue()
+                               completionHandler:^(NSURLResponse *res, NSData *data, NSError *error) {
+                                   if (error != nil) {
+                                       [deferred fail:error];
+                                   } else {
+                                       [deferred fulfil:[UIImage imageWithData:data]];
+                                   }
+                               }];
+        return deferred.promise;
     };
 
     NSArray *emails = @[
-        @"b52@reaktor42.de",
-        @"doesnt@exist.xyz"
+        @"205e460b479e2e5b48aec07710c08d50",
+        @"deadc0dedeadc0dedeadc0dedeadc0de"
     ];
 
     NSMutableArray *promises = [NSMutableArray arrayWithCapacity:emails.count];
@@ -27,12 +39,13 @@ Here is how you would accomplish such task using OMPromises:
             // in case the promise failed, we supply a dummy image to use instead
             return [UIImage imageNamed:@"dummy_image.png"];
         }];
-
         [promises addObject:imagePromise];
     }
 
-    [[OMPromise all:promises] fulfilled:^(NSArray *images) {
+    [[[OMPromise all:promises] fulfilled:^(NSArray *images) {
         // called once all images are loaded, now show them ...
+    }] progressed:^(NSNumber *progress) {
+        NSLog(@"%.2f%% done...", progress.floatValue * 100.f);
     }];
 
 [gravatar]: http://www.gravatar.com
