@@ -79,12 +79,34 @@ typedef enum OMPromiseState {
  */
 + (OMPromise *)promiseWithResult:(id)result;
 
+/** Create a promise which gets fulfilled after a certain delay.
+
+ After a certain amount of time the promise gets fulfilled using the supplied value.
+ 
+ @param result The value to fulfil the promise.
+ @param delay Time span to wait before fulfilling the promise.
+ @return A promise that will get fulfilled.
+ @see promiseWithResult:
+ */
++ (OMPromise *)promiseWithResult:(id)result after:(NSTimeInterval)delay;
+
 /** Create a failed promise.
  
  @param error Reason why the promise failed.
  @return A failed promise.
  */
 + (OMPromise *)promiseWithError:(NSError *)error;
+
+/** Create a promise which fails after a certain delay.
+
+ After a certain amount of time the promise fails using the supplied error.
+ 
+ @param error Reason why the promise failed.
+ @param delay Time span to wait before the promise fails.
+ @return A promise that will fail.
+ @see promiseWithError:
+ */
++ (OMPromise *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay;
 
 ///---------------------------------------------------------------------------------------
 /// @name Bind

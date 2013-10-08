@@ -65,9 +65,21 @@
     return deferred.promise;
 }
 
++ (OMPromise *)promiseWithResult:(id)result after:(NSTimeInterval)delay {
+    OMDeferred *deferred = [OMDeferred deferred];
+    [deferred performSelector:@selector(fulfil:) withObject:result afterDelay:delay];
+    return deferred.promise;
+}
+
 + (OMPromise *)promiseWithError:(NSError *)error {
     OMDeferred *deferred = [OMDeferred deferred];
     [deferred fail:error];
+    return deferred.promise;
+}
+
++ (OMPromise *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay {
+    OMDeferred *deferred = [OMDeferred deferred];
+    [deferred performSelector:@selector(fail:) withObject:error afterDelay:delay];
     return deferred.promise;
 }
 
