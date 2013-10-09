@@ -121,7 +121,7 @@
 
         [[self fulfilled:^(id result) {
             [deferred fulfil:result];
-        }] self failed:^(NSError *error) {
+        }] failed:^(NSError *error) {
             id next = rescueHandler(error);
             if ([next isKindOfClass:OMPromise.class]) {
                 [(OMPromise *)next control:deferred];
@@ -182,22 +182,24 @@
 + (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result {
     OMDeferred *deferred = [OMDeferred deferred];
     
-    if (fs.count == 0) {
+    if (thenHandlers.count == 0) {
         [deferred fulfil:result];
     } else {
-        id (^f)(id) = [fs objectAtIndex:0];
-        [[OMPromise promisify:f(result)] fulfilled:^(id nextResult) {
-            [[[[OMPromise chain:[fs subarrayWithRange:NSMakeRange(1, fs.count - 1)] initial:nextResult] fulfilled:^(id result) {
+        id (^f)(id) = [thenHandlers objectAtIndex:0];
+        [[[[OMPromise promisify:f(result)] fulfilled:^(id nextResult) {
+            [deferred progress:@(1.f / thenHandlers.count)];
+            
+            [[[[OMPromise chain:[thenHandlers subarrayWithRange:NSMakeRange(1, thenHandlers.count - 1)] initial:nextResult] fulfilled:^(id result) {
                 [deferred fulfil:result];
             }] failed:^(NSError *error) {
                 [deferred fail:error];
             }] progressed:^(NSNumber *progress) {
-                [deferred progress:@(progress.floatValue / fs.count * (fs.count - 1) + 1.f/fs.count)];
+                [deferred progress:@(progress.floatValue / thenHandlers.count * (thenHandlers.count - 1) + 1.f/thenHandlers.count)];
             }];
-        } failed:^(NSError *error) {
+        }] failed:^(NSError *error) {
             [deferred fail:error];
-        } progressed:^(NSNumber *progress) {
-            [deferred progress:@(progress.floatValue / fs.count)];
+        }] progressed:^(NSNumber *progress) {
+            [deferred progress:@(progress.floatValue / thenHandlers.count)];
         }];
     }
     
@@ -239,11 +241,21 @@
 
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:promises.count];
     __block NSUInteger done = 0;
+    
+    void (^updateProgress)() = ^{
+        float sum = 0;
+        for (OMPromise *promise in promises) {
+            sum += promise.progress.floatValue;
+        }
+        [deferred progress:@(sum / promises.count)];
+    };
 
     for (NSUInteger i = 0; i < promises.count; ++i) {
         [results addObject:[NSNull null]];
         [[[(OMPromise *)promises[i] fulfilled:^(id result) {
             if (deferred.state == OMPromiseStateUnfulfilled) {
+                updateProgress();
+                
                 if (result != nil) {
                     results[i] = result;
                 }
@@ -258,11 +270,7 @@
             }
         }] progressed:^(NSNumber *number) {
             if (deferred.state == OMPromiseStateUnfulfilled) {
-                CGFloat sum = 0;
-                for (OMPromise *promise in promises) {
-                    sum += promise.progress.floatValue;
-                }
-                [deferred progress:@(sum)];
+                updateProgress();
             }
         }];
     }

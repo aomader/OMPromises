@@ -82,7 +82,7 @@
     NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
     NSAssert(self.progress.floatValue <= progress.floatValue, @"Progress can only increase");
     
-    if (self.progress != progress) {
+    if (self.progress.floatValue < progress.floatValue) {
         self.progress = progress;
         for (void (^progressHandler)(NSNumber *) in self.progressHandlers) {
             progressHandler(progress);
