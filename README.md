@@ -7,6 +7,15 @@ If you are completely unfamiliar with promises, I recommend you to read some
 articles and tutorials like one of [1], [2] or [3]. Some method names
 might differ but the idea is mostly the same.
 
+## Documentation
+
+All public classes, methods, properties and types are documented, thus each
+copy of OMPromises comes with a full documentation found in the corresponding
+[header](OMPromises) file.
+
+An online and much more readable version, rendered using [appledoc],
+can be found [here].
+
 ## Examples
 
 ### Creation - Making promises
@@ -212,6 +221,17 @@ for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
     }];
 ```
 
+### Combinators - Forming promise combinations besides chains
+
+Currently only the following combinators are available, have a look at the documentation
+for a more detailed explanation. Each combinator creates a reasonable progress
+combination assuming an equal distribution of workload over all supplied promises.
+
+* **`chain:initial:`** - Equal to applying multiple `then:` calls but respects the progress
+  of each promise.
+* **`all:`** - Waits for all promises to get fulfilled, fails in case any promise fails.
+* **`any:`** - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
+
 ## License
 
 OMPromises is licensed under the terms of the MIT license.
@@ -221,5 +241,7 @@ Please see the [LICENSE](LICENSE) file for full details.
 [1]: http://blog.parse.com/2013/01/29/whats-so-great-about-javascript-promises/
 [2]: https://coderwall.com/p/ijy61g
 [3]: http://strongloop.com/strongblog/promises-in-node-js-with-q-an-alternative-to-callbacks/
+[appledoc]: https://github.com/tomaz/appledoc
+[here]: http://b52.github.io/OMPromises
 [Haskell]: http://www.haskell.org
 [gravatar]: http://www.gravatar.com
