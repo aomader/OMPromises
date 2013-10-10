@@ -1,13 +1,100 @@
 # OMPromises
 
-A tested and fully documented promises library comparable to Promises/A with
-certain additions and changes to better fit the Objective-C style.
+A tested and fully documented promises library inspired by [Promises/A] with
+certain additions and changes to better fit the common Objective-C patterns.
+
+If you are completely unfamiliar with promises, I recommend you to read some
+articles and tutorials like one of [[1]], [[2]] or [[3]]. Some method names
+might differ but the idea is mostly the same.
 
 ## Examples
 
+### Creation - Making promises
+
+Promises are represented by objects of type `OMPromise`.
+Creating already fulfilled, failed or delayed promises that might get
+fulfilled or fail is as simple as using one of the following static methods.
+
+```objc
+OMPromise *promise = [OMPromise promiseWithResult:@1337];
+// promise.state == OMPromiseStateFulfilled
+// promise.result == @1337
+
+OMPromise *promise1SecLate = [OMPromise promiseWithResult:@1338 after:1.f];
+// promise1SecLate.state == OMPromiseStateUnfulfilled
+// promise1SecLate.result == nil
+// ... after 1 second ..
+// promise1SecLate.state == OMPromiseStateFulfilled
+// promise1SecLate.result == @1338
+
+OMPromise *failed = [OMPromise promiseWithError:[NSError ...]];
+// failed.state == OMPromiseStateFailed
+// failed.error == [NSError ...]
+
+// To delay the fail use promiseWithError:after: similar to promiseWithResult:after:
+```
+
+One special property of promises is, that they make only one state transition from
+_unfulfilled_ to either _failed_ or _fulfilled_. The promise itself doesn't provide
+an interface to do such transitions. That's why a superior class,
+called `OMDeferred`, exists, which yields a promise and is the only authority that
+might change the state of the aligned promise.
+
+Thus the promises used in the above example are read-only. To create promises
+you might actually change you have to create a deferred, which you should keep to
+yourself, and return the promise aligned to the newly created deferred.
+
+```objc
+- (OMPromise *)workIntensiveButSynchronousMethod {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // do your long-running task, eventually provide information about the progress..
+        while (running)
+            [deferred progress:progress];
+
+        if (failed) {
+            [deferred fail:error];
+        } else {
+            [deferred fulfil:result];
+        }
+    });
+
+    return deferred.promise;
+}
+```
+
+### Callbacks - Reacting on changes in state
+
+Once you have an instance of an `OMPromise` you might want to act on state changes.
+This is done by registering blocks using the methods `fulfilled:`, `failed:` and/or
+`progressed:` which are called if the corresponding event happens. The methods
+return `self` to simply chain multiple methods calls and allow to register multiple
+callbacks for same event.
+
+```objc
+[[OMPromise promiseWithResult:@1337 after:1.f]
+    fulfilled:^(id result) {
+        // called after 1 second, result == @1337
+    }];
+
+OMPromise *networkRequest = [self get:@"http://google.com"];
+[[[networkRequest
+    fulfilled:^(id result) {
+        // called if the network request succeeded
+    }]
+    failed:^(NSError *error) {
+        // otherwise ...
+    }]
+    progressed:^(NSNumber *progress) {
+        // describes the progress as a value between 0.f and 1.f
+    }];
+```
+
+
 ## Demonstration
 
-Assume you want to get [gravatar] images for a list of e-mail addresses. Additionally
+Assume you want to get [Gravatar] images for a list of email addresses. Additionally
 you prepared a fallback image for addresses that don't resolve to an image. Once all
 images are fetched, you want to use them for further processing.
 
@@ -60,4 +147,8 @@ for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
 OMPromises is licensed under the terms of the MIT license.
 Please see the [LICENSE](LICENSE) file for full details.
 
+[Promises/A]: http://wiki.commonjs.org/wiki/Promises/A
+[[1]]: http://blog.parse.com/2013/01/29/whats-so-great-about-javascript-promises/
+[[2]]: https://coderwall.com/p/ijy61g
+[[3]]: http://strongloop.com/strongblog/promises-in-node-js-with-q-an-alternative-to-callbacks/
 [gravatar]: http://www.gravatar.com
