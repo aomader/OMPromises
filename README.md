@@ -169,6 +169,17 @@ but the supplied block is called if the _promise fails_.
 At that point some people might recognize the resemblance to monads in category theory.
 If not, you might benefit from looking into [Haskell] and its concepts.
 
+### Combinators - Forming promise combinations besides chains
+
+Currently only the following combinators are available, have a look at the documentation
+for a more detailed explanation. Each combinator creates a reasonable progress
+combination assuming an equal distribution of workload over all supplied promises.
+
+* ** `chain:initial:` ** - Equal to applying multiple `then:` calls but respects the progress
+  of each promise.
+* ** `all:` ** - Waits for all promises to get fulfilled, fails in case any promise fails.
+* ** `any:` ** - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
+
 ## Demonstration
 
 Assume you want to get [Gravatar] images for a list of email addresses. Additionally
@@ -220,17 +231,6 @@ for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
         NSLog(@"%.2f%%...", progress.floatValue * 100.f);
     }];
 ```
-
-### Combinators - Forming promise combinations besides chains
-
-Currently only the following combinators are available, have a look at the documentation
-for a more detailed explanation. Each combinator creates a reasonable progress
-combination assuming an equal distribution of workload over all supplied promises.
-
-* **`chain:initial:`** - Equal to applying multiple `then:` calls but respects the progress
-  of each promise.
-* **`all:`** - Waits for all promises to get fulfilled, fails in case any promise fails.
-* **`any:`** - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
 
 ## License
 
