@@ -175,10 +175,10 @@ Currently only the following combinators are available, have a look at the docum
 for a more detailed explanation. Each combinator creates a reasonable progress
 combination assuming an equal distribution of workload over all supplied promises.
 
-* ** `chain:initial:` ** - Equal to applying multiple `then:` calls but respects the progress
+* `chain:initial:` - Equal to applying multiple `then:` calls but respects the progress
   of each promise.
-* ** `all:` ** - Waits for all promises to get fulfilled, fails in case any promise fails.
-* ** `any:` ** - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
+* `all:` - Waits for all promises to get fulfilled, fails in case any promise fails.
+* `any:` - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
 
 ## Demonstration
 
