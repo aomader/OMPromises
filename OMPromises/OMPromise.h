@@ -64,7 +64,7 @@ typedef enum OMPromiseState {
  Describes the progress of the underyling workload as a floating point number in range
  [0, 1]. It only increases.
  */
-@property(readonly) NSNumber *progress;
+@property(assign, readonly) float progress;
 
 ///---------------------------------------------------------------------------------------
 /// @name Return
@@ -160,7 +160,7 @@ typedef enum OMPromiseState {
  @param progressHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)progressed:(void (^)(NSNumber *))progressHandler;
+- (OMPromise *)progressed:(void (^)(float))progressHandler;
 
 ///---------------------------------------------------------------------------------------
 /// @name Combinators

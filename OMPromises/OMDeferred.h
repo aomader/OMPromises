@@ -73,11 +73,12 @@
 
 /** Update the progress.
  
- The new progress has to be higher than the previous one.
+ The new progress has to be higher than the previous one. Equal values are skipped,
+ but lower values raise an exception.
  
  @param progress Higher progress to set and propagate.
  */
-- (void)progress:(NSNumber *)progress;
+- (void)progress:(float)progress;
 
 @end
 

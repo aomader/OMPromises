@@ -47,7 +47,7 @@
     _result = result;
 }
 
-- (void)setProgress:(NSNumber *)progress {
+- (void)setProgress:(float)progress {
     _progress = progress;
 }
 
@@ -152,7 +152,7 @@
     return self;
 }
 
-- (OMPromise *)progressed:(void (^)(NSNumber *))progressHandler {
+- (OMPromise *)progressed:(void (^)(float))progressHandler {
     if (self.state == OMPromiseStateUnfulfilled) {
         if (self.progressHandlers == nil) {
             self.progressHandlers = [NSMutableArray arrayWithCapacity:1];
@@ -173,19 +173,19 @@
     } else {
         id (^f)(id) = [thenHandlers objectAtIndex:0];
         [[[[OMPromise promisify:f(result)] fulfilled:^(id nextResult) {
-            [deferred progress:@(1.f / thenHandlers.count)];
+            [deferred progress:(1.f / thenHandlers.count)];
             
             [[[[OMPromise chain:[thenHandlers subarrayWithRange:NSMakeRange(1, thenHandlers.count - 1)] initial:nextResult] fulfilled:^(id result) {
                 [deferred fulfil:result];
             }] failed:^(NSError *error) {
                 [deferred fail:error];
-            }] progressed:^(NSNumber *progress) {
-                [deferred progress:@(progress.floatValue / thenHandlers.count * (thenHandlers.count - 1) + 1.f/thenHandlers.count)];
+            }] progressed:^(float progress) {
+                [deferred progress:(progress / thenHandlers.count * (thenHandlers.count - 1) + 1.f/thenHandlers.count)];
             }];
         }] failed:^(NSError *error) {
             [deferred fail:error];
-        }] progressed:^(NSNumber *progress) {
-            [deferred progress:@(progress.floatValue / thenHandlers.count)];
+        }] progressed:^(float progress) {
+            [deferred progress:(progress / thenHandlers.count)];
         }];
     }
     
@@ -207,9 +207,9 @@
 #warning Add proper error reason
                 [deferred fail:nil];
             }
-        }] progressed:^(NSNumber *number) {
-            if (number.floatValue > deferred.progress.floatValue) {
-                [deferred progress:number];
+        }] progressed:^(float progress) {
+            if (progress > deferred.progress) {
+                [deferred progress:progress];
             }
         }];
     }
@@ -231,9 +231,9 @@
     void (^updateProgress)() = ^{
         float sum = 0;
         for (OMPromise *promise in promises) {
-            sum += promise.progress.floatValue;
+            sum += promise.progress;
         }
-        [deferred progress:@(sum / promises.count)];
+        [deferred progress:(sum / promises.count)];
     };
 
     for (NSUInteger i = 0; i < promises.count; ++i) {
@@ -254,7 +254,7 @@
             if (deferred.state == OMPromiseStateUnfulfilled) {
                 [deferred fail:error];
             }
-        }] progressed:^(NSNumber *number) {
+        }] progressed:^(float progress) {
             if (deferred.state == OMPromiseStateUnfulfilled) {
                 updateProgress();
             }
@@ -275,7 +275,7 @@
         [deferred fulfil:result];
     }] failed:^(NSError *error) {
         [deferred fail:error];
-    }] progressed:^(NSNumber *progress) {
+    }] progressed:^(float progress) {
         [deferred progress:progress];
     }];
 }

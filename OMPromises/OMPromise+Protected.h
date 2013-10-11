@@ -33,7 +33,7 @@
 
 - (void)setError:(NSError *)error;
 - (void)setResult:(id)result;
-- (void)setProgress:(NSNumber *)progress;
+- (void)setProgress:(float)progress;
 - (void)setState:(OMPromiseState)state;
 
 @end

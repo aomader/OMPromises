@@ -34,7 +34,7 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.progress = @0.f;
+        self.progress = 0.f;
     }
     return self;
 }
@@ -50,7 +50,7 @@
 }
 
 - (void)fulfil:(id)result {
-    [self progress:@1.f];
+    [self progress:1.f];
     
     self.state = OMPromiseStateFulfilled;
     self.result = result;
@@ -69,13 +69,13 @@
     }
 }
 
-- (void)progress:(NSNumber *)progress {
+- (void)progress:(float)progress {
     NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
-    NSAssert(self.progress.floatValue <= progress.floatValue, @"Progress can only increase");
+    NSAssert(self.progress <= progress, @"Progress can only increase");
     
-    if (self.progress.floatValue < progress.floatValue) {
+    if (self.progress < progress) {
         self.progress = progress;
-        for (void (^progressHandler)(NSNumber *) in self.progressHandlers) {
+        for (void (^progressHandler)(float) in self.progressHandlers) {
             progressHandler(progress);
         }
     }

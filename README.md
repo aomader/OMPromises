@@ -95,7 +95,7 @@ OMPromise *networkRequest = [self get:@"http://google.com"];
     failed:^(NSError *error) {
         // otherwise ...
     }]
-    progressed:^(NSNumber *progress) {
+    progressed:^(float progress) {
         // describes the progress as a value between 0.f and 1.f
     }];
 ```
@@ -227,8 +227,8 @@ for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
         NSLog(@"Done. %i images loaded.", images.count);
         // do something with your images ...
     }]
-    progressed:^(NSNumber *progress) {
-        NSLog(@"%.2f%%...", progress.floatValue * 100.f);
+    progressed:^(float progress) {
+        NSLog(@"%.2f%%...", progress * 100.f);
     }];
 ```
 
