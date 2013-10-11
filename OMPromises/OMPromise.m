@@ -86,52 +86,38 @@
 #pragma mark - Bind
 
 - (OMPromise *)then:(id (^)(id result))thenHandler {
-    if (self.state == OMPromiseStateFailed) {
-        return self;
-    } else if (self.state == OMPromiseStateFulfilled) {
-        id next = thenHandler(self.result);
-        return [next isKindOfClass:OMPromise.class] ? next : [OMPromise promiseWithResult:next];
-    } else {
-        OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred deferred];
 
-        [[self fulfilled:^(id result) {
-            #warning check blocks for self references
-            id next = thenHandler(result);
-            if ([next isKindOfClass:OMPromise.class]) {
-                [(OMPromise *)next control:deferred];
-            } else {
-                [deferred fulfil:next];
-            }
-        }] failed:^(NSError *error) {
-            [deferred fail:error];
-        }];
+    [[self fulfilled:^(id result) {
+        #warning check blocks for self references
+        id next = thenHandler(result);
+        if ([next isKindOfClass:OMPromise.class]) {
+            [(OMPromise *)next control:deferred];
+        } else {
+            [deferred fulfil:next];
+        }
+    }] failed:^(NSError *error) {
+        [deferred fail:error];
+    }];
 
-        return deferred.promise;
-    }
+    return deferred.promise;
 }
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
-    if (self.state == OMPromiseStateFulfilled) {
-        return self;
-    } else if (self.state == OMPromiseStateFailed) {
-        id next = rescueHandler(self.error);
-        return [next isKindOfClass:OMPromise.class] ? next : [OMPromise promiseWithResult:next];
-    } else {
-        OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred deferred];
 
-        [[self fulfilled:^(id result) {
-            [deferred fulfil:result];
-        }] failed:^(NSError *error) {
-            id next = rescueHandler(error);
-            if ([next isKindOfClass:OMPromise.class]) {
-                [(OMPromise *)next control:deferred];
-            } else {
-                [deferred fulfil:next];
-            }
-        }];
+    [[self fulfilled:^(id result) {
+        [deferred fulfil:result];
+    }] failed:^(NSError *error) {
+        id next = rescueHandler(error);
+        if ([next isKindOfClass:OMPromise.class]) {
+            [(OMPromise *)next control:deferred];
+        } else {
+            [deferred fulfil:next];
+        }
+    }];
 
-        return deferred.promise;
-    }
+    return deferred.promise;
 }
 
 #pragma mark - Callbacks
