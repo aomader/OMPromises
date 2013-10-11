@@ -51,7 +51,9 @@ might change the state of the aligned promise.
 
 Thus the promises used in the above example are read-only. To create promises
 you might actually change you have to create a deferred, which you should keep to
-yourself, and return the promise aligned to the newly created deferred.
+yourself, and return the promise aligned to the newly created deferred. To keep
+the promise informed you may use `progress:` multiple times, followed by at most
+one call of either `fulfil:` or `fail:` on the deferred.
 
 ```objc
 - (OMPromise *)workIntensiveButSynchronousMethod {
