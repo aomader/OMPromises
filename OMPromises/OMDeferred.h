@@ -34,16 +34,16 @@
 @interface OMDeferred : OMPromise
 
 ///---------------------------------------------------------------------------------------
-/// @name Initialization
+/// @name Creation
 ///---------------------------------------------------------------------------------------
 
 /** Returns a new instance of the deferred.
- 
- Internally, a reference to this newly created deferred is stored until it is either
- fulfilled or failed. So ensure to finalize all deferred either way in order to prevent
- memory leaks.
  */
 + (OMDeferred *)deferred;
+
+///---------------------------------------------------------------------------------------
+/// @name Accessing the underlying promise
+///---------------------------------------------------------------------------------------
 
 /** Returns the associated promise.
  

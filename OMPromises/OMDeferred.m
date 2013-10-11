@@ -27,12 +27,6 @@
 
 #import "OMPromise+Protected.h"
 
-@interface OMDeferred ()
-
-@property OMDeferred *reference;
-
-@end
-
 @implementation OMDeferred
 
 #pragma mark - Init
@@ -41,7 +35,6 @@
     self = [super init];
     if (self) {
         self.progress = @0.f;
-        self.reference = self;
     }
     return self;
 }
@@ -59,7 +52,6 @@
 - (void)fulfil:(id)result {
     [self progress:@1.f];
     
-    self.reference = nil;
     self.state = OMPromiseStateFulfilled;
     self.result = result;
     
@@ -69,7 +61,6 @@
 }
 
 - (void)fail:(NSError *)error {
-    self.reference = nil;
     self.state = OMPromiseStateFailed;
     self.error = error;
     
