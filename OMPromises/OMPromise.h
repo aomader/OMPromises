@@ -61,7 +61,7 @@ typedef enum OMPromiseState {
 @interface OMPromise : NSObject
 
 ///---------------------------------------------------------------------------------------
-/// @name Current State
+/// @name Current state
 ///---------------------------------------------------------------------------------------
 
 /** Current state.
@@ -91,7 +91,7 @@ typedef enum OMPromiseState {
 @property(assign, readonly) float progress;
 
 ///---------------------------------------------------------------------------------------
-/// @name Return
+/// @name Creation
 ///---------------------------------------------------------------------------------------
 
 /** Create a fulfilled promise.
@@ -133,7 +133,7 @@ typedef enum OMPromiseState {
 + (OMPromise *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay;
 
 ///---------------------------------------------------------------------------------------
-/// @name Bind
+/// @name Building promise chains
 ///---------------------------------------------------------------------------------------
 
 /** Create a new promise by binding the fulfilled result to another promise.
@@ -162,7 +162,7 @@ typedef enum OMPromiseState {
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
 
 ///---------------------------------------------------------------------------------------
-/// @name Callbacks
+/// @name Registering callbacks
 ///---------------------------------------------------------------------------------------
 
 /** Register a block to be called when the promise gets fulfilled.
