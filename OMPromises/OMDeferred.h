@@ -25,11 +25,19 @@
 
 #import "OMPromise.h"
 
-/** Represents a bunch of work.
- 
- The bunch of work can progress and either fail or be fulfilled. Once failed or
- fulfilled the deferred is done. Meaning it cannot progress, fail or be fulfilled
- again.
+/** An OMDeferred is an abstract construct to control the outcome of an aligned
+ OMPromise, which is used to proxy the outcome of an asynchronous operation.
+
+ In order to model a long-running asynchronous operation, you would create an instance
+ of OMDeferred using deferred. You use this instance to control the state of the
+ underlying OMPromise, accessed by promise.
+
+ You might call progress: multiple times to keep the user informed, followed by a final
+ call to either fulfil:, in case everything went as expected, or fail: otherwise.
+
+ It's important to understand that the OMDeferred/OMPromise is sealed, once its stated
+ has been changed by calling fulfil: or fail:. After that calls to progress:, fulfil:
+ or fail: result in an exception.
  */
 @interface OMDeferred : OMPromise
 
@@ -37,7 +45,7 @@
 /// @name Creation
 ///---------------------------------------------------------------------------------------
 
-/** Returns a new instance of the deferred.
+/** Create and return a new deferred.
  */
 + (OMDeferred *)deferred;
 

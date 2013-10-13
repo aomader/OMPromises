@@ -23,7 +23,7 @@
 // THE SOFTWARE.
 //
 
-/** Possible states of an @p OMPromise.
+/** Possible states of an OMPromise.
  */
 typedef enum OMPromiseState {
     OMPromiseStateUnfulfilled = 0,
@@ -32,7 +32,31 @@ typedef enum OMPromiseState {
 } OMPromiseState;
 
 
-/** Proxies the outcome of a deferred.
+/** OMPromise proxies the outcome of a long-running asynchronous operation. It's
+ a read-only object which is described essentially by state. The state defines
+ how to interpret the values kept in result, error and progress.
+ If state is equal to OMPromiseStateFulfilled, the value kept in result is meaningful.
+ If state is equal to OMPromiseStateUnfulfilled, the value kept in error is meaningful.
+ Otherwise the promise is unfulfilled and the user might consult progress for further
+ information.
+
+ In order to get informed if either progress, result or error change, one can register
+ a block using progressed:, fulfilled: or failed: to get called. You might register
+ multiple blocks for the same event. Also the methods return self in order to easily
+ chain multiple method calls.
+
+ Sometimes it might be necessary to create a promise, once a promise is fulfilled, thus
+ building a chain of promises. That's the use-case of then:. The method takes a block
+ that is called once the promise is fulfilled and returns a new promise. The supplied
+ block has to return a value, either a promise or any other value, which is used to
+ determine the outcome of the newly returned promise. If the promise fails the 
+ block isn't called and the returned promise fails as well.
+
+ If you want to build a chain in case the promise fails, you use rescue:. It's very
+ similar to then:, but the supplied block is called in case the promise fails.
+ 
+ To build more complex structures you might use one combinator of chain:initial:,
+ all: or any:.
  */
 @interface OMPromise : NSObject
 
@@ -61,7 +85,7 @@ typedef enum OMPromiseState {
 
 /** Progress of the underlying workload.
  
- Describes the progress of the underyling workload as a floating point number in range
+ Describes the progress of the underlying workload as a floating point number in range
  [0, 1]. It only increases.
  */
 @property(assign, readonly) float progress;
@@ -72,10 +96,10 @@ typedef enum OMPromiseState {
 
 /** Create a fulfilled promise.
  
- Simply wraps the supplied value inside a fulfiled promise.
+ Simply wraps the supplied value inside a fulfilled promise.
  
  @param result The value to fulfil the promise.
- @return A fulfiled promise.
+ @return A fulfilled promise.
  */
 + (OMPromise *)promiseWithResult:(id)result;
 
@@ -128,7 +152,7 @@ typedef enum OMPromiseState {
 
 /** Create a new promise by binding the error reason to another promise.
 
- Similiar to then:, but the supplied block is called in case the promise fails. from
+ Similiar to then:, but the supplied block is called in case the promise fails, from
  which point on it behaves like then:. If the promise gets fulfilled the step is skipped.
 
  @param rescueHandler Block to be called once the promise failed.
