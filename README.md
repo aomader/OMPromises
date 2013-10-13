@@ -78,7 +78,7 @@ one call of either `fulfil:` or `fail:` on the deferred.
 ### Callbacks - Reacting on changes in state
 
 Once you have an instance of an `OMPromise` you might want to act on state changes.
-This is done by registering blocks using the methods `fulfilled:`, `failed:` and/or
+This is done by registering [blocks] using the methods `fulfilled:`, `failed:` and/or
 `progressed:` which are called if the corresponding event happens. The methods
 return `self` to simply chain multiple method calls and allow to register multiple
 callbacks for the same event.
@@ -245,5 +245,6 @@ Please see the [LICENSE](LICENSE) file for full details.
 [3]: http://strongloop.com/strongblog/promises-in-node-js-with-q-an-alternative-to-callbacks/
 [appledoc]: https://github.com/tomaz/appledoc
 [here]: http://b52.github.io/OMPromises
+[blocks]: https://developer.apple.com/library/ios/documentation/cocoa/Conceptual/Blocks/Articles/00_Introduction.html
 [Haskell]: http://www.haskell.org
 [gravatar]: http://www.gravatar.com
