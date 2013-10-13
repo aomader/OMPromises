@@ -4,7 +4,7 @@ A tested and fully documented promises library inspired by [Promises/A] with
 certain additions and changes to better fit the common Objective-C patterns.
 
 If you are completely unfamiliar with promises, I recommend you to read some
-articles and tutorials like one of [1], [2] or [3]. Some method names
+articles and tutorials like one of [1], [2], [3] or [4]. Some method names
 might differ but the idea is mostly the same.
 
 ## Documentation
@@ -241,6 +241,7 @@ Please see the [LICENSE](LICENSE) file for full details.
 [1]: http://blog.parse.com/2013/01/29/whats-so-great-about-javascript-promises/
 [2]: https://coderwall.com/p/ijy61g
 [3]: http://strongloop.com/strongblog/promises-in-node-js-with-q-an-alternative-to-callbacks/
+[4]: http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html
 [appledoc]: https://github.com/tomaz/appledoc
 [here]: http://b52.github.io/OMPromises
 [Haskell]: http://www.haskell.org
