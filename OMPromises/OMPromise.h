@@ -23,6 +23,7 @@
 // THE SOFTWARE.
 //
 
+
 /** Possible states of an OMPromise.
  */
 typedef enum OMPromiseState {
@@ -152,7 +153,7 @@ typedef enum OMPromiseState {
 
 /** Create a new promise by binding the error reason to another promise.
 
- Similiar to then:, but the supplied block is called in case the promise fails, from
+ Similar to then:, but the supplied block is called in case the promise fails, from
  which point on it behaves like then:. If the promise gets fulfilled the step is skipped.
 
  @param rescueHandler Block to be called once the promise failed.
@@ -221,7 +222,7 @@ typedef enum OMPromiseState {
  correct order. Nil has been replaced by [NSNull null]. If any promise fails,
  the returned promise fails also.
 
- Similiar to chain: the workload of each promise is considered equal to
+ Similar to chain: the workload of each promise is considered equal to
  determine the overall progress.
 
  @param promises A sequence of promises.

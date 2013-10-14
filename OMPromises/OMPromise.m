@@ -25,7 +25,7 @@
 
 #import "OMPromise.h"
 
-#import "OMDeferred.h"
+#import "OMPromises.h"
 
 @interface OMPromise ()
 
@@ -89,7 +89,6 @@
     OMDeferred *deferred = [OMDeferred deferred];
 
     [[self fulfilled:^(id result) {
-        #warning check blocks for self references
         id next = thenHandler(result);
         if ([next isKindOfClass:OMPromise.class]) {
             [(OMPromise *)next control:deferred];
@@ -204,8 +203,9 @@
             }
         }] failed:^(NSError *error) {
             if (++failed == promises.count) {
-#warning Add proper error reason
-                [deferred fail:nil];
+                [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
+                                                   code:OMPromisesCombinatorAnyNonFulfilledError
+                                               userInfo:nil]];
             }
         }] progressed:^(float progress) {
             if (progress > deferred.progress) {
@@ -215,8 +215,9 @@
     }
 
     if (promises.count == 0) {
-#warning Add proper error reason
-        [deferred fail:nil];
+        [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
+                                           code:OMPromisesCombinatorAnyNonFulfilledError
+                                       userInfo:nil]];
     }
 
     return deferred.promise;

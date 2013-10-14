@@ -138,20 +138,19 @@
 - (void)testIncreasingProgress {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    float values[] = {.1f, .5f, 1.f};
-    
     __block NSInteger called = 0;
     [deferred.promise progressed:^(float progress) {
+        float values[] = {.1f, .5f, 1.f};
         XCTAssertEqualWithAccuracy(values[called], progress, FLT_EPSILON, @"Unexpected progress");
         called += 1;
     }];
 
     XCTAssertEqual(called, 0, @"progressed-block should not have been called until now");
-    [deferred progress:values[0]];
+    [deferred progress:.1f];
     XCTAssertEqual(called, 1, @"progressed-block should be called once");
-    [deferred progress:values[0]];
+    [deferred progress:.1f];
     XCTAssertEqual(called, 1, @"progressed-block should be called once");
-    [deferred progress:values[1]];
+    [deferred progress:.5f];
     XCTAssertEqual(called, 2, @"progressed-block should be called twice");
     [deferred fulfil:self.result];
     XCTAssertEqual(called, 3, @"progressed-block should be called three times");
@@ -200,8 +199,6 @@
 - (void)testThenReturnPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    float progressValues[] = {.5f, 1.f};
-
     __block NSInteger called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
     OMDeferred *nextDeferred = [OMDeferred deferred];
     OMPromise *nextPromise = [[[deferred.promise then:^(id result) {
@@ -209,6 +206,7 @@
         called += 1;
         return nextDeferred.promise;
     }] progressed:^(float progress) {
+        float progressValues[] = {.5f, 1.f};
         XCTAssertEqualWithAccuracy(progress, progressValues[calledProgress], FLT_EPSILON, @"incorrect progress value");
         calledProgress += 1;
     }] fulfilled:^(id result) {
@@ -263,8 +261,6 @@
 - (void)testRescueReturnPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    float progressValues[] = {.5f, 1.f};
-
     __block NSInteger called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
     OMDeferred *nextDeferred = [OMDeferred deferred];
     OMPromise *nextPromise = [[[deferred.promise rescue:^(NSError *error) {
@@ -272,6 +268,7 @@
         called += 1;
         return nextDeferred.promise;
     }] progressed:^(float progress) {
+        float progressValues[] = {.5f, 1.f};
         XCTAssertEqualWithAccuracy(progress, progressValues[calledProgress], FLT_EPSILON, @"incorrect progress value");
         calledProgress += 1;
     }] fulfilled:^(id result) {
@@ -378,6 +375,8 @@
 - (void)testAnyEmptyArray {
     OMPromise *any = [OMPromise any:@[]];
     XCTAssertEqual(any.state, OMPromiseStateFailed, @"Any without any promise should have failed");
+    XCTAssertTrue([any.error.domain isEqualToString:OMPromisesErrorDomain], @"Error should be combinator specific");
+    XCTAssertEqual(any.error.code, OMPromisesCombinatorAnyNonFulfilledError, @"Error should be combinator specific");
 }
 
 - (void)testAnyFulfil {
@@ -418,6 +417,8 @@
     XCTAssertEqual(any.state, OMPromiseStateUnfulfilled, @"Any should be unfulfilled");
     [deferred2 fail:self.error];
     XCTAssertEqual(any.state, OMPromiseStateFailed, @"Any should have failed");
+    XCTAssertTrue([any.error.domain isEqualToString:OMPromisesErrorDomain], @"Error should be combinator specific");
+    XCTAssertEqual(any.error.code, OMPromisesCombinatorAnyNonFulfilledError, @"Error should be combinator specific");
 }
 
 - (void)testAllEmptyArray {

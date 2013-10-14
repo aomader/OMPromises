@@ -20,6 +20,8 @@
 		A1691F9917FBF2BE00C7FE5E /* OMDeferred.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9417FBF2AF00C7FE5E /* OMDeferred.m */; };
 		A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9617FBF2AF00C7FE5E /* OMPromise.m */; };
 		A1691FA817FC611300C7FE5E /* OMDeferredTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691FA717FC611300C7FE5E /* OMDeferredTests.m */; };
+		A17D8F93180BD4B800BEA154 /* OMPromises.m in Sources */ = {isa = PBXBuildFile; fileRef = A17D8F92180BD4B800BEA154 /* OMPromises.m */; };
+		A17D8F94180BD4B800BEA154 /* OMPromises.m in Sources */ = {isa = PBXBuildFile; fileRef = A17D8F92180BD4B800BEA154 /* OMPromises.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +64,7 @@
 		A1691F9617FBF2AF00C7FE5E /* OMPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMPromise.m; sourceTree = "<group>"; };
 		A1691F9C17FBF32800C7FE5E /* OMPromise+Protected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OMPromise+Protected.h"; sourceTree = "<group>"; };
 		A1691FA717FC611300C7FE5E /* OMDeferredTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMDeferredTests.m; sourceTree = "<group>"; };
+		A17D8F92180BD4B800BEA154 /* OMPromises.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMPromises.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				A1691F7217FBF1FA00C7FE5E /* OMPromises.h */,
+				A17D8F92180BD4B800BEA154 /* OMPromises.m */,
 				A1691F9317FBF2AF00C7FE5E /* OMDeferred.h */,
 				A1691F9417FBF2AF00C7FE5E /* OMDeferred.m */,
 				A1691F9517FBF2AF00C7FE5E /* OMPromise.h */,
@@ -239,6 +243,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A17D8F93180BD4B800BEA154 /* OMPromises.m in Sources */,
 				A1691F9717FBF2AF00C7FE5E /* OMDeferred.m in Sources */,
 				A1691F9817FBF2AF00C7FE5E /* OMPromise.m in Sources */,
 			);
@@ -250,6 +255,7 @@
 			files = (
 				A1691FA817FC611300C7FE5E /* OMDeferredTests.m in Sources */,
 				A1691F9917FBF2BE00C7FE5E /* OMDeferred.m in Sources */,
+				A17D8F94180BD4B800BEA154 /* OMPromises.m in Sources */,
 				A1691F8A17FBF1FA00C7FE5E /* OMPromiseTests.m in Sources */,
 				A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */,
 			);
