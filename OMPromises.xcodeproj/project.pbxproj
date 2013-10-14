@@ -163,6 +163,23 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXLegacyTarget section */
+		A17D8F95180BD81500BEA154 /* Documentation */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "-c appledoc -o docs -p OMPromises -c \"Oliver Mader\" --create-html --no-create-docset OMPromises";
+			buildConfigurationList = A17D8F96180BD81500BEA154 /* Build configuration list for PBXLegacyTarget "Documentation" */;
+			buildPhases = (
+			);
+			buildToolPath = /bin/sh;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = Documentation;
+			passBuildSettingsInEnvironment = 1;
+			productName = Documentation;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		A1691F6917FBF1FA00C7FE5E /* OMPromises */ = {
 			isa = PBXNativeTarget;
@@ -207,7 +224,7 @@
 			attributes = {
 				CLASSPREFIX = OM;
 				LastUpgradeCheck = 0500;
-				ORGANIZATIONNAME = reaktor42;
+				ORGANIZATIONNAME = "Oliver Mader";
 			};
 			buildConfigurationList = A1691F6517FBF1FA00C7FE5E /* Build configuration list for PBXProject "OMPromises" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -223,6 +240,7 @@
 			targets = (
 				A1691F6917FBF1FA00C7FE5E /* OMPromises */,
 				A1691F7917FBF1FA00C7FE5E /* OMPromisesTests */,
+				A17D8F95180BD81500BEA154 /* Documentation */,
 			);
 		};
 /* End PBXProject section */
@@ -415,6 +433,38 @@
 			};
 			name = Release;
 		};
+		A17D8F97180BD81500BEA154 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A17D8F98180BD81500BEA154 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -444,6 +494,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		A17D8F96180BD81500BEA154 /* Build configuration list for PBXLegacyTarget "Documentation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A17D8F97180BD81500BEA154 /* Debug */,
+				A17D8F98180BD81500BEA154 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
