@@ -7,6 +7,15 @@ If you are completely unfamiliar with promises, I recommend you to read some
 articles and tutorials like one of [1], [2], [3] or [4]. Some method names
 might differ but the idea is mostly the same.
 
+## Installation
+
+The recommended approach for installing OMPromises is to use [CocoaPods] package
+manager.
+
+```bash
+pod 'OMPromises', '~> 0.1.0'
+```
+
 ## Documentation
 
 All public classes, methods, properties and types are documented, thus each
@@ -16,7 +25,7 @@ copy of OMPromises comes with a full documentation found in the corresponding
 An online and much more readable version, rendered using [appledoc],
 can be found [here].
 
-## Examples
+## Overview
 
 ### Creation - Making promises
 
@@ -244,6 +253,7 @@ Please see the [LICENSE](LICENSE) file for full details.
 [2]: https://coderwall.com/p/ijy61g
 [3]: http://strongloop.com/strongblog/promises-in-node-js-with-q-an-alternative-to-callbacks/
 [4]: http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html
+[CocoaPods]: http://cocoapods.org/
 [appledoc]: https://github.com/tomaz/appledoc
 [here]: http://b52.github.io/OMPromises
 [blocks]: https://developer.apple.com/library/ios/documentation/cocoa/Conceptual/Blocks/Articles/00_Introduction.html
