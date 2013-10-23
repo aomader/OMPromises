@@ -11,4 +11,9 @@ Pod::Spec.new do |s|
   s.source_files  = 'OMPromises/*.{h,m}'
   s.public_header_files = 'OMPromises/{OMPromises,OMPromise,OMDeferred}.h'
   s.requires_arc = true
+
+  s.subspec 'Tests' do |ts|
+    ts.framework = 'XCTest'
+    ts.source_files = 'OMPromisesTests/*.{h,m}'
+  end
 end
