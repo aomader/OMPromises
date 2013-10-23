@@ -66,7 +66,7 @@
 - (void)testBindOnAlreadyFulfilledPromise {
     OMPromise *promise = [OMPromise promiseWithResult:self.result];
     
-    __block NSInteger called = 0;
+    __block int called = 0;
     [[[promise fulfilled:^(id result) {
         XCTAssertEqual(result, self.result, @"The supplied result should be identical");
         called += 1;
@@ -82,7 +82,7 @@
 - (void)testBindsOnNotAlreadyFulfilledPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0, progressCalled = 0;
+    __block int called = 0, progressCalled = 0;
     [[[deferred.promise fulfilled:^(id result) {
         XCTAssertEqual(result, self.result, @"The supplied result should be identical");
         XCTAssertTrue(progressCalled, @"progress-block should have been called before fulfilled-block");
@@ -104,7 +104,7 @@
 - (void)testBindsOnAlreadyFailedPromise {
     OMPromise *promise = [OMPromise promiseWithError:self.error];
 
-    __block NSInteger called = 0;
+    __block int called = 0;
     [[[promise fulfilled:^(id result) {
         XCTFail(@"fulfilled-block should not have been called");
     }] failed:^(NSError *error) {
@@ -120,7 +120,7 @@
 - (void)testBindsOnNotAlreadyFailedPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0;
+    __block int called = 0;
     [[[deferred.promise fulfilled:^(id result) {
         XCTFail(@"fulfilled-block should not have been called");
     }] failed:^(NSError *error) {
@@ -138,7 +138,7 @@
 - (void)testIncreasingProgress {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0;
+    __block int called = 0;
     [deferred.promise progressed:^(float progress) {
         float values[] = {.1f, .5f, 1.f};
         XCTAssertEqualWithAccuracy(values[called], progress, FLT_EPSILON, @"Unexpected progress");
@@ -159,7 +159,7 @@
 - (void)testMultipleBindsOnNotAlreadyFulfilledPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called1 = 0, called2 = 0;
+    __block int called1 = 0, called2 = 0;
     [[deferred.promise fulfilled:^(id result) {
         XCTAssertEqual(result, self.result, @"The supplied result should be identical");
         called1 += 1;
@@ -178,7 +178,7 @@
 - (void)testMultipleBindsOnNotAlreadyFailedPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called1 = 0, called2 = 0;
+    __block int called1 = 0, called2 = 0;
     [[deferred.promise failed:^(NSError *error) {
         XCTAssertEqual(error, self.error, @"The supplied error should be identical");
         called1 += 1;
@@ -199,7 +199,7 @@
 - (void)testThenReturnPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
+    __block int called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
     OMDeferred *nextDeferred = [OMDeferred deferred];
     OMPromise *nextPromise = [[[deferred.promise then:^(id result) {
         XCTAssertEqual(result, self.result, @"Supplied result should be identical to the one passed to fulfil:");
@@ -240,7 +240,7 @@
 - (void)testThenReturnValue {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0, calledFulfil = 0;
+    __block int called = 0, calledFulfil = 0;
     OMPromise *nextPromise = [[[deferred.promise then:^(id result) {
         called += 1;
         return self.result2;
@@ -261,7 +261,7 @@
 - (void)testRescueReturnPromise {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
+    __block int called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
     OMDeferred *nextDeferred = [OMDeferred deferred];
     OMPromise *nextPromise = [[[deferred.promise rescue:^(NSError *error) {
         XCTAssertEqual(error, self.error, @"Supplied error should be identical to the one passed to fail:");
@@ -301,7 +301,7 @@
 - (void)testRescueReturnValue {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    __block NSInteger called = 0, calledFulfil = 0;
+    __block int called = 0, calledFulfil = 0;
     OMPromise *nextPromise = [[[deferred.promise rescue:^(NSError *error) {
         called += 1;
         return self.result;
