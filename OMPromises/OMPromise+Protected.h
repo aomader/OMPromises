@@ -37,3 +37,4 @@
 - (void)setState:(OMPromiseState)state;
 
 @end
+
