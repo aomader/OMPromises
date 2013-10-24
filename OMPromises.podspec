@@ -8,6 +8,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '5.0'
   s.osx.deployment_target = '10.7'
   s.source       = { :git => 'https://github.com/b52/OMPromises.git', :tag => s.version.to_s }
+  s.requires_arc = true
 
   s.default_subspec = 'Core'
 
@@ -17,6 +18,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'Tests' do |ts|
+    ts.dependency 'OMPromises/Core'
     ts.framework = 'XCTest'
     ts.source_files = 'OMPromisesTests/*.{h,m}'
   end
