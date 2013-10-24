@@ -8,9 +8,13 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '5.0'
   s.osx.deployment_target = '10.7'
   s.source       = { :git => 'https://github.com/b52/OMPromises.git', :tag => s.version.to_s }
-  s.source_files  = 'OMPromises/*.{h,m}'
-  s.public_header_files = 'OMPromises/{OMPromises,OMPromise,OMDeferred}.h'
-  s.requires_arc = true
+
+  s.default_subspec = 'Core'
+
+  s.subspec 'Core' do |cs|
+    cs.source_files = 'OMPromises/*.{h,m}'
+    cs.public_header_files = 'OMPromises/{OMPromises,OMPromise,OMDeferred}.h'
+  end
 
   s.subspec 'Tests' do |ts|
     ts.framework = 'XCTest'
