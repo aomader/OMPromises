@@ -178,14 +178,14 @@ typedef enum OMPromiseState {
  @param failHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)failed:(void (^)(NSError *))failHandler;
+- (OMPromise *)failed:(void (^)(NSError *error))failHandler;
 
 /** Register a block to be called when the promise progresses.
 
  @param progressHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)progressed:(void (^)(float))progressHandler;
+- (OMPromise *)progressed:(void (^)(float progress))progressHandler;
 
 ///---------------------------------------------------------------------------------------
 /// @name Combinators
@@ -231,3 +231,4 @@ typedef enum OMPromiseState {
 + (OMPromise *)all:(NSArray *)promises;
 
 @end
+
