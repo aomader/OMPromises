@@ -255,7 +255,7 @@ Please see the [LICENSE](LICENSE) file for full details.
 [4]: http://sitr.us/2012/07/31/promise-pipelines-in-javascript.html
 [CocoaPods]: http://cocoapods.org/
 [appledoc]: https://github.com/tomaz/appledoc
-[here]: http://b52.github.io/OMPromises
+[here]: http://cocoadocs.org/docsets/OMPromises/
 [blocks]: https://developer.apple.com/library/ios/documentation/cocoa/Conceptual/Blocks/Articles/00_Introduction.html
 [Haskell]: http://www.haskell.org
 [gravatar]: http://www.gravatar.com
