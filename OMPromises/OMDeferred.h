@@ -63,7 +63,7 @@
 /// @name Change state
 ///---------------------------------------------------------------------------------------
 
-/** Finalizes the deferred by settings its state to @p OMPromiseStateFulfilled.
+/** Finalizes the deferred by settings its state to OMPromiseStateFulfilled.
  
  Implicitly sets the progress to 1.
  
@@ -72,7 +72,7 @@
  */
 - (void)fulfil:(id)result;
 
-/** Finalizes the deferred by settings its state to @p OMPromiseStateFailed.
+/** Finalizes the deferred by settings its state to OMPromiseStateFailed.
  
  @param error Error to set and propagate.
  @see fulfil:
