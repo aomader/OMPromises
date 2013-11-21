@@ -7,6 +7,8 @@ If you are completely unfamiliar with promises, I recommend you to read some
 articles and tutorials like one of [1], [2], [3] or [4]. Some method names
 might differ but the idea is mostly the same.
 
+[![Build Status](https://travis-ci.org/b52/OMPromises.png?branch=master)](https://travis-ci.org/b52/OMPromises)
+
 ## Installation
 
 The recommended approach for installing OMPromises is to use [CocoaPods] package
