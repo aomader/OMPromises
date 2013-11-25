@@ -285,5 +285,11 @@
     return [result isKindOfClass:OMPromise.class] ? result : [OMPromise promiseWithResult:result];
 }
 
+- (void)cleanup {
+    self.fulfilHandlers = nil;
+    self.failHandlers = nil;
+    self.progressHandlers = nil;
+}
+
 @end
 

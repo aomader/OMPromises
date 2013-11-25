@@ -58,6 +58,8 @@
     for (void (^fulfilHandler)(id) in self.fulfilHandlers) {
         fulfilHandler(result);
     }
+
+    [self cleanup];
 }
 
 - (void)fail:(NSError *)error {
@@ -67,6 +69,8 @@
     for (void (^failHandler)(NSError *) in self.failHandlers) {
         failHandler(error);
     }
+
+    [self cleanup];
 }
 
 - (void)progress:(float)progress {

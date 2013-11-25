@@ -36,5 +36,7 @@
 - (void)setProgress:(float)progress;
 - (void)setState:(OMPromiseState)state;
 
+- (void)cleanup;
+
 @end
 
