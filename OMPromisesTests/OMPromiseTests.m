@@ -319,7 +319,85 @@
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
 }
 
-#pragma mark Combinators
+#pragma mark Combinators & Transformers
+
+- (void)testJoinOnlyOneLevel {
+    OMDeferred *deferred = [OMDeferred deferred];
+    OMPromise *original = deferred.promise;
+    
+    OMPromise *joined  = [original join];
+    XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
+    
+    [deferred fulfil:self.result];
+    XCTAssertEqual(joined.state, OMPromiseStateFulfilled, @"Joined promise should be fulfilled");
+    XCTAssertEqual(joined.result, self.result, @"Joined promise should have original result");
+}
+
+- (void)testJoinFulfil {
+    OMDeferred *deferredOuter = [OMDeferred deferred];
+    OMDeferred *deferredInner = [OMDeferred deferred];
+    OMPromise *promiseOuter = deferredOuter.promise;
+    OMPromise *promiseInner = deferredInner.promise;
+    
+    OMPromise *joined = [promiseOuter join];
+    XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
+    
+    [deferredOuter progress:.5f];
+    XCTAssertEqualWithAccuracy(joined.progress, .25f, FLT_EPSILON, @"incorrect progress value");
+    
+    [deferredOuter fulfil:promiseInner];
+    XCTAssertEqualWithAccuracy(joined.progress, .5f, FLT_EPSILON, @"incorrect progress value");
+    XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
+    
+    [deferredInner progress:.5f];
+    XCTAssertEqualWithAccuracy(joined.progress, .75f, FLT_EPSILON, @"incorrect progress value");
+    
+    [deferredInner fulfil:self.result];
+    XCTAssertEqualWithAccuracy(joined.progress, 1.f, FLT_EPSILON, @"incorrect progress value");
+    XCTAssertEqual(joined.state, OMPromiseStateFulfilled, @"Joined promise should be unfulfilled");
+    XCTAssertEqual(joined.result, self.result, @"Joined promise should have result of inner promise");
+}
+
+- (void)testJoinFailOuter {
+    OMDeferred *deferredOuter = [OMDeferred deferred];
+    OMPromise *promiseOuter = deferredOuter.promise;
+    
+    OMPromise *joined = [promiseOuter join];
+    XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
+    
+    [deferredOuter progress:.5f];
+    XCTAssertEqualWithAccuracy(joined.progress, .25f, FLT_EPSILON, @"incorrect progress value");
+    
+    [deferredOuter fail:self.error];
+    XCTAssertEqualWithAccuracy(joined.progress, .25f, FLT_EPSILON, @"incorrect progress value");
+    XCTAssertEqual(joined.state, OMPromiseStateFailed, @"Joined promise should have failed");
+    XCTAssertEqual(joined.error, self.error, @"Joined promise should have error of outer one");
+}
+
+- (void)testJoinFailInner {
+    OMDeferred *deferredOuter = [OMDeferred deferred];
+    OMDeferred *deferredInner = [OMDeferred deferred];
+    OMPromise *promiseOuter = deferredOuter.promise;
+    OMPromise *promiseInner = deferredInner.promise;
+    
+    OMPromise *joined = [promiseOuter join];
+    XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
+    
+    [deferredOuter progress:.5f];
+    XCTAssertEqualWithAccuracy(joined.progress, .25f, FLT_EPSILON, @"incorrect progress value");
+    
+    [deferredOuter fulfil:promiseInner];
+    XCTAssertEqualWithAccuracy(joined.progress, .5f, FLT_EPSILON, @"incorrect progress value");
+    XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
+    
+    [deferredInner progress:.5f];
+    XCTAssertEqualWithAccuracy(joined.progress, .75f, FLT_EPSILON, @"incorrect progress value");
+    
+    [deferredInner fail:self.error];
+    XCTAssertEqualWithAccuracy(joined.progress, .75f, FLT_EPSILON, @"incorrect progress value");
+    XCTAssertEqual(joined.state, OMPromiseStateFailed, @"Joined promise should have failed");
+    XCTAssertEqual(joined.error, self.error, @"Joined promise should have error of inner one");
+}
 
 - (void)testChainEmptyArray {
     OMPromise *chain = [OMPromise chain:@[] initial:self.result];

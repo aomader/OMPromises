@@ -188,8 +188,15 @@ typedef enum OMPromiseState {
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler;
 
 ///---------------------------------------------------------------------------------------
-/// @name Combinators
+/// @name Combinators & Transformers
 ///---------------------------------------------------------------------------------------
+
+/** Remove one level of OMPromise wrapping.
+ 
+ Transforms a promise of type OMPromise[OMPromise[a]] into a promise of type OMPromise[a].
+ @return A new promise with one level of wrapping removed.
+ */
+- (OMPromise *)join;
 
 /** Create a promise chain as if you would do multiple then binds.
 

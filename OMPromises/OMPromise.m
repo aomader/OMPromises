@@ -162,7 +162,16 @@
     return self;
 }
 
-#pragma mark - Combinators
+#pragma mark - Combinators & Transformers
+
+- (OMPromise *)join {
+    return [OMPromise chain:@[
+        ^(id _) {
+            return self;
+        }, ^(id inner) {
+            return inner;
+        }] initial:nil];
+}
 
 + (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result {
     OMDeferred *deferred = [OMDeferred deferred];
