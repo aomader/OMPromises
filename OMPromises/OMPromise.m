@@ -25,7 +25,17 @@
 
 #import "OMPromise.h"
 
+#import "CTBlockDescription.h"
 #import "OMPromises.h"
+
+typedef NS_ENUM(NSInteger, OMPromiseHandler) {
+    OMPRomiseHandlerUnknown = -1,
+    OMPromiseHandlerFulfilled,
+    OMPromiseHandlerFailed,
+    OMPromiseHandlerProgressed,
+    OMPromiseHandlerThen,
+    OMPromiseHandlerRescue
+};
 
 @interface OMPromise ()
 
@@ -173,31 +183,81 @@
         }] initial:nil];
 }
 
-+ (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result {
-    OMDeferred *deferred = [OMDeferred deferred];
++ (OMPromise *)chain:(NSArray *)handlers initial:(id)result {
+    OMPromise *promise = [OMPromise promisify:result];
     
-    if (thenHandlers.count == 0) {
-        [deferred fulfil:result];
+    if (handlers.count == 0) {
+        return promise;
     } else {
-        id (^f)(id) = [thenHandlers objectAtIndex:0];
-        [[[[OMPromise promisify:f(result)] fulfilled:^(id nextResult) {
-            [deferred progress:(1.f / thenHandlers.count)];
-            
-            [[[[OMPromise chain:[thenHandlers subarrayWithRange:NSMakeRange(1, thenHandlers.count - 1)] initial:nextResult] fulfilled:^(id result) {
-                [deferred fulfil:result];
-            }] failed:^(NSError *error) {
+        NSUInteger total = 0;
+        
+        // the workload portion is determined by the total amount of then handlers
+        for (id f in handlers) {
+            if ([OMPromise typeOfHandler:f] == OMPromiseHandlerThen) {
+                total += 1;
+            }
+        }
+        
+        return [OMPromise chain:handlers
+                       previous:promise
+                       deferred:[OMDeferred deferred]
+                       progress:0.f
+                          total:total];
+    }
+}
+
++ (OMPromise *)chain:(NSArray *)handlers
+            previous:(OMPromise *)previous
+            deferred:(OMDeferred *)deferred
+            progress:(float)progress
+               total:(NSUInteger)total {
+    // base case
+    if (handlers.count == 0) {
+        [[previous
+            failed:^(NSError *error) {
                 [deferred fail:error];
-            }] progressed:^(float progress) {
-                [deferred progress:(progress / thenHandlers.count * (thenHandlers.count - 1) + 1.f/thenHandlers.count)];
+            }]
+            fulfilled:^(id result) {
+                [deferred fulfil:result];
             }];
-        }] failed:^(NSError *error) {
-            [deferred fail:error];
-        }] progressed:^(float progress) {
-            [deferred progress:(progress / thenHandlers.count)];
-        }];
+        return deferred.promise;
     }
     
-    return deferred.promise;
+    id f = handlers[0];
+    OMPromiseHandler type = [OMPromise typeOfHandler:f];
+    
+    if (type == OMPromiseHandlerFulfilled) {
+        [previous fulfilled:f];
+    } else if (type == OMPromiseHandlerProgressed) {
+        [previous progressed:f];
+    } else if (type == OMPromiseHandlerFailed) {
+        [previous failed:f];
+    } else if (type == OMPromiseHandlerThen) {
+        previous = [previous then:f];
+    } else if (type == OMPromiseHandlerRescue) {
+        previous = [previous rescue:f];
+    } else {
+        [NSException raise:@"Invalid block type"
+                    format:@"The supplied block %@ is of unknown type", f];
+    }
+    
+    if (type == OMPromiseHandlerThen) {
+        [[previous
+            progressed:^(float part) {
+                [deferred progress:progress + part / total];
+            }]
+            fulfilled:^(id _) {
+                [deferred progress:progress + 1.f / total];
+            }];
+        
+        progress += 1.f / total;
+    }
+    
+    return [OMPromise chain:[handlers subarrayWithRange:NSMakeRange(1, handlers.count - 1)]
+                   previous:previous
+                   deferred:deferred
+                   progress:progress
+                      total:total];
 }
 
 + (OMPromise *)any:(NSArray *)promises {
@@ -292,6 +352,37 @@
 
 + (OMPromise *)promisify:(id)result {
     return [result isKindOfClass:OMPromise.class] ? result : [OMPromise promiseWithResult:result];
+}
+
++ (OMPromiseHandler)typeOfHandler:(id)handler {
+    NSMethodSignature *signature = [[[CTBlockDescription alloc] initWithBlock:handler] blockSignature];
+    
+    if ([signature numberOfArguments] != 2) {
+        return OMPRomiseHandlerUnknown;
+    }
+    
+    // parse return type
+    BOOL callback = [signature methodReturnType][0] == 'v';
+    BOOL chain = [signature methodReturnType][0] == '@';
+    
+    // parse argument
+    BOOL error = strcmp([signature getArgumentTypeAtIndex:1], "@\"NSError\"") == 0;
+    BOOL progress = strcmp([signature getArgumentTypeAtIndex:1], "f") == 0;
+    BOOL result = !error && [signature getArgumentTypeAtIndex:1][0] == '@';
+    
+    if (callback && error) {
+        return OMPromiseHandlerFailed;
+    } else if (callback && progress) {
+        return OMPromiseHandlerProgressed;
+    } else if (callback && result) {
+        return OMPromiseHandlerFulfilled;
+    } else if (chain && error) {
+        return OMPromiseHandlerRescue;
+    } else if (chain && result) {
+        return OMPromiseHandlerThen;
+    }
+    
+    return OMPRomiseHandlerUnknown;
 }
 
 - (void)cleanup {

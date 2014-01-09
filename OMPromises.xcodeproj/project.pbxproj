@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A13BEEF2187DB94C001755CE /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = A13BEEF1187DB94C001755CE /* CTBlockDescription.m */; };
 		A1691F6E17FBF1FA00C7FE5E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1691F6D17FBF1FA00C7FE5E /* Foundation.framework */; };
 		A1691F7317FBF1FA00C7FE5E /* OMPromises.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A1691F7217FBF1FA00C7FE5E /* OMPromises.h */; };
 		A1691F7C17FBF1FA00C7FE5E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1691F7B17FBF1FA00C7FE5E /* XCTest.framework */; };
@@ -48,6 +49,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A13BEEF0187DB94C001755CE /* CTBlockDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
+		A13BEEF1187DB94C001755CE /* CTBlockDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
 		A1691F6A17FBF1FA00C7FE5E /* libOMPromises.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOMPromises.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1691F6D17FBF1FA00C7FE5E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A1691F7117FBF1FA00C7FE5E /* OMPromises-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OMPromises-Prefix.pch"; sourceTree = "<group>"; };
@@ -90,6 +93,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A13BEEEF187DB8D8001755CE /* External */ = {
+			isa = PBXGroup;
+			children = (
+				A13BEEF0187DB94C001755CE /* CTBlockDescription.h */,
+				A13BEEF1187DB94C001755CE /* CTBlockDescription.m */,
+			);
+			path = External;
+			sourceTree = "<group>";
+		};
 		A1691F6117FBF1FA00C7FE5E = {
 			isa = PBXGroup;
 			children = (
@@ -122,6 +134,7 @@
 		A1691F6F17FBF1FA00C7FE5E /* OMPromises */ = {
 			isa = PBXGroup;
 			children = (
+				A13BEEEF187DB8D8001755CE /* External */,
 				A1691F7217FBF1FA00C7FE5E /* OMPromises.h */,
 				A17D8F92180BD4B800BEA154 /* OMPromises.m */,
 				A1691F9317FBF2AF00C7FE5E /* OMDeferred.h */,
@@ -262,6 +275,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A17D8F93180BD4B800BEA154 /* OMPromises.m in Sources */,
+				A13BEEF2187DB94C001755CE /* CTBlockDescription.m in Sources */,
 				A1691F9717FBF2AF00C7FE5E /* OMDeferred.m in Sources */,
 				A1691F9817FBF2AF00C7FE5E /* OMPromise.m in Sources */,
 			);
@@ -502,6 +516,7 @@
 				A17D8F98180BD81500BEA154 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
