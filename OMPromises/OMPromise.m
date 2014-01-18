@@ -2,7 +2,7 @@
 // OMPromise.h
 // OMPromises
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 // THE SOFTWARE.
 //
 
-#import "OMPromise.h"
+#import "OMPromise+Protected.h"
 
 #import "OMPromises.h"
 
@@ -32,13 +32,14 @@
 @property NSMutableArray *fulfilHandlers;
 @property NSMutableArray *failHandlers;
 @property NSMutableArray *progressHandlers;
+@property NSMutableArray *cancelHandlers;
 
 @end
 
 @implementation OMPromise
 
 #pragma mark - Property Interaction
-
+/*
 - (void)setError:(NSError *)error {
     _error = error;
 }
@@ -50,6 +51,7 @@
 - (void)setProgress:(float)progress {
     _progress = progress;
 }
+*/
 
 - (void)setState:(OMPromiseState)state {
     NSAssert(_state == OMPromiseStateUnfulfilled && state != OMPromiseStateUnfulfilled,
@@ -160,6 +162,31 @@
     }
 
     return self;
+}
+
+#pragma mark - Cancellation
+
+- (void)cancel {
+    self.state = OMPromiseStateFailed;
+    self.error = [NSError errorWithDomain:OMPromisesErrorDomain
+                                     code:OMPromisesCancelledError
+                                 userInfo:nil];
+
+    for (void (^cancelHandler)(OMDeferred *) in self.cancelHandlers) {
+        cancelHandler((OMDeferred *)self);
+    }
+
+    [self cleanup];
+}
+
+- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
+    if (self.state == OMPromiseStateUnfulfilled) {
+        if (self.cancelHandlers == nil) {
+            self.cancelHandlers = [NSMutableArray arrayWithCapacity:1];
+        }
+        [self.cancelHandlers addObject:cancelHandler];
+    }
+    self.cancellable = YES;
 }
 
 #pragma mark - Combinators & Transformers
@@ -298,6 +325,7 @@
     self.fulfilHandlers = nil;
     self.failHandlers = nil;
     self.progressHandlers = nil;
+    self.cancelHandlers = nil;
 }
 
 @end

@@ -2,7 +2,7 @@
 // OMPromises.h
 // OMPromises
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,9 @@ extern NSString *const OMPromisesErrorDomain;
 /** Codes used for errors that lie in the domain of OMPromisesErrorDomain.
  */
 typedef NS_ENUM(NSInteger, OMPromisesErrorCodes) {
+    /** Indicates that the promise has been cancelled. */
+    OMPromisesCancelledError,
     /** Indicates that no promise passed to the any: combinator got fulfilled.
      */
-    OMPromisesCombinatorAnyNonFulfilledError = 0
+    OMPromisesCombinatorAnyNonFulfilledError
 };

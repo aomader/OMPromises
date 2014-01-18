@@ -88,5 +88,19 @@
  */
 - (void)progress:(float)progress;
 
+///---------------------------------------------------------------------------------------
+/// @name Cancellation
+///---------------------------------------------------------------------------------------
+
+/** Add a handler to be called on cancel.
+ 
+ If at least one handler is registered, it is assumed that the corresponding promise
+ supports cancellation. Once the promise is cancelled, it transits into a failed state
+ // TODO
+ 
+ @param cancelHandler The block to be called, once the promise is cancelled.
+ */
+- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
+
 @end
 

@@ -2,7 +2,7 @@
 // OMPromise.h
 // OMPromises
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@
 
 /** Possible states of an OMPromise.
  */
-typedef enum OMPromiseState {
+typedef NS_ENUM(NSInteger, OMPromiseState) {
     OMPromiseStateUnfulfilled = 0,
     OMPromiseStateFailed = 1,
     OMPromiseStateFulfilled = 2
-} OMPromiseState;
+};
 
 
 /** OMPromise proxies the outcome of a long-running asynchronous operation. It's
@@ -67,8 +67,8 @@ typedef enum OMPromiseState {
 
 /** Current state.
 
- May only change from @p OMPromiseStateUnfulfilled to either @p OMPromiseStateFailed or
- @p OMPRomiseStateFulfilled.
+ May only change from `OMPromiseStateUnfulfilled` to either `OMPromiseStateFailed` or
+ `OMPRomiseStateFulfilled`.
  */
 @property(assign, readonly) OMPromiseState state;
 
@@ -90,6 +90,12 @@ typedef enum OMPromiseState {
  [0, 1]. It only increases.
  */
 @property(assign, readonly) float progress;
+
+/** Whether the underlying operation supports cancellation or not.
+ 
+ In case cancellable is `YES`, it's safe to call cancel.
+ */
+@property(assign, readonly) BOOL cancellable;
 
 ///---------------------------------------------------------------------------------------
 /// @name Creation
@@ -188,6 +194,13 @@ typedef enum OMPromiseState {
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler;
 
 ///---------------------------------------------------------------------------------------
+/// @name Cancellation
+///---------------------------------------------------------------------------------------
+
+
+- (void)cancel;
+
+///---------------------------------------------------------------------------------------
 /// @name Combinators & Transformers
 ///---------------------------------------------------------------------------------------
 
@@ -226,7 +239,7 @@ typedef enum OMPromiseState {
 
  In case that all supplied promises get fulfilled, the promise itself returns
  an array containing all results for the supplied promises while respecting the
- correct order. Nil has been replaced by [NSNull null]. If any promise fails,
+ correct order. `nil` has been replaced by `[NSNull null]`. If any promise fails,
  the returned promise fails also.
 
  Similar to chain: the workload of each promise is considered equal to
