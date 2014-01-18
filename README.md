@@ -216,6 +216,7 @@ the cancel-handler.
 
 - (void)startDownloadAndAbort {
     OMPromise *dl = [self get100GofData];
+    // dl.cancellable == YES
     
     // ...
     // for an unknown reason we dont need it anymore
