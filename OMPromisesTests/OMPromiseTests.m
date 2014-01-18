@@ -319,7 +319,36 @@
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
 }
 
-#pragma mark Combinators & Transformers
+#pragma mark - Cancellation
+
+- (void)testCancelException {
+    OMDeferred *deferred = [OMDeferred deferred];
+    XCTAssertThrows([deferred.promise cancel], @"Deferred must explicitly made cancellable");
+}
+
+- (void)testCancelSuccess {
+    OMDeferred *deferred = [OMDeferred deferred];
+    OMPromise *promise = deferred.promise;
+    
+    [deferred cancelled:^(id _){}];
+    
+    __block int failed = 0;
+    
+    [[[promise progressed:^(float _) {
+        XCTFail(@"progressed-block shouldn't be called");
+    }] fulfilled:^(id _) {
+        XCTFail(@"fulfilled-block shouldn't be called");
+    }] failed:^(NSError *error) {
+        XCTAssertEqual(error.domain, OMPromisesErrorDomain, @"Error domain incorrect");
+        XCTAssertEqual(error.code, OMPromisesCancelledError, @"Error code should be cancelled");
+        failed += 1;
+    }];
+    
+    [promise cancel];
+    XCTAssertEqual(failed, 1, @"failed-block should have been called once");
+}
+
+#pragma mark - Combinators & Transformers
 
 - (void)testJoinOnlyOneLevel {
     OMDeferred *deferred = [OMDeferred deferred];

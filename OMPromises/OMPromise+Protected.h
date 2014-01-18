@@ -33,11 +33,11 @@
 @property(readonly) NSArray *failHandlers;
 @property(readonly) NSArray *progressHandlers;
 
-@property(assign, nonatomic) OMPromiseState state;
-@property NSError *error;
-@property id result;
-@property(assign) float progress;
-@property(assign) BOOL cancellable;
+- (void)setError:(NSError *)error;
+- (void)setResult:(id)result;
+- (void)setProgress:(float)progress;
+- (void)setState:(OMPromiseState)state;
+- (void)setCancellable:(BOOL)cancellable;
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
 

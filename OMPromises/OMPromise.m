@@ -39,7 +39,7 @@
 @implementation OMPromise
 
 #pragma mark - Property Interaction
-/*
+
 - (void)setError:(NSError *)error {
     _error = error;
 }
@@ -51,7 +51,10 @@
 - (void)setProgress:(float)progress {
     _progress = progress;
 }
-*/
+
+- (void)setCancellable:(BOOL)cancellable {
+    _cancellable = cancellable;
+}
 
 - (void)setState:(OMPromiseState)state {
     NSAssert(_state == OMPromiseStateUnfulfilled && state != OMPromiseStateUnfulfilled,
@@ -167,6 +170,8 @@
 #pragma mark - Cancellation
 
 - (void)cancel {
+    NSAssert(self.cancellable, @"Promise does not support cancellation!");
+    
     self.state = OMPromiseStateFailed;
     self.error = [NSError errorWithDomain:OMPromisesErrorDomain
                                      code:OMPromisesCancelledError
@@ -174,6 +179,10 @@
 
     for (void (^cancelHandler)(OMDeferred *) in self.cancelHandlers) {
         cancelHandler((OMDeferred *)self);
+    }
+    
+    for (void (^failHandler)(NSError *) in self.failHandlers) {
+        failHandler(self.error);
     }
 
     [self cleanup];

@@ -25,7 +25,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import "OMDeferred.h"
+#import "OMPromises.h"
 
 @interface OMDeferredTests : XCTestCase
 
@@ -40,6 +40,7 @@
     XCTAssertNil(deferred.result, @"There shouldn't be a result yet");
     XCTAssertNil(deferred.error, @"There shouldn't be an error");
     XCTAssertEqualWithAccuracy(deferred.progress, 0.f, FLT_EPSILON, @"Progress should be 0");
+    XCTAssertFalse(deferred.cancellable, @"Not cancellable by default");
 }
 
 - (void)testFulfil {
@@ -66,7 +67,7 @@
     
     XCTAssertEqual(deferred.state, OMPromiseStateFailed, @"Should be Failed by now");
     XCTAssertEqual(deferred.error, error, @"There should be the supplied error by now");
-    XCTAssertNil(deferred.result, @"There shouldn't be an error");
+    XCTAssertNil(deferred.result, @"There shouldn't be an result");
     XCTAssertEqualWithAccuracy(deferred.progress, 0.f, FLT_EPSILON, @"Progress should be unchanged");
     
     XCTAssertThrows([deferred fulfil:nil], @"Shouldn't be possible to do further state changes");
@@ -92,6 +93,31 @@
     
     XCTAssertThrows([deferred progress:.1f], @"Must not decrease progress");
     XCTAssertEqualWithAccuracy(deferred.progress, .2f, FLT_EPSILON, @"Progress shouldn't have changed");
+}
+
+- (void)testCancelled {
+    OMDeferred *deferred = [OMDeferred deferred];
+    OMPromise *promise = deferred.promise;
+    
+    __block int cancelled = 0;
+    
+    [deferred cancelled:^(OMDeferred *d) {
+        XCTAssertEqual(deferred, d, @"Passed deferred should be equal to created one");
+        XCTAssertEqual(promise.error.domain, OMPromisesErrorDomain, @"Error domain incorrect");
+        XCTAssertEqual(promise.error.code, OMPromisesCancelledError, @"Error code should be cancelled");
+        XCTAssertNil(promise.result, @"There shouldn't be an result");
+        cancelled += 1;
+    }];
+    
+    XCTAssertTrue(promise.cancellable, @"Now it should be cancellable");
+    
+    [promise cancel];
+    
+    XCTAssertEqual(cancelled, 1, @"Cancel handler should be called once");
+    
+    XCTAssertThrows([deferred fulfil:nil], @"Shouldn't be possible to do further state changes");
+    XCTAssertThrows([deferred fail:nil], @"Shouldn't be possible to do further state changes");
+    XCTAssertThrows([deferred progress:1.f], @"Shouldn't be possible to do further state changes");
 }
 
 @end
