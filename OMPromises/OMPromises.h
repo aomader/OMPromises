@@ -36,6 +36,7 @@ extern NSString *const OMPromisesErrorDomain;
 typedef NS_ENUM(NSInteger, OMPromisesErrorCodes) {
     /** Indicates that the promise has been cancelled. */
     OMPromisesCancelledError,
+    
     /** Indicates that no promise passed to the any: combinator got fulfilled.
      */
     OMPromisesCombinatorAnyNonFulfilledError

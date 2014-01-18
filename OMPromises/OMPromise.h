@@ -197,7 +197,12 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 /// @name Cancellation
 ///---------------------------------------------------------------------------------------
 
-
+/** Cancel a still unfulfilled promise.
+ 
+ If the deferred supports cancellation, it should try to stop/abort the corresponding
+ task. By default a deferred _does not_ support cancellation, in which case a call
+ to cancel would throw an exception.
+ */
 - (void)cancel;
 
 ///---------------------------------------------------------------------------------------

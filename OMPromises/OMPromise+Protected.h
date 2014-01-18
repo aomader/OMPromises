@@ -37,7 +37,6 @@
 - (void)setResult:(id)result;
 - (void)setProgress:(float)progress;
 - (void)setState:(OMPromiseState)state;
-- (void)setCancellable:(BOOL)cancellable;
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
 
