@@ -115,15 +115,24 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
     OMDeferred *deferred = [OMDeferred deferred];
 
-    [[self fulfilled:^(id result) {
+    [[[self fulfilled:^(id result) {
         [deferred fulfil:result];
     }] failed:^(NSError *error) {
         id next = rescueHandler(error);
+        float failedAt = self.progress;
         if ([next isKindOfClass:OMPromise.class]) {
-            [(OMPromise *)next control:deferred];
+            [[[(OMPromise *)next fulfilled:^(id result) {
+                [deferred fulfil:result];
+            }] failed:^(NSError *error) {
+                [deferred fail:error];
+            }] progressed:^(float progress) {
+                [deferred progress:failedAt + (1 - failedAt)*progress];
+            }];
         } else {
             [deferred fulfil:next];
         }
+    }] progressed:^(float progress) {
+        [deferred progress:progress];
     }];
 
     return deferred.promise;
@@ -184,26 +193,70 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 }
 
 + (OMPromise *)chain:(NSArray *)handlers initial:(id)result {
-    OMPromise *promise = [OMPromise promisify:result];
+    OMDeferred *deferred = [OMDeferred deferred];
     
-    if (handlers.count == 0) {
-        return promise;
-    } else {
-        NSUInteger total = 0;
+    NSUInteger total = 0;
+    OMPromiseHandler handlerTypes[handlers.count];
+    
+    // the workload portion is determined by the total amount of then handlers
+    for (NSUInteger i = 0; i < handlers.count; ++i) {
+        handlerTypes[i] = [OMPromise typeOfHandler:handlers[i]];
+        total += (handlerTypes[i] == OMPromiseHandlerThen) ? 1 : 0;
+    }
+    
+    OMPromise *promise = [OMPromise promisify:result];
+    NSUInteger done = 0;
+    
+    for (NSUInteger i = 0; i < handlers.count; ++i) {
+        id f = handlers[i];
+        OMPromiseHandler type = handlerTypes[i];
         
-        // the workload portion is determined by the total amount of then handlers
-        for (id f in handlers) {
-            if ([OMPromise typeOfHandler:f] == OMPromiseHandlerThen) {
-                total += 1;
-            }
+        if (type == OMPromiseHandlerFulfilled) {
+            [promise fulfilled:f];
+        } else if (type == OMPromiseHandlerProgressed) {
+            [promise progressed:f];
+        } else if (type == OMPromiseHandlerFailed) {
+            [promise failed:f];
+        } else if (type == OMPromiseHandlerThen) {
+            promise = [promise then:f];
+        } else if (type == OMPromiseHandlerRescue) {
+            promise = [promise rescue:f];
+            
+        } else {
+            [NSException raise:@"Invalid block type"
+                        format:@"The supplied block %@ is of unknown type", f];
         }
         
-        return [OMPromise chain:handlers
-                       previous:promise
-                       deferred:[OMDeferred deferred]
-                       progress:0.f
-                          total:total];
+        BOOL updateProgress = type == OMPromiseHandlerRescue;
+        for (NSUInteger j = i + 1; j < handlers.count && !updateProgress; ++j) {
+            updateProgress = handlerTypes[j] == OMPromiseHandlerThen;
+            if (handlerTypes[j] == OMPromiseHandlerRescue)
+                break;
+        }
+        
+        if (updateProgress) {
+            float doneProgress = (float)done / total;
+            [[promise
+              progressed:^(float part) {
+                  [deferred progress:doneProgress + part / total];
+              }]
+             fulfilled:^(id _) {
+                 [deferred progress:doneProgress + 1.f / total];
+             }];
+            done += 1;
+        }
     }
+    
+    // final promise fulfills/fails the chain
+    [[promise
+        fulfilled:^(id result) {
+            [deferred fulfil:result];
+        }]
+        failed:^(NSError *error) {
+            [deferred fail:error];
+        }];
+    
+    return deferred.promise;
 }
 
 + (OMPromise *)chain:(NSArray *)handlers

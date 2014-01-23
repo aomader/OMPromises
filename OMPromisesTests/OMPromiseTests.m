@@ -428,6 +428,62 @@
     XCTAssertEqualWithAccuracy(chain.progress, 1.f, FLT_EPSILON, @"Chain should be done");
 }
 
+- (void)testGenericChainFulfil {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block id resultFulfilled1;
+    __block id resultFulfilled2;
+    __block int progressed = 0;
+    
+    OMPromise *chain = [OMPromise chain:@[
+        ^id(id result) {
+            return result;
+        },
+        ^(id result) {
+            resultFulfilled1 = result;
+        },
+        ^(NSError *error) {
+            XCTFail(@"We shouldnt call the error handler");
+        },
+        ^id(NSError *error) {
+            XCTFail(@"We shouldnt call the rescue handler");
+            return nil;
+        },
+        ^id(id result) {
+            return deferred.promise;
+        },
+        ^(float progress) {
+            float values[] = {.5f, 1.f};
+            XCTAssertEqualWithAccuracy(values[progressed++], progress, FLT_EPSILON, @"Unexpected progress");
+        },
+        ^(id result) {
+            resultFulfilled2 = result;
+        },
+        ^(NSError *error) {
+            XCTFail(@"We shouldnt call the error handler");
+        },
+        ^id(NSError *error) {
+            XCTFail(@"We shouldnt call the rescue handler");
+            return nil;
+        }
+    ] initial:self.result];
+    
+    XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should be unfulfilled");
+    XCTAssertEqualWithAccuracy(chain.progress, .5f, FLT_EPSILON, @"Chain should be have way done");
+    XCTAssertEqual(resultFulfilled1, self.result, @"Fulfilled handler should have been called");
+    
+    [deferred progress:.5f];
+    XCTAssertEqualWithAccuracy(chain.progress, .75f, FLT_EPSILON, @"Assuming equal distribution of work load");
+    XCTAssertEqual(progressed, 1, @"Progressed handler should have been called");
+    
+    [deferred fulfil:self.result2];
+    XCTAssertEqual(chain.state, OMPromiseStateFulfilled, @"Chain should be fulfilled");
+    XCTAssertEqual(resultFulfilled2, self.result2, @"Fulfilled handler should have been called");
+    XCTAssertEqual(chain.result, self.result2, @"Chain should have result of last promise in chain");
+    XCTAssertEqual(progressed, 2, @"Progressed handler should have been called");
+    XCTAssertEqualWithAccuracy(chain.progress, 1.f, FLT_EPSILON, @"Chain should be done");
+}
+
 - (void)testChainFail {
     OMDeferred *deferred = [OMDeferred deferred];
 
@@ -448,6 +504,76 @@
     XCTAssertEqual(chain.state, OMPromiseStateFailed, @"Chain should have failed");
     XCTAssertEqual(chain.error, self.error, @"Chain error should be equal to promise error");
     XCTAssertEqualWithAccuracy(chain.progress, .25f, FLT_EPSILON, @"Chain should be have way done");
+}
+
+- (void)testGenericChainFail {
+    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred1 = [OMDeferred deferred];
+    
+    __block int progressed = 0;
+    __block int progressed1 = 0;
+    __block id fulfilled = nil;
+    
+    OMPromise *chain = [OMPromise chain:@[
+        ^id(id result) {
+            return deferred.promise;
+        },
+        ^(float progress) {
+            float values[] = {.5f};
+            XCTAssertEqualWithAccuracy(values[progressed++], progress, FLT_EPSILON, @"Unexpected progress");
+        },
+        ^id(id result) {
+            XCTFail(@"Chain should short-circuit in case of failure");
+            return nil;
+        },
+        ^(id result) {
+            XCTFail(@"Chain should short-circuit in case of failure");
+        },
+        ^(float progress) {
+            XCTFail(@"Chain should short-circuit in case of failure");
+        },
+        ^id(NSError *error) {
+            XCTAssertEqual(error, self.error, @"We should rescue the previous error");
+            return deferred1.promise;
+        },
+        ^id(NSError *error) {
+            XCTFail(@"We shouldnt call the rescue handler once its rescued");
+            return nil;
+        },
+        ^(NSError *error) {
+            XCTFail(@"We shouldnt call the error handler once its rescued");
+        },
+        ^(float progress) {
+            float values[] = {.5f, 1.f};
+            XCTAssertEqualWithAccuracy(values[progressed1++], progress, FLT_EPSILON, @"Unexpected progress");
+        },
+        ^(id result) {
+            fulfilled = result;
+        },
+         ^id(id result) {
+            return self.result2;
+        }
+    ] initial:self.result];
+    
+    [deferred progress:.5f];
+    XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should be unfulfilled");
+    XCTAssertEqual(progressed, 1, @"Progressed handler should have been called once");
+    XCTAssertEqualWithAccuracy(chain.progress, 1/6.f, FLT_EPSILON, @"Chain should be have way done");
+    
+    [deferred fail:self.error];
+    XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should not have failed");
+    XCTAssertEqualWithAccuracy(chain.progress, 1/6.f, FLT_EPSILON, @"Progres should remain");
+    
+    [deferred1 progress:.5f];
+    XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should not have failed");
+    XCTAssertEqualWithAccuracy(chain.progress, 1/6.f + (1/12.f), FLT_EPSILON, @"Rescue should fill the remaining progress of the failed promise");
+    XCTAssertEqual(progressed1, 1, @"Progressed handler should have been called once");
+    
+    [deferred1 fulfil:self.result2];
+    XCTAssertEqual(chain.state, OMPromiseStateFulfilled, @"Chain should be done now.");
+    XCTAssertEqualWithAccuracy(chain.progress, 6/6.f, FLT_EPSILON, @"Chain should be nearly done");
+    XCTAssertEqual(progressed1, 2, @"Progressed handler should have been called twice");
+    XCTAssertEqual(chain.result, self.result2, @"Chain should have result of last promise in chain");
 }
 
 - (void)testAnyEmptyArray {
