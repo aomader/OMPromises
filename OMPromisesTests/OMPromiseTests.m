@@ -194,6 +194,74 @@
     XCTAssertEqual(called2, 1, @"second failed-block should have been called once");
 }
 
+
+#define WAIT_UNTIL(condition, timeout, msg, ...) \
+{ \
+    NSDate *date = [NSDate date]; \
+    while (!(condition)) { \
+        if ([date timeIntervalSinceNow] < -timeout) { \
+            XCTFail(msg); \
+            break;\
+        } \
+        usleep(10000); \
+    } \
+}
+
+
+- (void)testFulfilledQueue {
+    OMDeferred *deferred = [OMDeferred deferred];
+        
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    __block int called = 0;
+    [deferred.promise fulfilled:^(id result) {
+        XCTAssertEqual(result, self.result, @"The supplied result should be identical");
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        called += 1;
+    } on:queue];
+        
+    [deferred fulfil:self.result];
+    
+    WAIT_UNTIL(called == 1, 1, @"Not called within 1 sec");
+}
+
+- (void)testFailedQueue {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    __block int called = 0;
+    [deferred.promise failed:^(NSError *error) {
+        XCTAssertEqual(error, self.error, @"The supplied error should be identical");
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        called += 1;
+    } on:queue];
+    
+    [deferred fail:self.error];
+    
+    WAIT_UNTIL(called == 1, 1, @"Not called within 1 sec");
+}
+
+- (void)testProgressedQueue {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    __block int called = 0;
+    [deferred.promise progressed:^(float progress) {
+        XCTAssertEqualWithAccuracy(progress, .5f, FLT_EPSILON, @"incorrect progress value");
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        called += 1;
+    } on:queue];
+    
+    [deferred progress:.5f];
+    
+    WAIT_UNTIL(called == 1, 1, @"Not called within 1 sec");
+}
+
 #pragma mark - Bind
 
 - (void)testThenReturnPromise {
@@ -256,6 +324,25 @@
     XCTAssertEqual(nextPromise.result, self.result2, @"Final result should be the last returned one");
     XCTAssertEqual(called, 1, @"then-block should have been called exactly once");
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+}
+
+- (void)testThenQueue {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    __block int called = 0;
+    [deferred.promise then:^id(id result) {
+        XCTAssertEqual(result, self.result, @"The supplied result should be identical");
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        called += 1;
+        return nil;
+    } on:queue];
+    
+    [deferred fulfil:self.result];
+    
+    WAIT_UNTIL(called == 1, 1, @"Not called within 1 sec");
 }
 
 - (void)testRescueReturnPromise {
@@ -344,6 +431,25 @@
     
     [nextDeferred fulfil:self.result];
     XCTAssertEqual(calledProgress, 3, @"progress-block should have been called exactly once");
+}
+
+- (void)testRescueQueue {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    __block int called = 0;
+    [deferred.promise rescue:^id(NSError *error) {
+        XCTAssertEqual(error, self.error, @"The supplied error should be identical");
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        called += 1;
+        return nil;
+    } on:queue];
+    
+    [deferred fail:self.error];
+    
+    WAIT_UNTIL(called == 1, 1, @"Not called within 1 sec");
 }
 
 #pragma mark - Cancellation

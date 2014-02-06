@@ -157,6 +157,15 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)then:(id (^)(id result))thenHandler;
 
+/** Similar to then:, but executes the supplied block asynchrounsly on a specific queue.
+ 
+ @param thenHandler Block to be called once the promise gets fulfilled.
+ @param queue Context in which the block is executed.
+ @return A new promise.
+ @see then:
+ */
+- (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue;
+
 /** Create a new promise by binding the error reason to another promise.
 
  Similar to then:, but the supplied block is called in case the promise fails, from
@@ -170,6 +179,15 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
 
+/** Similar to rescue:, but executes the supplied block asynchrounsly on a specific queue.
+ 
+ @param rescueHandler Block to be called once the promise failed.
+ @param queue Context in which the block is executed.
+ @return A new promise.
+ @see rescue:
+ */
+- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue;
+
 ///---------------------------------------------------------------------------------------
 /// @name Registering callbacks
 ///---------------------------------------------------------------------------------------
@@ -181,6 +199,16 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler;
 
+/** Similar to fulfilled:, but executes the supplied block asynchrounsly on a specific
+ queue.
+
+ @param fulfilHandler Block to be called.
+ @param queue Context in which the block is executed.
+ @return The promise itself.
+ @see fulfilled:
+ */
+- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue;
+
 /** Register a block to be called when the promise fails.
 
  @param failHandler Block to be called.
@@ -188,12 +216,31 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)failed:(void (^)(NSError *error))failHandler;
 
+/** Similar to failed:, but executes the supplied block asynchrounsly on a specific queue.
+ 
+ @param failHandler Block to be called.
+ @param queue Context in which the block is executed.
+ @return The promise itself.
+ @see failed:
+ */
+- (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue;
+
 /** Register a block to be called when the promise progresses.
 
  @param progressHandler Block to be called.
  @return The promise itself.
  */
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler;
+
+/** Similar to progressed:, but executes the supplied block asynchrounsly on a specific
+ queue.
+ 
+ @param progressHandler Block to be called.
+ @param queue Context in which the block is executed.
+ @return The promise itself.
+ @see progressed:
+ */
+- (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
 /// @name Cancellation
