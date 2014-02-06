@@ -109,18 +109,27 @@
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
     OMDeferred *deferred = [OMDeferred deferred];
-
-    [[self fulfilled:^(id result) {
+    
+    [[[self fulfilled:^(id result) {
         [deferred fulfil:result];
     }] failed:^(NSError *error) {
         id next = rescueHandler(error);
+        float failedAt = self.progress;
         if ([next isKindOfClass:OMPromise.class]) {
-            [(OMPromise *)next control:deferred];
+            [[[(OMPromise *)next fulfilled:^(id result) {
+                [deferred fulfil:result];
+            }] failed:^(NSError *error) {
+                [deferred fail:error];
+            }] progressed:^(float progress) {
+                [deferred progress:failedAt + (1 - failedAt)*progress];
+            }];
         } else {
             [deferred fulfil:next];
         }
+    }] progressed:^(float progress) {
+        [deferred progress:progress];
     }];
-
+    
     return deferred.promise;
 }
 

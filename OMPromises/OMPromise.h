@@ -161,6 +161,8 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 
  Similar to then:, but the supplied block is called in case the promise fails, from
  which point on it behaves like then:. If the promise gets fulfilled the step is skipped.
+ The returned promise proxies the progress of the original one. In case the original
+ promise fails, the rescueHandler continues from that point on.
 
  @param rescueHandler Block to be called once the promise failed.
  @return A new promise.

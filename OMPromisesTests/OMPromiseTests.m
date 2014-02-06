@@ -319,6 +319,33 @@
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
 }
 
+- (void)testRescueProxyProgress {
+    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *nextDeferred = [OMDeferred deferred];
+    
+    __block int calledProgress = 0;
+    OMPromise *nextPromise = [[deferred.promise rescue:^(NSError *error) {
+        return nextDeferred.promise;
+    }] progressed:^(float progress) {
+        float progressValues[] = {.5f, .75f, 1.f};
+        XCTAssertEqualWithAccuracy(progress, progressValues[calledProgress], FLT_EPSILON, @"incorrect progress value");
+        calledProgress += 1;
+    }];
+    
+    [deferred progress:.5f];
+    XCTAssertEqual(calledProgress, 1, @"progress-block should have been called exactly once");
+    
+    [deferred fail:self.error];
+    XCTAssertEqual(calledProgress, 1, @"progress-block should have been called exactly once");
+    XCTAssertEqual(nextPromise.state, OMPromiseStateUnfulfilled, @"Second promise should be fulfilled");
+    
+    [nextDeferred progress:.5f];
+    XCTAssertEqual(calledProgress, 2, @"progress-block should have been called exactly once");
+    
+    [nextDeferred fulfil:self.result];
+    XCTAssertEqual(calledProgress, 3, @"progress-block should have been called exactly once");
+}
+
 #pragma mark - Cancellation
 
 - (void)testCancelException {
