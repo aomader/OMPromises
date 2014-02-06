@@ -101,6 +101,28 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 /// @name Creation
 ///---------------------------------------------------------------------------------------
 
+/** Create a promise with its outcome determined by a supplied block.
+ 
+ The promise completed with the result of the block. If anything within the block
+ raises an exception, the promise fails with the OMPromiseExceptionError code.
+ The block is executed asynchronously in a background queue. If you need more control
+ where the block is executed, have a look at promiseWithTask:on:.
+ 
+ @param task The task describing the outcome of the promise.
+ @return A new promise.
+ @see promiseWithTask:on:
+ */
++ (OMPromise *)promiseWithTask:(id (^)())task;
+
+/** Similar to promiseWithTask:, but executes the block on a specific queue.
+ 
+ @param task The task describing the outcome of the promise.
+ @param queue Context in which the block is executed.
+ @return A new promise.
+ @see promiseWithTask:
+ */
++ (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
+
 /** Create a fulfilled promise.
  
  Simply wraps the supplied value inside a fulfilled promise.

@@ -34,10 +34,12 @@ extern NSString *const OMPromisesErrorDomain;
 /** Codes used for errors that lie in the domain of OMPromisesErrorDomain.
  */
 typedef NS_ENUM(NSInteger, OMPromisesErrorCodes) {
+    /** An user supplied block raised an exception. */
+    OMPromisesExceptionError,
+    
     /** Indicates that the promise has been cancelled. */
     OMPromisesCancelledError,
     
-    /** Indicates that no promise passed to the any: combinator got fulfilled.
-     */
+    /** Indicates that no promise passed to the any: combinator got fulfilled. */
     OMPromisesCombinatorAnyNonFulfilledError
 };

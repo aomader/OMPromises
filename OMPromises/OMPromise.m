@@ -64,6 +64,33 @@
 
 #pragma mark - Return
 
++ (OMPromise *)promiseWithTask:(id (^)())task {
+    return [OMPromise promiseWithTask:task on:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
+}
+
++ (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    dispatch_async(queue, ^{
+        id result = nil;
+        
+        @try {
+            result = task();
+        }
+        @catch (NSException *exception) {
+            [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
+                                               code:OMPromisesExceptionError
+                                           userInfo:@{NSUnderlyingErrorKey: exception}]];
+        }
+        
+        if (deferred.promise.state == OMPromiseStateUnfulfilled) {
+            [deferred fulfil:result];
+        }
+    });
+    
+    return deferred.promise;
+}
+
 + (OMPromise *)promiseWithResult:(id)result {
     OMDeferred *deferred = [OMDeferred deferred];
     [deferred fulfil:result];

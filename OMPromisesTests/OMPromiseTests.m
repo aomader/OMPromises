@@ -27,6 +27,18 @@
 
 #import "OMPromises.h"
 
+#define WAIT_UNTIL(condition, timeout, msg, ...) \
+    { \
+        NSDate *date = [NSDate date]; \
+        while (!(condition)) { \
+            if ([date timeIntervalSinceNow] < -timeout) { \
+                XCTFail(msg); \
+                break;\
+            } \
+            usleep(10000); \
+        } \
+    }
+
 @interface OMPromisesTests : XCTestCase
 
 @property id result;
@@ -44,6 +56,41 @@
 }
 
 #pragma mark - Return
+
+- (void)testTaskPromise {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    __block int called = 0;
+    OMPromise *promise = [OMPromise promiseWithTask:^id{
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        called += 1;
+        return self.result;
+    } on:queue];
+    
+    WAIT_UNTIL(called == 1, 1, @"Task should be executed");
+    
+    XCTAssertEqual(promise.state, OMPromiseStateFulfilled, @"Promise should be fulfilled");
+    XCTAssertEqual(promise.result, self.result, @"Promise should have the supplied result");
+}
+
+- (void)testFailingTaskPromise {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
+    
+    NSException *exception = [NSException exceptionWithName:@"foo" reason:@"bar" userInfo:nil];
+    
+    OMPromise *promise = [OMPromise promiseWithTask:^id{
+        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
+        @throw exception;
+        return self.result;
+    } on:queue];
+    
+    WAIT_UNTIL(promise.state == OMPromiseStateFailed, 1, @"Promise should have failed");
+    
+    XCTAssertEqual(promise.error.code, OMPromisesExceptionError, @"Error should be caused by exception");
+    XCTAssertEqual(promise.error.userInfo[NSUnderlyingErrorKey], exception, @"Exception should be provided");
+}
 
 - (void)testFulfilledPromise {
     OMPromise *promise = [OMPromise promiseWithResult:self.result];
@@ -193,20 +240,6 @@
     XCTAssertEqual(called1, 1, @"first failed-block should have been called once");
     XCTAssertEqual(called2, 1, @"second failed-block should have been called once");
 }
-
-
-#define WAIT_UNTIL(condition, timeout, msg, ...) \
-{ \
-    NSDate *date = [NSDate date]; \
-    while (!(condition)) { \
-        if ([date timeIntervalSinceNow] < -timeout) { \
-            XCTFail(msg); \
-            break;\
-        } \
-        usleep(10000); \
-    } \
-}
-
 
 - (void)testFulfilledQueue {
     OMDeferred *deferred = [OMDeferred deferred];
