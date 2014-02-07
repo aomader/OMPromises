@@ -34,9 +34,21 @@
 @property NSMutableArray *progressHandlers;
 @property NSMutableArray *cancelHandlers;
 
+@property(assign) NSUInteger depth;
+
 @end
 
 @implementation OMPromise
+
+#pragma mark - Init
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _depth = 1;
+    }
+    return self;
+}
 
 #pragma mark - Property Interaction
 
@@ -69,26 +81,10 @@
 }
 
 + (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue {
-    OMDeferred *deferred = [OMDeferred deferred];
-    
-    dispatch_async(queue, ^{
-        id result = nil;
-        
-        @try {
-            result = task();
-        }
-        @catch (NSException *exception) {
-            [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
-                                               code:OMPromisesExceptionError
-                                           userInfo:@{NSUnderlyingErrorKey: exception}]];
-        }
-        
-        if (deferred.promise.state == OMPromiseStateUnfulfilled) {
-            [deferred fulfil:result];
-        }
-    });
-    
-    return deferred.promise;
+    return [[OMPromise promiseWithResult:nil]
+        then:^(id _) {
+            return task();
+        } on:queue];
 }
 
 + (OMPromise *)promiseWithResult:(id)result {
@@ -124,16 +120,24 @@
 - (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue {
     OMDeferred *deferred = [OMDeferred deferred];
     
-    [[self fulfilled:^(id result) {
-        id next = thenHandler(result);
-        if ([next isKindOfClass:OMPromise.class]) {
-            [(OMPromise *)next control:deferred];
-        } else {
-            [deferred fulfil:next];
-        }
-    } on:queue] failed:^(NSError *error) {
-        [deferred fail:error];
-    }];
+    NSUInteger current = self.depth;
+    NSUInteger next = self.depth + 1;
+    
+    deferred.promise.depth = next;
+    
+    [[[self
+        fulfilled:^(id result) {
+            [[OMPromise bind:deferred with:thenHandler using:result]
+                progressed:^(float progress) {
+                    [deferred progress:progress/next + ((float)current/next)];
+                }];
+        } on:queue]
+        failed:^(NSError *error) {
+            [deferred fail:error];
+        }]
+        progressed:^(float progress) {
+            [deferred progress:progress * ((float)current/next)];
+        }];
     
     return deferred.promise;
 }
@@ -148,19 +152,11 @@
     [[[self fulfilled:^(id result) {
         [deferred fulfil:result];
     }] failed:^(NSError *error) {
-        id next = rescueHandler(error);
         float failedAt = self.progress;
-        if ([next isKindOfClass:OMPromise.class]) {
-            [[[(OMPromise *)next fulfilled:^(id result) {
-                [deferred fulfil:result];
-            }] failed:^(NSError *error) {
-                [deferred fail:error];
-            }] progressed:^(float progress) {
+        [[OMPromise bind:deferred with:rescueHandler using:error]
+            progressed:^(float progress) {
                 [deferred progress:failedAt + (1 - failedAt)*progress];
             }];
-        } else {
-            [deferred fulfil:next];
-        }
     } on:queue] progressed:^(float progress) {
         [deferred progress:progress];
     }];
@@ -396,14 +392,31 @@
 
 #pragma mark - Private Helper Methods
 
-- (void)control:(OMDeferred *)deferred {
-    [[[self fulfilled:^(id result) {
-        [deferred fulfil:result];
-    }] failed:^(NSError *error) {
-        [deferred fail:error];
-    }] progressed:^(float progress) {
-        [deferred progress:progress];
-    }];
++ (OMPromise *)bind:(OMDeferred *)deferred with:(id (^)(id))handler using:(id)parameter {
+    id next = nil;
+    
+    @try {
+        next = handler(parameter);
+    }
+    @catch (NSException *exception) {
+        next = [NSError errorWithDomain:OMPromisesErrorDomain
+                                   code:OMPromisesExceptionError
+                               userInfo:@{NSUnderlyingErrorKey: exception}];
+    }
+    
+    if ([next isKindOfClass:OMPromise.class]) {
+        return [[(OMPromise *)next fulfilled:^(id result) {
+            [deferred fulfil:result];
+        }] failed:^(NSError *error) {
+            [deferred fail:error];
+        }];
+    } else if ([next isKindOfClass:NSError.class]) {
+        [deferred fail:next];
+    } else {
+        [deferred fulfil:next];
+    }
+    
+    return nil;
 }
 
 + (OMPromise *)promisify:(id)result {

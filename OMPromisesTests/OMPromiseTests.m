@@ -74,22 +74,28 @@
     XCTAssertEqual(promise.result, self.result, @"Promise should have the supplied result");
 }
 
-- (void)testFailingTaskPromise {
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
-    XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
-    
+- (void)testTaskPromiseThrowException {
     NSException *exception = [NSException exceptionWithName:@"foo" reason:@"bar" userInfo:nil];
     
     OMPromise *promise = [OMPromise promiseWithTask:^id{
-        XCTAssertEqual(queue, dispatch_get_current_queue(), @"Should run on specified queue");
         @throw exception;
         return self.result;
-    } on:queue];
+    }];
     
     WAIT_UNTIL(promise.state == OMPromiseStateFailed, 1, @"Promise should have failed");
     
     XCTAssertEqual(promise.error.code, OMPromisesExceptionError, @"Error should be caused by exception");
     XCTAssertEqual(promise.error.userInfo[NSUnderlyingErrorKey], exception, @"Exception should be provided");
+}
+
+- (void)testTaskPromiseReturnError {
+    OMPromise *promise = [OMPromise promiseWithTask:^id{
+        return self.error;
+    }];
+    
+    WAIT_UNTIL(promise.state == OMPromiseStateFailed, 1, @"Promise should have failed");
+    
+    XCTAssertEqual(promise.error, self.error, @"error should be the one returned by the task");
 }
 
 - (void)testFulfilledPromise {
@@ -307,7 +313,7 @@
         called += 1;
         return nextDeferred.promise;
     }] progressed:^(float progress) {
-        float progressValues[] = {.5f, 1.f};
+        float progressValues[] = {.5f, .75f, 1.f};
         XCTAssertEqualWithAccuracy(progress, progressValues[calledProgress], FLT_EPSILON, @"incorrect progress value");
         calledProgress += 1;
     }] fulfilled:^(id result) {
@@ -328,12 +334,12 @@
     [deferred fulfil:self.result];
     XCTAssertEqual(nextPromise.state, OMPromiseStateUnfulfilled, @"Second promise should not be fulfilled yet");
     XCTAssertEqual(called, 1, @"then-block should have been called exactly once");
-    XCTAssertEqual(calledProgress, 0, @"progressed-block should not have been called yet");
+    XCTAssertEqual(calledProgress, 1, @"progressed-block should have been called once");
 
     [nextDeferred progress:.5f];
     [nextDeferred fulfil:self.result2];
     XCTAssertEqual(nextPromise.state, OMPromiseStateFulfilled, @"Second promise should be fulfilled");
-    XCTAssertEqual(calledProgress, 2, @"progressed-block should have been called exactly twice");
+    XCTAssertEqual(calledProgress, 3, @"progressed-block should have been called exactly twice");
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
     XCTAssertEqual(calledFail, 1, @"failed-block should have been called exactly once");
 }
@@ -351,12 +357,66 @@
     }] failed:^(NSError *error) {
         XCTFail(@"failed-block shouldn't be called");
     }];
-
+    
     [deferred fulfil:self.result];
     XCTAssertEqual(nextPromise.state, OMPromiseStateFulfilled, @"Second promise should be fulfilled");
     XCTAssertEqual(nextPromise.result, self.result2, @"Final result should be the last returned one");
     XCTAssertEqual(called, 1, @"then-block should have been called exactly once");
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+}
+
+- (void)testThenReturnError {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block int called = 0, calledFailed = 0;
+    OMPromise *nextPromise = [[deferred.promise then:^id(id result) {
+        called += 1;
+        return self.error;
+    }] failed:^(NSError *error) {
+        XCTAssertEqual(error, self.error, @"supplied error should be identical to previously returned one");
+        calledFailed += 1;
+    }];
+    
+    [deferred fulfil:self.result];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateFailed, @"Second promise should have failed");
+    XCTAssertEqual(nextPromise.error, self.error, @"Final error should be the last returned one");
+    XCTAssertEqual(called, 1, @"rescue-block should have been called exactly once");
+    XCTAssertEqual(calledFailed, 1, @"fulfilled-block should have been called exactly once");
+}
+
+- (void)testThenProgressChain {
+    OMDeferred *deferred1 = [OMDeferred deferred];
+    OMDeferred *deferred2 = [OMDeferred deferred];
+    OMDeferred *deferred3 = [OMDeferred deferred];
+    
+    __block int called = 0;
+    [[[deferred1.promise then:^(id result) {
+        return deferred2.promise;
+    }] then:^id(id result) {
+        return deferred3.promise;
+    }] progressed:^(float progress) {
+        float progressValues[] = {1/6.f, 1/3.f, .75f * 1/3 + 1/3.f, 2/3.f, 5/6.f, 1.f};
+        XCTAssertEqualWithAccuracy(progress, progressValues[called], FLT_EPSILON, @"incorrect progress value");
+        called += 1;
+    }];
+    
+    [deferred1 progress:.5f];
+    XCTAssertEqual(called, 1, @"progressed-block should have been called once by now");
+    
+    [deferred1 fulfil:nil];
+    XCTAssertEqual(called, 2, @"progressed-block should have been called twice by now");
+    
+    [deferred2 progress:.75f];
+    XCTAssertEqual(called, 3, @"progressed-block should have been called three times by now");
+    
+    [deferred2 fulfil:nil];
+    XCTAssertEqual(called, 4, @"progressed-block should have been called four times by now");
+    
+    [deferred3 progress:.5f];
+    XCTAssertEqual(called, 5, @"progressed-block should have been called five times by now");
+    
+    [deferred3 fulfil:nil];
+    XCTAssertEqual(called, 6, @"progressed-block should have been called six times by now");
 }
 
 - (void)testThenQueue {
@@ -437,6 +497,25 @@
     XCTAssertEqual(nextPromise.result, self.result, @"Final result should be the last returned one");
     XCTAssertEqual(called, 1, @"rescue-block should have been called exactly once");
     XCTAssertEqual(calledFulfil, 1, @"fulfilled-block should have been called exactly once");
+}
+
+- (void)testRescueReturnError {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block int called = 0, calledFailed = 0;
+    OMPromise *nextPromise = [[deferred.promise rescue:^(NSError *error) {
+        called += 1;
+        return self.error;
+    }] failed:^(NSError *error) {
+        XCTAssertEqual(error, self.error, @"supplied error should be identical to previously returned one");
+        calledFailed += 1;
+    }];
+    
+    [deferred fail:self.error];
+    XCTAssertEqual(nextPromise.state, OMPromiseStateFailed, @"Second promise should have failed");
+    XCTAssertEqual(nextPromise.error, self.error, @"Final error should be the last returned one");
+    XCTAssertEqual(called, 1, @"rescue-block should have been called exactly once");
+    XCTAssertEqual(calledFailed, 1, @"fulfilled-block should have been called exactly once");
 }
 
 - (void)testRescueProxyProgress {

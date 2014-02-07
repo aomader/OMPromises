@@ -167,11 +167,19 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 
 /** Create a new promise by binding the fulfilled result to another promise.
 
- The supplied block gets called in case the promise gets fulfilled. The block can return
- a simple value or another block, in both cases the promise returned by this method
- is bound to the result of the block.
-
- If the promise fails, the chain is short-circuited and the resulting promise fails too.
+ The supplied block gets called in case the promise gets fulfilled. If the promise fails,
+ the block is not called and the returned promise fails (short-circuited).
+ 
+ The block can either return a promise, n which case the returned promise is bound to
+ the promise returned by this method. But it can also return a simple id value, which
+ either directly fulfils the returned promise or fails it, in case the object returned by
+ the block is of type NSError.
+ 
+ If the supplied block raises an exception during execution, the promise fails also
+ with an OMPromiseExceptionError error code.
+ 
+ The returned promise is aware of all parent promises and thus models the progress as
+ an equal distribution of workload amongst all promises in the chain.
 
  @param thenHandler Block to be called once the promise gets fulfilled.
  @return A new promise.
