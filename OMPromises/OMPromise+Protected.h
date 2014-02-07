@@ -2,7 +2,7 @@
 // OMPromise+Protected.h
 // OMPromises
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@
 
 #import "OMPromise.h"
 
+#import "OMDeferred.h"
+
 @interface OMPromise (Protected)
 
 @property(readonly) NSArray *fulfilHandlers;
@@ -35,6 +37,8 @@
 - (void)setResult:(id)result;
 - (void)setProgress:(float)progress;
 - (void)setState:(OMPromiseState)state;
+
+- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
 
 - (void)cleanup;
 

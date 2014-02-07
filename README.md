@@ -9,6 +9,16 @@ might differ but the idea is mostly the same.
 
 [![Build Status](https://travis-ci.org/b52/OMPromises.png?branch=master)](https://travis-ci.org/b52/OMPromises)
 
+## Features
+
+The main features of OMPromises are listed below.
+
+* Fully tested and documented
+* Clean interface and separation of concerns
+* Support for chaining and callbacks
+* Optional support for cancellation
+* Various combinators
+
 ## Installation
 
 The recommended approach for installing OMPromises is to use [CocoaPods] package
@@ -181,6 +191,44 @@ but the supplied block is called if the _promise fails_.
 
 At that point some people might recognize the resemblance to monads in category theory.
 If not, you might benefit from looking into [Haskell] and its concepts.
+
+### Cancellation - Aborting an ongoing operation
+
+If your abstracted operation is kinda heavy and long-running, you might want to
+support _cancellation_. It allows the owner of the promise to `cancel` the
+promise and thus the long-running operation, if possible. Once a promise is
+cancelled, it switches into the failed state with an cancellation specific
+error code.
+
+A promise is by default not `cancellable`, but the owner of the deferred can
+make it so by registering at least one cancel-handler using `cancelled:`.
+It depends on the task and the use-case whether it makes sense to implement
+the cancel-handler.
+
+```objc
+- (OMPromise *)get100GofData {
+    OMDeferred *deferred = [OMDeferred deferred];
+    [deferred cancelled:^(OMDeferred *this) {
+        // cancel the download..
+    }];
+    return deferred.promise;
+}
+
+- (void)startDownloadAndAbort {
+    OMPromise *dl = [self get100GofData];
+    // dl.cancellable == YES
+    
+    // ...
+    // for an unknown reason we dont need it anymore
+    [dl cancel];
+
+    // if cancelled, it switches into the failed state
+    [dl failed:^(NSError *error) {
+        // error.domain == OMPromisesErrorDomain
+        // error.code == OMPromisesCancelledError
+    }];
+}
+```
 
 ### Combinators & Transformers - Forming promise combinations besides chains
 

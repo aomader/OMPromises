@@ -2,7 +2,7 @@
 // OMPromise.h
 // OMPromises
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 // THE SOFTWARE.
 //
 
-#import "OMPromise.h"
+#import "OMPromise+Protected.h"
 
 #import "CTBlockDescription.h"
 #import "OMPromises.h"
@@ -42,10 +42,23 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 @property NSMutableArray *fulfilHandlers;
 @property NSMutableArray *failHandlers;
 @property NSMutableArray *progressHandlers;
+@property NSMutableArray *cancelHandlers;
+
+@property(assign) NSUInteger depth;
 
 @end
 
 @implementation OMPromise
+
+#pragma mark - Init
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _depth = 1;
+    }
+    return self;
+}
 
 #pragma mark - Property Interaction
 
@@ -61,6 +74,10 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     _progress = progress;
 }
 
+- (void)setCancellable:(BOOL)cancellable {
+    _cancellable = cancellable;
+}
+
 - (void)setState:(OMPromiseState)state {
     NSAssert(_state == OMPromiseStateUnfulfilled && state != OMPromiseStateUnfulfilled,
              @"A state transition requires to go from Unfulfilled to either Fulfilled or Failed");
@@ -68,6 +85,17 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 }
 
 #pragma mark - Return
+
++ (OMPromise *)promiseWithTask:(id (^)())task {
+    return [OMPromise promiseWithTask:task on:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
+}
+
++ (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue {
+    return [[OMPromise promiseWithResult:nil]
+        then:^(id _) {
+            return task();
+        } on:queue];
+}
 
 + (OMPromise *)promiseWithResult:(id)result {
     OMDeferred *deferred = [OMDeferred deferred];
@@ -96,89 +124,164 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 #pragma mark - Bind
 
 - (OMPromise *)then:(id (^)(id result))thenHandler {
+    return [self then:thenHandler on:nil];
+}
+
+- (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue {
     OMDeferred *deferred = [OMDeferred deferred];
-
-    [[self fulfilled:^(id result) {
-        id next = thenHandler(result);
-        if ([next isKindOfClass:OMPromise.class]) {
-            [(OMPromise *)next control:deferred];
-        } else {
-            [deferred fulfil:next];
-        }
-    }] failed:^(NSError *error) {
-        [deferred fail:error];
-    }];
-
+    
+    NSUInteger current = self.depth;
+    NSUInteger next = self.depth + 1;
+    
+    deferred.promise.depth = next;
+    
+    [[[self
+        fulfilled:^(id result) {
+            [[OMPromise bind:deferred with:thenHandler using:result]
+                progressed:^(float progress) {
+                    [deferred progress:progress/next + ((float)current/next)];
+                }];
+        } on:queue]
+        failed:^(NSError *error) {
+            [deferred fail:error];
+        }]
+        progressed:^(float progress) {
+            [deferred progress:progress * ((float)current/next)];
+        }];
+    
     return deferred.promise;
 }
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
-    OMDeferred *deferred = [OMDeferred deferred];
+    return [self rescue:rescueHandler on:nil];
+}
 
+- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
     [[[self fulfilled:^(id result) {
         [deferred fulfil:result];
     }] failed:^(NSError *error) {
-        id next = rescueHandler(error);
         float failedAt = self.progress;
-        if ([next isKindOfClass:OMPromise.class]) {
-            [[[(OMPromise *)next fulfilled:^(id result) {
-                [deferred fulfil:result];
-            }] failed:^(NSError *error) {
-                [deferred fail:error];
-            }] progressed:^(float progress) {
+        [[OMPromise bind:deferred with:rescueHandler using:error]
+            progressed:^(float progress) {
                 [deferred progress:failedAt + (1 - failedAt)*progress];
             }];
-        } else {
-            [deferred fulfil:next];
-        }
-    }] progressed:^(float progress) {
+    } on:queue] progressed:^(float progress) {
         [deferred progress:progress];
     }];
-
+    
     return deferred.promise;
 }
 
 #pragma mark - Callbacks
 
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler {
+    return [self fulfilled:fulfilHandler on:nil];
+}
+
+- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue {
+    if (queue != nil) {
+        fulfilHandler = ^(id result) {
+            dispatch_async(queue, ^{
+                fulfilHandler(result);
+            });
+        };
+    }
+    
     if (self.state == OMPromiseStateFulfilled) {
         fulfilHandler(self.result);
     }
-
+    
     if (self.state == OMPromiseStateUnfulfilled) {
         if (self.fulfilHandlers == nil) {
             self.fulfilHandlers = [NSMutableArray arrayWithCapacity:1];
         }
         [self.fulfilHandlers addObject:fulfilHandler];
     }
-
+    
     return self;
 }
 
-- (OMPromise *)failed:(void (^)(NSError *))failHandler {
+- (OMPromise *)failed:(void (^)(NSError *error))failHandler {
+    return [self failed:failHandler on:nil];
+}
+
+- (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue {
+    if (queue != nil) {
+        failHandler = ^(NSError *error) {
+            dispatch_async(queue, ^{
+                failHandler(error);
+            });
+        };
+    }
+    
     if (self.state == OMPromiseStateFailed) {
         failHandler(self.error);
     }
-
+    
     if (self.state == OMPromiseStateUnfulfilled) {
         if (self.failHandlers == nil) {
             self.failHandlers = [NSMutableArray arrayWithCapacity:1];
         }
         [self.failHandlers addObject:failHandler];
     }
-
+    
     return self;
 }
 
-- (OMPromise *)progressed:(void (^)(float))progressHandler {
+- (OMPromise *)progressed:(void (^)(float progress))progressHandler {
+    return [self progressed:progressHandler on:nil];
+}
+
+- (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue {
+    if (queue != nil) {
+        progressHandler = ^(float progress) {
+            dispatch_async(queue, ^{
+                progressHandler(progress);
+            });
+        };
+    }
+    
     if (self.state == OMPromiseStateUnfulfilled) {
         if (self.progressHandlers == nil) {
             self.progressHandlers = [NSMutableArray arrayWithCapacity:1];
         }
         [self.progressHandlers addObject:progressHandler];
     }
-
+    
     return self;
+}
+
+#pragma mark - Cancellation
+
+- (void)cancel {
+    NSAssert(self.cancellable, @"Promise does not support cancellation!");
+    
+    self.state = OMPromiseStateFailed;
+    self.error = [NSError errorWithDomain:OMPromisesErrorDomain
+                                     code:OMPromisesCancelledError
+                                 userInfo:nil];
+
+    for (void (^cancelHandler)(OMDeferred *) in self.cancelHandlers) {
+        cancelHandler((OMDeferred *)self);
+    }
+    
+    for (void (^failHandler)(NSError *) in self.failHandlers) {
+        failHandler(self.error);
+    }
+
+    [self cleanup];
+}
+
+- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
+    if (self.state == OMPromiseStateUnfulfilled) {
+        if (self.cancelHandlers == nil) {
+            self.cancelHandlers = [NSMutableArray arrayWithCapacity:1];
+        }
+        [self.cancelHandlers addObject:cancelHandler];
+    }
+    self.cancellable = YES;
 }
 
 #pragma mark - Combinators & Transformers
@@ -393,14 +496,31 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 
 #pragma mark - Private Helper Methods
 
-- (void)control:(OMDeferred *)deferred {
-    [[[self fulfilled:^(id result) {
-        [deferred fulfil:result];
-    }] failed:^(NSError *error) {
-        [deferred fail:error];
-    }] progressed:^(float progress) {
-        [deferred progress:progress];
-    }];
++ (OMPromise *)bind:(OMDeferred *)deferred with:(id (^)(id))handler using:(id)parameter {
+    id next = nil;
+    
+    @try {
+        next = handler(parameter);
+    }
+    @catch (NSException *exception) {
+        next = [NSError errorWithDomain:OMPromisesErrorDomain
+                                   code:OMPromisesExceptionError
+                               userInfo:@{NSUnderlyingErrorKey: exception}];
+    }
+    
+    if ([next isKindOfClass:OMPromise.class]) {
+        return [[(OMPromise *)next fulfilled:^(id result) {
+            [deferred fulfil:result];
+        }] failed:^(NSError *error) {
+            [deferred fail:error];
+        }];
+    } else if ([next isKindOfClass:NSError.class]) {
+        [deferred fail:next];
+    } else {
+        [deferred fulfil:next];
+    }
+    
+    return nil;
 }
 
 + (OMPromise *)promisify:(id)result {
@@ -442,6 +562,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     self.fulfilHandlers = nil;
     self.failHandlers = nil;
     self.progressHandlers = nil;
+    self.cancelHandlers = nil;
 }
 
 @end

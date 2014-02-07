@@ -179,7 +179,7 @@
 /* Begin PBXLegacyTarget section */
 		A17D8F95180BD81500BEA154 /* Documentation */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = "-o docs -p OMPromises -c \"Oliver Mader\" -v \"0.1\" --create-html --no-create-docset OMPromises";
+			buildArgumentsString = "-o docs -p OMPromises -c \"Oliver Mader\" -v \"0.1.2\" --create-html --no-create-docset OMPromises";
 			buildConfigurationList = A17D8F96180BD81500BEA154 /* Build configuration list for PBXLegacyTarget "Documentation" */;
 			buildPhases = (
 			);

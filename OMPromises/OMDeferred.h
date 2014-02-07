@@ -34,6 +34,11 @@
 
  You might call progress: multiple times to keep the user informed, followed by a final
  call to either fulfil:, in case everything went as expected, or fail: otherwise.
+ 
+ If it is possible and desirable to stop or abort the abstracted operation, you should
+ register a cancel-handler using cancelled:. Doing so makes the aligned promise
+ implicitly cancellable, thus the handler is called once someone calls cancel on the
+ promise.
 
  It's important to understand that the OMDeferred/OMPromise is sealed, once its stated
  has been changed by calling fulfil: or fail:. After that calls to progress:, fulfil:
@@ -87,6 +92,21 @@
  @param progress Higher progress to set and propagate.
  */
 - (void)progress:(float)progress;
+
+///---------------------------------------------------------------------------------------
+/// @name Cancellation
+///---------------------------------------------------------------------------------------
+
+/** Add a handler to be called on cancel.
+ 
+ If at least one handler is registered, it is assumed that the corresponding promise
+ supports cancellation. Once the promise is cancelled, it changes into a failed state
+ with error code OMPromisesCancelledError and the corresponding cancel-handlers and
+ fail-handlers are called.
+ 
+ @param cancelHandler The block to be called, once the promise is cancelled.
+ */
+- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
 
 @end
 

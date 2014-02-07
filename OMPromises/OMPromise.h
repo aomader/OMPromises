@@ -2,7 +2,7 @@
 // OMPromise.h
 // OMPromises
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@
 
 /** Possible states of an OMPromise.
  */
-typedef enum OMPromiseState {
+typedef NS_ENUM(NSInteger, OMPromiseState) {
     OMPromiseStateUnfulfilled = 0,
     OMPromiseStateFailed = 1,
     OMPromiseStateFulfilled = 2
-} OMPromiseState;
+};
 
 
 /** OMPromise proxies the outcome of a long-running asynchronous operation. It's
@@ -67,8 +67,8 @@ typedef enum OMPromiseState {
 
 /** Current state.
 
- May only change from @p OMPromiseStateUnfulfilled to either @p OMPromiseStateFailed or
- @p OMPRomiseStateFulfilled.
+ May only change from `OMPromiseStateUnfulfilled` to either `OMPromiseStateFailed` or
+ `OMPRomiseStateFulfilled`.
  */
 @property(assign, readonly) OMPromiseState state;
 
@@ -91,9 +91,37 @@ typedef enum OMPromiseState {
  */
 @property(assign, readonly) float progress;
 
+/** Whether the underlying operation supports cancellation or not.
+ 
+ In case cancellable is `YES`, it's safe to call cancel.
+ */
+@property(assign, readonly) BOOL cancellable;
+
 ///---------------------------------------------------------------------------------------
 /// @name Creation
 ///---------------------------------------------------------------------------------------
+
+/** Create a promise with its outcome determined by a supplied block.
+ 
+ The promise completed with the result of the block. If anything within the block
+ raises an exception, the promise fails with the OMPromiseExceptionError code.
+ The block is executed asynchronously in a background queue. If you need more control
+ where the block is executed, have a look at promiseWithTask:on:.
+ 
+ @param task The task describing the outcome of the promise.
+ @return A new promise.
+ @see promiseWithTask:on:
+ */
++ (OMPromise *)promiseWithTask:(id (^)())task;
+
+/** Similar to promiseWithTask:, but executes the block on a specific queue.
+ 
+ @param task The task describing the outcome of the promise.
+ @param queue Context in which the block is executed.
+ @return A new promise.
+ @see promiseWithTask:
+ */
++ (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
 
 /** Create a fulfilled promise.
  
@@ -139,11 +167,19 @@ typedef enum OMPromiseState {
 
 /** Create a new promise by binding the fulfilled result to another promise.
 
- The supplied block gets called in case the promise gets fulfilled. The block can return
- a simple value or another block, in both cases the promise returned by this method
- is bound to the result of the block.
-
- If the promise fails, the chain is short-circuited and the resulting promise fails too.
+ The supplied block gets called in case the promise gets fulfilled. If the promise fails,
+ the block is not called and the returned promise fails (short-circuited).
+ 
+ The block can either return a promise, n which case the returned promise is bound to
+ the promise returned by this method. But it can also return a simple id value, which
+ either directly fulfils the returned promise or fails it, in case the object returned by
+ the block is of type NSError.
+ 
+ If the supplied block raises an exception during execution, the promise fails also
+ with an OMPromiseExceptionError error code.
+ 
+ The returned promise is aware of all parent promises and thus models the progress as
+ an equal distribution of workload amongst all promises in the chain.
 
  @param thenHandler Block to be called once the promise gets fulfilled.
  @return A new promise.
@@ -151,16 +187,36 @@ typedef enum OMPromiseState {
  */
 - (OMPromise *)then:(id (^)(id result))thenHandler;
 
+/** Similar to then:, but executes the supplied block asynchrounsly on a specific queue.
+ 
+ @param thenHandler Block to be called once the promise gets fulfilled.
+ @param queue Context in which the block is executed.
+ @return A new promise.
+ @see then:
+ */
+- (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue;
+
 /** Create a new promise by binding the error reason to another promise.
 
  Similar to then:, but the supplied block is called in case the promise fails, from
  which point on it behaves like then:. If the promise gets fulfilled the step is skipped.
+ The returned promise proxies the progress of the original one. In case the original
+ promise fails, the rescueHandler continues from that point on.
 
  @param rescueHandler Block to be called once the promise failed.
  @return A new promise.
  @see then:
  */
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
+
+/** Similar to rescue:, but executes the supplied block asynchrounsly on a specific queue.
+ 
+ @param rescueHandler Block to be called once the promise failed.
+ @param queue Context in which the block is executed.
+ @return A new promise.
+ @see rescue:
+ */
+- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
 /// @name Registering callbacks
@@ -173,6 +229,16 @@ typedef enum OMPromiseState {
  */
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler;
 
+/** Similar to fulfilled:, but executes the supplied block asynchrounsly on a specific
+ queue.
+
+ @param fulfilHandler Block to be called.
+ @param queue Context in which the block is executed.
+ @return The promise itself.
+ @see fulfilled:
+ */
+- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue;
+
 /** Register a block to be called when the promise fails.
 
  @param failHandler Block to be called.
@@ -180,12 +246,43 @@ typedef enum OMPromiseState {
  */
 - (OMPromise *)failed:(void (^)(NSError *error))failHandler;
 
+/** Similar to failed:, but executes the supplied block asynchrounsly on a specific queue.
+ 
+ @param failHandler Block to be called.
+ @param queue Context in which the block is executed.
+ @return The promise itself.
+ @see failed:
+ */
+- (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue;
+
 /** Register a block to be called when the promise progresses.
 
  @param progressHandler Block to be called.
  @return The promise itself.
  */
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler;
+
+/** Similar to progressed:, but executes the supplied block asynchrounsly on a specific
+ queue.
+ 
+ @param progressHandler Block to be called.
+ @param queue Context in which the block is executed.
+ @return The promise itself.
+ @see progressed:
+ */
+- (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue;
+
+///---------------------------------------------------------------------------------------
+/// @name Cancellation
+///---------------------------------------------------------------------------------------
+
+/** Cancel a still unfulfilled promise.
+ 
+ If the deferred supports cancellation, it should try to stop/abort the corresponding
+ task. By default a deferred _does not_ support cancellation, in which case a call
+ to cancel would throw an exception.
+ */
+- (void)cancel;
 
 ///---------------------------------------------------------------------------------------
 /// @name Combinators & Transformers
@@ -226,7 +323,7 @@ typedef enum OMPromiseState {
 
  In case that all supplied promises get fulfilled, the promise itself returns
  an array containing all results for the supplied promises while respecting the
- correct order. Nil has been replaced by [NSNull null]. If any promise fails,
+ correct order. `nil` has been replaced by `[NSNull null]`. If any promise fails,
  the returned promise fails also.
 
  Similar to chain: the workload of each promise is considered equal to
