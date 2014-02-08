@@ -15,8 +15,12 @@ The main features of OMPromises are listed below.
 
 * Fully tested and documented
 * Clean interface and separation of concerns
-* Support for chaining and callbacks
+* Support for chaining and callbacks, using `then:`, `rescue:`, `fulfilled:`,
+  `failed:` and `progressed:`, similar to most other libraries
+* Chaining blocks are protected against exceptions
+* Support for progress notifications, unlike other libraries
 * Optional support for cancellation
+* Queue based block execution if needed
 * Various combinators
 
 ## Installation
@@ -93,6 +97,21 @@ one call of either `fulfil:` or `fail:` on the deferred.
     });
 
     return deferred.promise;
+}
+```
+
+If you don't need the progress you could also simplify above snippet like this:
+
+```objc
+- (OMPromise *)workIntensiveButSynchronousMethod {
+    return [OMPromise promiseWithTask:^{
+        // do the long running task
+        // ...
+
+        // once we are done, we return the result, an NSError is automatically
+        // treated as failure
+        return (failed) ? error : result;
+    } on:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
 }
 ```
 
@@ -237,8 +256,7 @@ for a more detailed explanation. Each combinator creates a reasonable progress
 combination assuming an equal distribution of workload over all supplied promises.
 
 * `join` - Remove one level of promise wrapping
-* `chain:initial:` - Equal to applying multiple `then:` calls but respects the progress
-  of each promise.
+* `chain:initial:` - Equal to applying multiple chaining/callback calls
 * `all:` - Waits for all promises to get fulfilled, fails in case any promise fails.
 * `any:` - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
 
