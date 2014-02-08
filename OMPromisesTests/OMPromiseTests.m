@@ -50,6 +50,8 @@
 @implementation OMPromisesTests
 
 - (void)setUp {
+    [super setUp];
+    
     self.result = @.1337;
     self.result2 = @.31337;
     self.error = [NSError errorWithDomain:@"idontgiveadamn" code:1337 userInfo:nil];

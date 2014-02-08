@@ -193,15 +193,21 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
         };
     }
     
-    if (self.state == OMPromiseStateFulfilled) {
-        fulfilHandler(self.result);
+    OMPromiseState state;
+    
+    @synchronized (self) {
+        state = self.state;
+        
+        if (state == OMPromiseStateUnfulfilled) {
+            if (self.fulfilHandlers == nil) {
+                self.fulfilHandlers = [NSMutableArray arrayWithCapacity:1];
+            }
+            [self.fulfilHandlers addObject:fulfilHandler];
+        }
     }
     
-    if (self.state == OMPromiseStateUnfulfilled) {
-        if (self.fulfilHandlers == nil) {
-            self.fulfilHandlers = [NSMutableArray arrayWithCapacity:1];
-        }
-        [self.fulfilHandlers addObject:fulfilHandler];
+    if (state == OMPromiseStateFulfilled) {
+        fulfilHandler(self.result);
     }
     
     return self;
@@ -220,15 +226,21 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
         };
     }
     
-    if (self.state == OMPromiseStateFailed) {
-        failHandler(self.error);
+    OMPromiseState state;
+    
+    @synchronized (self) {
+        state = self.state;
+        
+        if (state == OMPromiseStateUnfulfilled) {
+            if (self.failHandlers == nil) {
+                self.failHandlers = [NSMutableArray arrayWithCapacity:1];
+            }
+            [self.failHandlers addObject:failHandler];
+        }
     }
     
-    if (self.state == OMPromiseStateUnfulfilled) {
-        if (self.failHandlers == nil) {
-            self.failHandlers = [NSMutableArray arrayWithCapacity:1];
-        }
-        [self.failHandlers addObject:failHandler];
+    if (self.state == OMPromiseStateFailed) {
+        failHandler(self.error);
     }
     
     return self;
@@ -251,11 +263,15 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
         progressHandler(self.progress);
     }
     
-    if (self.state == OMPromiseStateUnfulfilled) {
-        if (self.progressHandlers == nil) {
-            self.progressHandlers = [NSMutableArray arrayWithCapacity:1];
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled) {
+            if (self.progressHandlers == nil) {
+                self.progressHandlers = [NSMutableArray arrayWithCapacity:1];
+            }
+            @synchronized (self.progressHandlers) {
+                [self.progressHandlers addObject:progressHandler];
+            }
         }
-        [self.progressHandlers addObject:progressHandler];
     }
     
     return self;
@@ -264,12 +280,14 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 #pragma mark - Cancellation
 
 - (void)cancel {
-    NSAssert(self.cancellable, @"Promise does not support cancellation!");
-    
-    self.state = OMPromiseStateFailed;
-    self.error = [NSError errorWithDomain:OMPromisesErrorDomain
-                                     code:OMPromisesCancelledError
-                                 userInfo:nil];
+    @synchronized (self) {
+        NSAssert(self.cancellable, @"Promise does not support cancellation!");
+        
+        self.state = OMPromiseStateFailed;
+        self.error = [NSError errorWithDomain:OMPromisesErrorDomain
+                                         code:OMPromisesCancelledError
+                                     userInfo:nil];
+    }
 
     for (void (^cancelHandler)(OMDeferred *) in self.cancelHandlers) {
         cancelHandler((OMDeferred *)self);
@@ -283,13 +301,15 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 }
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
-    if (self.state == OMPromiseStateUnfulfilled) {
-        if (self.cancelHandlers == nil) {
-            self.cancelHandlers = [NSMutableArray arrayWithCapacity:1];
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled) {
+            if (self.cancelHandlers == nil) {
+                self.cancelHandlers = [NSMutableArray arrayWithCapacity:1];
+            }
+            [self.cancelHandlers addObject:cancelHandler];
+            self.cancellable = YES;
         }
-        [self.cancelHandlers addObject:cancelHandler];
     }
-    self.cancellable = YES;
 }
 
 #pragma mark - Combinators & Transformers

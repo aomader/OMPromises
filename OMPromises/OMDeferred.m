@@ -52,8 +52,10 @@
 - (void)fulfil:(id)result {
     [self progress:1.f];
     
-    self.state = OMPromiseStateFulfilled;
-    self.result = result;
+    @synchronized (self) {
+        self.state = OMPromiseStateFulfilled;
+        self.result = result;
+    }
     
     for (void (^fulfilHandler)(id) in self.fulfilHandlers) {
         fulfilHandler(result);
@@ -63,8 +65,10 @@
 }
 
 - (void)fail:(NSError *)error {
-    self.state = OMPromiseStateFailed;
-    self.error = error;
+    @synchronized (self) {
+        self.state = OMPromiseStateFailed;
+        self.error = error;
+    }
     
     for (void (^failHandler)(NSError *) in self.failHandlers) {
         failHandler(error);
@@ -74,12 +78,21 @@
 }
 
 - (void)progress:(float)progress {
-    NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
-    NSAssert(self.progress <= progress, @"Progress can only increase");
+    NSArray *progressHandlers = nil;
     
-    if (self.progress < progress) {
-        self.progress = progress;
-        for (void (^progressHandler)(float) in self.progressHandlers) {
+    @synchronized (self) {
+        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
+        NSAssert(self.progress <= progress, @"Progress can only increase");
+        
+        if (self.progress < progress) {
+            self.progress = progress;
+            progressHandlers = self.progressHandlers;
+        }
+        
+    }
+    
+    @synchronized (progressHandlers) {
+        for (void (^progressHandler)(float) in progressHandlers) {
             progressHandler(progress);
         }
     }
