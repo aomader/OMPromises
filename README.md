@@ -29,7 +29,7 @@ The recommended approach for installing OMPromises is to use [CocoaPods] package
 manager.
 
 ```bash
-pod 'OMPromises', '~> 0.1.0'
+pod 'OMPromises', '~> 0.2.0'
 ```
 
 ## Documentation
