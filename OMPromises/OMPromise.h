@@ -223,6 +223,8 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 ///---------------------------------------------------------------------------------------
 
 /** Register a block to be called when the promise gets fulfilled.
+ 
+ The handler is immediately executed if the promise is already in the fulfilled state.
 
  @param fulfilHandler Block to be called.
  @return The promise itself.
@@ -240,6 +242,8 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise fails.
+ 
+ The handler is immediately executed if the promise is already in the failed state.
 
  @param failHandler Block to be called.
  @return The promise itself.
@@ -256,6 +260,10 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 - (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise progresses.
+ 
+ If the promise already made some progress
+ the handler is called immediately with the current progress. That's also true if you register a progressed
+ block at an already fulfilled/failed promise.
 
  @param progressHandler Block to be called.
  @return The promise itself.
@@ -295,14 +303,14 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)join;
 
-/** Create a promise chain as if you would do multiple then binds.
+/** Create a promise chain as if you would register blocks in immediate succession.
 
- It also respects the progress of each chain step by assuming an equal distribution
- of work over all items, such that it also updates the progress with respect to
- each individual step.
+ You can use all kind of blocks as they are specified by then:, rescue:, fulfilled:,
+ failed: and progressed:.
+ The initial value can either be a simple object or a promise.
 
  @param thenHandlers Sequence of then: handler blocks.
- @param initial Initial result supplied to the first then: handler block.
+ @param initial Initial result supplied to the first handler block.
  @return A new promise describing the whole chain.
  */
 + (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result;

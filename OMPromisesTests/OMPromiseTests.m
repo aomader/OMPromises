@@ -2,7 +2,7 @@
 // OMPromiseTests.h
 // OMPromisesTests
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -119,17 +119,19 @@
 - (void)testBindOnAlreadyFulfilledPromise {
     OMPromise *promise = [OMPromise promiseWithResult:self.result];
     
-    __block int called = 0;
+    __block int called = 0, calledProgress = 0;
     [[[promise fulfilled:^(id result) {
         XCTAssertEqual(result, self.result, @"The supplied result should be identical");
         called += 1;
     }] failed:^(NSError *error) {
         XCTFail(@"Fail should not have been called");
     }] progressed:^(float progress) {
-        XCTFail(@"Progress should not have been called");
+        XCTAssertEqualWithAccuracy(progress, 1.f, FLT_EPSILON, @"Progress should be 0");
+        calledProgress += 1;
     }];
     
     XCTAssertEqual(called, 1, @"fulfilled-block should have been called once");
+    XCTAssertEqual(calledProgress, 1, @"progressed-block should have been called once");
 }
 
 - (void)testBindsOnNotAlreadyFulfilledPromise {
@@ -186,6 +188,27 @@
     XCTAssertEqual(called, 0, @"failed-block should not have been called yet");
     [deferred fail:self.error];
     XCTAssertEqual(called, 1, @"failed-block should have been called");
+}
+
+- (void)testNoInitialProgress {
+    OMDeferred *deferred = [OMDeferred deferred];
+    [deferred.promise progressed:^(float progress) {
+        XCTFail(@"there shouldnt be any progress");
+    }];
+}
+
+- (void)testInitialProgress {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    [deferred progress:.5f];
+    
+    __block int called = 0;
+    [deferred.promise progressed:^(float progress) {
+        XCTAssertEqualWithAccuracy(progress, .5f, FLT_EPSILON, @"Unexpected progress");
+        called += 1;
+    }];
+    
+    XCTAssertEqual(called, 1, @"progressed-block should not have been called until now");
 }
 
 - (void)testIncreasingProgress {
@@ -727,8 +750,8 @@
             return deferred.promise;
         },
         ^(float progress) {
-            float values[] = {.5f, 1.f};
-            XCTAssertEqualWithAccuracy(values[progressed++], progress, FLT_EPSILON, @"Unexpected progress");
+            float values[] = {.5f, .75f, 1.f};
+            XCTAssertEqualWithAccuracy(progress, values[progressed++], FLT_EPSILON, @"Unexpected progress");
         },
         ^(id result) {
             resultFulfilled2 = result;
@@ -748,13 +771,13 @@
     
     [deferred progress:.5f];
     XCTAssertEqualWithAccuracy(chain.progress, .75f, FLT_EPSILON, @"Assuming equal distribution of work load");
-    XCTAssertEqual(progressed, 1, @"Progressed handler should have been called");
+    XCTAssertEqual(progressed, 2, @"Progressed handler should have been called");
     
     [deferred fulfil:self.result2];
     XCTAssertEqual(chain.state, OMPromiseStateFulfilled, @"Chain should be fulfilled");
     XCTAssertEqual(resultFulfilled2, self.result2, @"Fulfilled handler should have been called");
     XCTAssertEqual(chain.result, self.result2, @"Chain should have result of last promise in chain");
-    XCTAssertEqual(progressed, 2, @"Progressed handler should have been called");
+    XCTAssertEqual(progressed, 3, @"Progressed handler should have been called");
     XCTAssertEqualWithAccuracy(chain.progress, 1.f, FLT_EPSILON, @"Chain should be done");
 }
 
@@ -784,8 +807,7 @@
     OMDeferred *deferred = [OMDeferred deferred];
     OMDeferred *deferred1 = [OMDeferred deferred];
     
-    __block int progressed = 0;
-    __block int progressed1 = 0;
+    __block int progressed = 0, progressed1 = 0, progressed2 = 0;
     __block id fulfilled = nil;
     
     OMPromise *chain = [OMPromise chain:@[
@@ -804,7 +826,8 @@
             XCTFail(@"Chain should short-circuit in case of failure");
         },
         ^(float progress) {
-            XCTFail(@"Chain should short-circuit in case of failure");
+            float values[] = {.25f};
+            XCTAssertEqualWithAccuracy(progress, values[progressed1++], FLT_EPSILON, @"Unexpected progress");
         },
         ^id(NSError *error) {
             XCTAssertEqual(error, self.error, @"We should rescue the previous error");
@@ -818,8 +841,8 @@
             XCTFail(@"We shouldnt call the error handler once its rescued");
         },
         ^(float progress) {
-            float values[] = {.5f, 1.f};
-            XCTAssertEqualWithAccuracy(values[progressed1++], progress, FLT_EPSILON, @"Unexpected progress");
+            float values[] = {.25f, .25f + (.75f * .5f), 1.f};
+            XCTAssertEqualWithAccuracy(progress, values[progressed2++], FLT_EPSILON, @"Unexpected progress");
         },
         ^(id result) {
             fulfilled = result;
@@ -832,22 +855,48 @@
     [deferred progress:.5f];
     XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should be unfulfilled");
     XCTAssertEqual(progressed, 1, @"Progressed handler should have been called once");
+    XCTAssertEqual(progressed1, 1, @"Progressed handler should have been called once");
     XCTAssertEqualWithAccuracy(chain.progress, 1/6.f, FLT_EPSILON, @"Chain should be have way done");
     
     [deferred fail:self.error];
     XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should not have failed");
     XCTAssertEqualWithAccuracy(chain.progress, 1/6.f, FLT_EPSILON, @"Progres should remain");
+    XCTAssertEqual(progressed2, 1, @"Progressed handler should have been called once");
     
     [deferred1 progress:.5f];
     XCTAssertEqual(chain.state, OMPromiseStateUnfulfilled, @"Chain should not have failed");
-    XCTAssertEqualWithAccuracy(chain.progress, 1/6.f + (1/12.f), FLT_EPSILON, @"Rescue should fill the remaining progress of the failed promise");
-    XCTAssertEqual(progressed1, 1, @"Progressed handler should have been called once");
+    XCTAssertEqualWithAccuracy(chain.progress, 1/6.f + .5f * 3/6.f, FLT_EPSILON, @"Rescue should fill the remaining progress of the failed promise");
+    XCTAssertEqual(progressed2, 2, @"Progressed handler should have been called twice");
     
     [deferred1 fulfil:self.result2];
     XCTAssertEqual(chain.state, OMPromiseStateFulfilled, @"Chain should be done now.");
     XCTAssertEqualWithAccuracy(chain.progress, 6/6.f, FLT_EPSILON, @"Chain should be nearly done");
-    XCTAssertEqual(progressed1, 2, @"Progressed handler should have been called twice");
+    XCTAssertEqual(progressed2, 3, @"Progressed handler should have been called three times");
     XCTAssertEqual(chain.result, self.result2, @"Chain should have result of last promise in chain");
+}
+
+- (void)testChainInitialPromise {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block int called = 0;
+    OMPromise *chain = [OMPromise chain:@[
+        ^id(id result) {
+            XCTAssertEqual(result, self.result, @"First result should be determined by initial promise");
+            return self.result2;
+        }
+    ] initial:deferred.promise];
+    
+    [chain progressed:^(float progress) {
+        float values[] = {.25f, .5f, 1.f};
+        XCTAssertEqualWithAccuracy(progress, values[called++], FLT_EPSILON, @"Unexpected progress");
+    }];
+    
+    [deferred progress:.5f];
+    XCTAssertEqual(called, 1, @"Progressed handler should have been called once");
+    
+    [deferred fulfil:self.result];
+    XCTAssertEqual(called, 3, @"Progressed handler should have been called three times");
+    XCTAssertEqual(chain.result, self.result2, @"Last then determines chain result");
 }
 
 - (void)testAnyEmptyArray {

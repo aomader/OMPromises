@@ -2,7 +2,7 @@
 // OMDeferredTests.h
 // OMPromisesTests
 //
-// Copyright (C) 2013 Oliver Mader
+// Copyright (C) 2013,2014 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

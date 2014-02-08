@@ -136,18 +136,18 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     deferred.promise.depth = next;
     
     [[[self
+        progressed:^(float progress) {
+            [deferred progress:progress * ((float)current/next)];
+        }]
+        failed:^(NSError *error) {
+            [deferred fail:error];
+        }]
         fulfilled:^(id result) {
             [[OMPromise bind:deferred with:thenHandler using:result]
                 progressed:^(float progress) {
                     [deferred progress:progress/next + ((float)current/next)];
                 }];
-        } on:queue]
-        failed:^(NSError *error) {
-            [deferred fail:error];
-        }]
-        progressed:^(float progress) {
-            [deferred progress:progress * ((float)current/next)];
-        }];
+        } on:queue];
     
     return deferred.promise;
 }
@@ -158,18 +158,22 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue {
     OMDeferred *deferred = [OMDeferred deferred];
+    deferred.promise.depth = self.depth;
     
-    [[[self fulfilled:^(id result) {
-        [deferred fulfil:result];
-    }] failed:^(NSError *error) {
-        float failedAt = self.progress;
-        [[OMPromise bind:deferred with:rescueHandler using:error]
-            progressed:^(float progress) {
-                [deferred progress:failedAt + (1 - failedAt)*progress];
-            }];
-    } on:queue] progressed:^(float progress) {
-        [deferred progress:progress];
-    }];
+    [[[self
+        progressed:^(float progress) {
+            [deferred progress:progress];
+        }]
+        fulfilled:^(id result) {
+            [deferred fulfil:result];
+        }]
+        failed:^(NSError *error) {
+            float failedAt = self.progress;
+            [[OMPromise bind:deferred with:rescueHandler using:error]
+                progressed:^(float progress) {
+                    [deferred progress:failedAt + (1 - failedAt)*progress];
+                }];
+        } on:queue];
     
     return deferred.promise;
 }
@@ -243,6 +247,10 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
         };
     }
     
+    if (self.progress > 0.f) {
+        progressHandler(self.progress);
+    }
+    
     if (self.state == OMPromiseStateUnfulfilled) {
         if (self.progressHandlers == nil) {
             self.progressHandlers = [NSMutableArray arrayWithCapacity:1];
@@ -287,32 +295,21 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 #pragma mark - Combinators & Transformers
 
 - (OMPromise *)join {
-    return [OMPromise chain:@[
-        ^(id _) {
-            return self;
-        }, ^(id inner) {
-            return inner;
-        }] initial:nil];
+    return [self then:^(OMPromise *next) {
+        return next;
+    }];
 }
 
 + (OMPromise *)chain:(NSArray *)handlers initial:(id)result {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMPromise *promise = result;
     
-    NSUInteger total = 0;
-    OMPromiseHandler handlerTypes[handlers.count];
-    
-    // the workload portion is determined by the total amount of then handlers
-    for (NSUInteger i = 0; i < handlers.count; ++i) {
-        handlerTypes[i] = [OMPromise typeOfHandler:handlers[i]];
-        total += (handlerTypes[i] == OMPromiseHandlerThen) ? 1 : 0;
+    if (![result isKindOfClass:OMPromise.class]) {
+        promise = [OMPromise promiseWithResult:result];
+        promise.depth = 0;
     }
     
-    OMPromise *promise = [OMPromise promisify:result];
-    NSUInteger done = 0;
-    
-    for (NSUInteger i = 0; i < handlers.count; ++i) {
-        id f = handlers[i];
-        OMPromiseHandler type = handlerTypes[i];
+    for (id f in handlers) {
+        OMPromiseHandler type = [OMPromise typeOfHandler:f];
         
         if (type == OMPromiseHandlerFulfilled) {
             [promise fulfilled:f];
@@ -324,96 +321,13 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
             promise = [promise then:f];
         } else if (type == OMPromiseHandlerRescue) {
             promise = [promise rescue:f];
-            
         } else {
             [NSException raise:@"Invalid block type"
                         format:@"The supplied block %@ is of unknown type", f];
         }
-        
-        BOOL updateProgress = type == OMPromiseHandlerRescue;
-        for (NSUInteger j = i + 1; j < handlers.count && !updateProgress; ++j) {
-            updateProgress = handlerTypes[j] == OMPromiseHandlerThen;
-            if (handlerTypes[j] == OMPromiseHandlerRescue)
-                break;
-        }
-        
-        if (updateProgress) {
-            float doneProgress = (float)done / total;
-            [[promise
-              progressed:^(float part) {
-                  [deferred progress:doneProgress + part / total];
-              }]
-             fulfilled:^(id _) {
-                 [deferred progress:doneProgress + 1.f / total];
-             }];
-            done += 1;
-        }
     }
     
-    // final promise fulfills/fails the chain
-    [[promise
-        fulfilled:^(id result) {
-            [deferred fulfil:result];
-        }]
-        failed:^(NSError *error) {
-            [deferred fail:error];
-        }];
-    
-    return deferred.promise;
-}
-
-+ (OMPromise *)chain:(NSArray *)handlers
-            previous:(OMPromise *)previous
-            deferred:(OMDeferred *)deferred
-            progress:(float)progress
-               total:(NSUInteger)total {
-    // base case
-    if (handlers.count == 0) {
-        [[previous
-            failed:^(NSError *error) {
-                [deferred fail:error];
-            }]
-            fulfilled:^(id result) {
-                [deferred fulfil:result];
-            }];
-        return deferred.promise;
-    }
-    
-    id f = handlers[0];
-    OMPromiseHandler type = [OMPromise typeOfHandler:f];
-    
-    if (type == OMPromiseHandlerFulfilled) {
-        [previous fulfilled:f];
-    } else if (type == OMPromiseHandlerProgressed) {
-        [previous progressed:f];
-    } else if (type == OMPromiseHandlerFailed) {
-        [previous failed:f];
-    } else if (type == OMPromiseHandlerThen) {
-        previous = [previous then:f];
-    } else if (type == OMPromiseHandlerRescue) {
-        previous = [previous rescue:f];
-    } else {
-        [NSException raise:@"Invalid block type"
-                    format:@"The supplied block %@ is of unknown type", f];
-    }
-    
-    if (type == OMPromiseHandlerThen) {
-        [[previous
-            progressed:^(float part) {
-                [deferred progress:progress + part / total];
-            }]
-            fulfilled:^(id _) {
-                [deferred progress:progress + 1.f / total];
-            }];
-        
-        progress += 1.f / total;
-    }
-    
-    return [OMPromise chain:[handlers subarrayWithRange:NSMakeRange(1, handlers.count - 1)]
-                   previous:previous
-                   deferred:deferred
-                   progress:progress
-                      total:total];
+    return promise;
 }
 
 + (OMPromise *)any:(NSArray *)promises {
@@ -521,10 +435,6 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     }
     
     return nil;
-}
-
-+ (OMPromise *)promisify:(id)result {
-    return [result isKindOfClass:OMPromise.class] ? result : [OMPromise promiseWithResult:result];
 }
 
 + (OMPromiseHandler)typeOfHandler:(id)handler {
