@@ -23,13 +23,13 @@
 // THE SOFTWARE.
 //
 
-#import "OMPromise+Protected.h"
+#import "OMPromise.h"
 
 #import "CTBlockDescription.h"
 #import "OMPromises.h"
 
 typedef NS_ENUM(NSInteger, OMPromiseHandler) {
-    OMPRomiseHandlerUnknown = -1,
+    OMPromiseHandlerUnknown = -1,
     OMPromiseHandlerFulfilled,
     OMPromiseHandlerFailed,
     OMPromiseHandlerProgressed,
@@ -143,10 +143,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
             [deferred fail:error];
         }]
         fulfilled:^(id result) {
-            [[OMPromise bind:deferred with:thenHandler using:result]
-                progressed:^(float progress) {
-                    [deferred progress:progress/next + ((float)current/next)];
-                }];
+            [OMPromise bind:deferred with:thenHandler using:result bias:(float)current/next fraction:(float)1/next];
         } on:queue];
     
     return deferred.promise;
@@ -168,11 +165,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
             [deferred fulfil:result];
         }]
         failed:^(NSError *error) {
-            float failedAt = self.progress;
-            [[OMPromise bind:deferred with:rescueHandler using:error]
-                progressed:^(float progress) {
-                    [deferred progress:failedAt + (1 - failedAt)*progress];
-                }];
+            [OMPromise bind:deferred with:rescueHandler using:error bias:self.progress fraction:1 - self.progress];
         } on:queue];
     
     return deferred.promise;
@@ -430,7 +423,11 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 
 #pragma mark - Private Helper Methods
 
-+ (OMPromise *)bind:(OMDeferred *)deferred with:(id (^)(id))handler using:(id)parameter {
++ (OMPromise *)bind:(OMDeferred *)deferred
+               with:(id (^)(id))handler
+              using:(id)parameter
+               bias:(float)bias
+           fraction:(float)fraction {
     id next = nil;
     
     @try {
@@ -443,7 +440,9 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     }
     
     if ([next isKindOfClass:OMPromise.class]) {
-        return [[(OMPromise *)next fulfilled:^(id result) {
+        return [[[(OMPromise *)next progressed:^(float progress) {
+            [deferred progress:bias + progress*fraction];
+        }] fulfilled:^(id result) {
             [deferred fulfil:result];
         }] failed:^(NSError *error) {
             [deferred fail:error];
@@ -461,7 +460,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     NSMethodSignature *signature = [[[CTBlockDescription alloc] initWithBlock:handler] blockSignature];
     
     if ([signature numberOfArguments] != 2) {
-        return OMPRomiseHandlerUnknown;
+        return OMPromiseHandlerUnknown;
     }
     
     // parse return type
@@ -485,7 +484,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
         return OMPromiseHandlerThen;
     }
     
-    return OMPRomiseHandlerUnknown;
+    return OMPromiseHandlerUnknown;
 }
 
 - (void)cleanup {
