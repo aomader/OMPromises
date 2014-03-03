@@ -98,6 +98,47 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
 @property(assign, readonly) BOOL cancellable;
 
 ///---------------------------------------------------------------------------------------
+/// @name Queue Management
+///---------------------------------------------------------------------------------------
+
+/** Returns the defaultQueue set for each promise on creation.
+
+ The global default queue is used as default parameter for defaultQueue of
+ each OMPromise instance. It defaults to nil.
+
+ @return The global default queue.
+ @see setGlobalDefaultQueue:
+ @see defaultQueue
+ */
++ (dispatch_queue_t)globalDefaultQueue;
+
+/** Override the global default queue.
+
+ @param queue The new global default queue.
+ @see globalDefaultQueue
+ */
++ (void)setGlobalDefaultQueue:(dispatch_queue_t)queue;
+
+/** Blocks are dispatched to this queue if not specified otherwise.
+
+ This property inherits the globalDefaultQueue property during instantiation.
+ Calls that take a block where you don't explicitly provide the GCD queue, use
+ this queue to dispatch the block to.
+ If this property is set to nil, blocks are executed in the calling context.
+
+ @see globalDefaultQueue:
+ @see on:
+ */
+@property dispatch_queue_t defaultQueue;
+
+/** Convenience method to set the defaultQueue and ease successive operations.
+
+ @return The current promise.
+ @see defaultQueue
+ */
+- (OMPromise *)on:(dispatch_queue_t)queue;
+
+///---------------------------------------------------------------------------------------
 /// @name Creation
 ///---------------------------------------------------------------------------------------
 
@@ -187,7 +228,7 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)then:(id (^)(id result))thenHandler;
 
-/** Similar to then:, but executes the supplied block asynchrounsly on a specific queue.
+/** Similar to then:, but executes the supplied block asynchronously on a specific queue.
  
  @param thenHandler Block to be called once the promise gets fulfilled.
  @param queue Context in which the block is executed.
@@ -209,7 +250,7 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
 
-/** Similar to rescue:, but executes the supplied block asynchrounsly on a specific queue.
+/** Similar to rescue:, but executes the supplied block asynchronously on a specific queue.
  
  @param rescueHandler Block to be called once the promise failed.
  @param queue Context in which the block is executed.
@@ -231,7 +272,7 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler;
 
-/** Similar to fulfilled:, but executes the supplied block asynchrounsly on a specific
+/** Similar to fulfilled:, but executes the supplied block asynchronously on a specific
  queue.
 
  @param fulfilHandler Block to be called.
@@ -250,7 +291,7 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)failed:(void (^)(NSError *error))failHandler;
 
-/** Similar to failed:, but executes the supplied block asynchrounsly on a specific queue.
+/** Similar to failed:, but executes the supplied block asynchronously on a specific queue.
  
  @param failHandler Block to be called.
  @param queue Context in which the block is executed.
@@ -270,7 +311,7 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
  */
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler;
 
-/** Similar to progressed:, but executes the supplied block asynchrounsly on a specific
+/** Similar to progressed:, but executes the supplied block asynchronously on a specific
  queue.
  
  @param progressHandler Block to be called.

@@ -51,10 +51,69 @@
 
 - (void)setUp {
     [super setUp];
-    
+
     self.result = @.1337;
     self.result2 = @.31337;
     self.error = [NSError errorWithDomain:@"idontgiveadamn" code:1337 userInfo:nil];
+}
+
+- (void)tearDown {
+    [OMPromise setGlobalDefaultQueue:nil];
+    [super tearDown];
+}
+
+#pragma mark - Queue
+
+- (void)testGlobalDefaultQueue {
+    XCTAssertEqual([OMPromise globalDefaultQueue], (dispatch_queue_t)nil, @"Global default queue should be nil if not specified otherwise.");
+
+    OMPromise *promise = [OMPromise promiseWithResult:self.result];
+    XCTAssertEqual(promise.defaultQueue, (dispatch_queue_t)nil, @"defaultQueue should inherit the globalDefaultQueue");
+
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    [OMPromise setGlobalDefaultQueue:mainQueue];
+    XCTAssertEqual([OMPromise globalDefaultQueue], mainQueue, @"Global default queue should be overridable");
+
+    OMDeferred *deferred = [OMDeferred deferred];
+    XCTAssertEqual(deferred.promise.defaultQueue, mainQueue, @"defalultQueue should inherit the globalDefaultQueue");
+}
+
+- (void)testDefaultQueue {
+    OMPromise *promise = [OMPromise promiseWithResult:self.result];
+
+    XCTAssertEqual(promise.defaultQueue, (dispatch_queue_t)nil, @"defaultQueue should inherit the globalDefaultQueue");
+
+    dispatch_queue_t mainQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    promise.defaultQueue = mainQueue;
+
+    __block int called = 0;
+    [promise fulfilled:^(id _) {
+        XCTAssertEqual(dispatch_get_current_queue(), mainQueue, @"Should run on default queue");
+        called += 1;
+    }];
+
+    WAIT_UNTIL(called == 1, 1, @"Fulfilled block should have been called");
+
+    dispatch_queue_t otherQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    XCTAssertNotEqual(mainQueue, otherQueue, @"queues should not be identical");
+
+    called = 0;
+    [promise fulfilled:^(id _) {
+        XCTAssertEqual(dispatch_get_current_queue(), otherQueue, @"Should run on specified queue");
+        called += 1;
+    } on:otherQueue];
+
+    WAIT_UNTIL(called == 1, 1, @"Fulfilled block should have been called");
+}
+
+- (void)testOn {
+    OMPromise *promise = [OMPromise promiseWithResult:self.result];
+
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    OMPromise *promise2 = [promise on:mainQueue];
+
+    XCTAssertEqual(promise, promise2, @"on: should return self");
+    XCTAssertEqual(promise.defaultQueue, mainQueue, @"defalultQueue should be set by on:");
 }
 
 #pragma mark - Return

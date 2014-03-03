@@ -34,6 +34,7 @@
 - (id)init {
     self = [super init];
     if (self) {
+        self.defaultQueue = [OMPromise globalDefaultQueue];
         self.progress = 0.f;
     }
     return self;

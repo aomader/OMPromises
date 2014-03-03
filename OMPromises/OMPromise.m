@@ -37,6 +37,8 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     OMPromiseHandlerRescue
 };
 
+static dispatch_queue_t globalDefaultQueue = nil;
+
 @interface OMPromise ()
 
 @property NSMutableArray *fulfilHandlers;
@@ -84,6 +86,21 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     _state = state;
 }
 
+#pragma mark - Queue
+
++ (dispatch_queue_t)globalDefaultQueue {
+    return globalDefaultQueue;
+}
+
++ (void)setGlobalDefaultQueue:(dispatch_queue_t)queue {
+    globalDefaultQueue = queue;
+}
+
+- (OMPromise *)on:(dispatch_queue_t)queue {
+    self.defaultQueue = queue;
+    return self;
+}
+
 #pragma mark - Return
 
 + (OMPromise *)promiseWithTask:(id (^)())task {
@@ -124,7 +141,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 #pragma mark - Bind
 
 - (OMPromise *)then:(id (^)(id result))thenHandler {
-    return [self then:thenHandler on:nil];
+    return [self then:thenHandler on:self.defaultQueue];
 }
 
 - (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue {
@@ -150,7 +167,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 }
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
-    return [self rescue:rescueHandler on:nil];
+    return [self rescue:rescueHandler on:self.defaultQueue];
 }
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue {
@@ -174,7 +191,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 #pragma mark - Callbacks
 
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler {
-    return [self fulfilled:fulfilHandler on:nil];
+    return [self fulfilled:fulfilHandler on:self.defaultQueue];
 }
 
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue {
@@ -207,7 +224,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 }
 
 - (OMPromise *)failed:(void (^)(NSError *error))failHandler {
-    return [self failed:failHandler on:nil];
+    return [self failed:failHandler on:self.defaultQueue];
 }
 
 - (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue {
@@ -240,7 +257,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
 }
 
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler {
-    return [self progressed:progressHandler on:nil];
+    return [self progressed:progressHandler on:self.defaultQueue];
 }
 
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue {
