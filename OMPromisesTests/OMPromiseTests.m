@@ -369,6 +369,18 @@
     XCTAssertEqual(calledFail, 1, @"failed-block should have been called exactly once");
 }
 
+- (void)testThenReturnAlreadyFulfilledPromise {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    OMPromise *promise = [deferred.promise then:^id(id _) {
+        return [OMPromise promiseWithResult:self.result2];
+    }];
+
+    [deferred fulfil:self.result];
+    XCTAssertEqual(promise.state, OMPromiseStateFulfilled, @"Promise should be fulfilled");
+    XCTAssertEqual(promise.result, self.result2, @"Result should be from inner promise");
+}
+
 - (void)testThenReturnValue {
     OMDeferred *deferred = [OMDeferred deferred];
 
