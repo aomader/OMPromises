@@ -62,6 +62,9 @@
     [super tearDown];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #pragma mark - Queue
 
 - (void)testGlobalDefaultQueue {
@@ -1063,5 +1066,7 @@
     [deferred2 fulfil:self.result];
     XCTAssertEqual(all.state, OMPromiseStateFailed, @"All should have failed");
 }
+
+#pragma clang diagnostics pop
 
 @end

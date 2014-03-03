@@ -28,6 +28,8 @@
 #import "CTBlockDescription.h"
 #import "OMPromises.h"
 
+NSString *const OMPromisesErrorDomain = @"de.reaktor42.OMPromises";
+
 typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     OMPromiseHandlerUnknown = -1,
     OMPromiseHandlerFulfilled,

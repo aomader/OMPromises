@@ -32,6 +32,21 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
     OMPromiseStateFulfilled = 2
 };
 
+/** Codes used for errors that lie in the domain of OMPromisesErrorDomain.
+ */
+typedef NS_ENUM(NSInteger, OMPromisesErrorCodes) {
+    /** An user supplied block raised an exception. */
+    OMPromisesExceptionError,
+    /** Indicates that the promise has been cancelled. */
+    OMPromisesCancelledError,
+    /** Indicates that no promise passed to the any: combinator got fulfilled. */
+    OMPromisesCombinatorAnyNonFulfilledError
+};
+
+/** The error domain used within NSError to distinguish errors specific
+ to OMPromises.
+ */
+extern NSString *const OMPromisesErrorDomain;
 
 /** OMPromise proxies the outcome of a long-running asynchronous operation. It's
  a read-only object which is described essentially by state. The state defines
