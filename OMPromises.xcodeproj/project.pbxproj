@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4480318F32BDF37D8B6D34B7 /* OMHTTPPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 448037ED55C0AF751C41FDCD /* OMHTTPPromise.m */; };
+		448033B974EB56400A72B339 /* OMPromise+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 448038904E20817F10EBEB61 /* OMPromise+HTTP.m */; };
+		448035174A0482C519BFCBFE /* OMHTTPPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 448035763EF94F3F14421DF0 /* OMHTTPPromiseTests.m */; };
+		4480355179CDAB344E563694 /* OMHTTPPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 448037ED55C0AF751C41FDCD /* OMHTTPPromise.m */; };
+		448036600F92C6B7EE8ADA8D /* OMPromise+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 448038904E20817F10EBEB61 /* OMPromise+HTTP.m */; };
+		448037E00730509C87E2367B /* OMHTTPResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 44803125E21E7AED56B48236 /* OMHTTPResponse.m */; };
+		44803F768BABA6FBDBFF78A3 /* OMHTTPResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 44803125E21E7AED56B48236 /* OMHTTPResponse.m */; };
 		A13BEEF2187DB94C001755CE /* CTBlockDescription.m in Sources */ = {isa = PBXBuildFile; fileRef = A13BEEF1187DB94C001755CE /* CTBlockDescription.m */; };
 		A1691F6E17FBF1FA00C7FE5E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1691F6D17FBF1FA00C7FE5E /* Foundation.framework */; };
 		A1691F7317FBF1FA00C7FE5E /* OMPromises.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A1691F7217FBF1FA00C7FE5E /* OMPromises.h */; };
@@ -47,6 +54,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		44803125E21E7AED56B48236 /* OMHTTPResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMHTTPResponse.m; sourceTree = "<group>"; };
+		448031B2513417E0F9B6F3F9 /* OMHTTPResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMHTTPResponse.h; sourceTree = "<group>"; };
+		448035763EF94F3F14421DF0 /* OMHTTPPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMHTTPPromiseTests.m; sourceTree = "<group>"; };
+		448037ED55C0AF751C41FDCD /* OMHTTPPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMHTTPPromise.m; sourceTree = "<group>"; };
+		448038904E20817F10EBEB61 /* OMPromise+HTTP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "OMPromise+HTTP.m"; sourceTree = "<group>"; };
+		44803A91EF5D77F6DEEDEBC4 /* OMPromise+HTTP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OMPromise+HTTP.h"; sourceTree = "<group>"; };
+		44803F60644C6B7D6F23AEFD /* OMHTTPPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMHTTPPromise.h; sourceTree = "<group>"; };
 		A13BEEF0187DB94C001755CE /* CTBlockDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTBlockDescription.h; sourceTree = "<group>"; };
 		A13BEEF1187DB94C001755CE /* CTBlockDescription.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CTBlockDescription.m; sourceTree = "<group>"; };
 		A1691F6A17FBF1FA00C7FE5E /* libOMPromises.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOMPromises.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,6 +104,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4480374473D2F6D57F433C16 /* HTTP */ = {
+			isa = PBXGroup;
+			children = (
+				448037ED55C0AF751C41FDCD /* OMHTTPPromise.m */,
+				44803F60644C6B7D6F23AEFD /* OMHTTPPromise.h */,
+				44803125E21E7AED56B48236 /* OMHTTPResponse.m */,
+				448031B2513417E0F9B6F3F9 /* OMHTTPResponse.h */,
+				448038904E20817F10EBEB61 /* OMPromise+HTTP.m */,
+				44803A91EF5D77F6DEEDEBC4 /* OMPromise+HTTP.h */,
+			);
+			path = HTTP;
+			sourceTree = "<group>";
+		};
+		44803A5CDF32A4DEF3B76523 /* HTTP */ = {
+			isa = PBXGroup;
+			children = (
+				448035763EF94F3F14421DF0 /* OMHTTPPromiseTests.m */,
+			);
+			path = HTTP;
+			sourceTree = "<group>";
+		};
 		A13BEEEF187DB8D8001755CE /* External */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +174,7 @@
 				A1691F9C17FBF32800C7FE5E /* OMPromise+Protected.h */,
 				A1691F9617FBF2AF00C7FE5E /* OMPromise.m */,
 				A1691F7017FBF1FA00C7FE5E /* Supporting Files */,
+				4480374473D2F6D57F433C16 /* HTTP */,
 			);
 			path = OMPromises;
 			sourceTree = "<group>";
@@ -157,6 +193,7 @@
 				A1691F8917FBF1FA00C7FE5E /* OMPromiseTests.m */,
 				A1691FA717FC611300C7FE5E /* OMDeferredTests.m */,
 				A1691F8417FBF1FA00C7FE5E /* Supporting Files */,
+				44803A5CDF32A4DEF3B76523 /* HTTP */,
 			);
 			path = OMPromisesTests;
 			sourceTree = "<group>";
@@ -273,6 +310,9 @@
 				A13BEEF2187DB94C001755CE /* CTBlockDescription.m in Sources */,
 				A1691F9717FBF2AF00C7FE5E /* OMDeferred.m in Sources */,
 				A1691F9817FBF2AF00C7FE5E /* OMPromise.m in Sources */,
+				4480355179CDAB344E563694 /* OMHTTPPromise.m in Sources */,
+				448037E00730509C87E2367B /* OMHTTPResponse.m in Sources */,
+				448036600F92C6B7EE8ADA8D /* OMPromise+HTTP.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +324,10 @@
 				A1691F9917FBF2BE00C7FE5E /* OMDeferred.m in Sources */,
 				A1691F8A17FBF1FA00C7FE5E /* OMPromiseTests.m in Sources */,
 				A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */,
+				448035174A0482C519BFCBFE /* OMHTTPPromiseTests.m in Sources */,
+				44803F768BABA6FBDBFF78A3 /* OMHTTPResponse.m in Sources */,
+				448033B974EB56400A72B339 /* OMPromise+HTTP.m in Sources */,
+				4480318F32BDF37D8B6D34B7 /* OMHTTPPromise.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
