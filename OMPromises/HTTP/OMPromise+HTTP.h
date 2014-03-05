@@ -31,4 +31,10 @@
 
 - (OMPromise *)http_parseText;
 
+/*
++ (OMPromise *)httpGet:(NSString *)urlString parameters:(NSDictionary *)parameters options:(NSDictionary *)options;
++ (OMPromise *)httpGet:(NSString *)urlString options:(NSDictionary *)options;
++ (OMPromise *)httpGet:(NSString *)urlString;
+*/
+
 @end

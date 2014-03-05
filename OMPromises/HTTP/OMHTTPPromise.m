@@ -77,6 +77,17 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 
 #pragma mark - Public Static Methods
 
++ (OMPromise *)requestWithMethod:(NSString *)method
+                             url:(NSURL *)url
+                      parameters:(NSDictionary *)parameters
+                         options:(NSDictionary *)options
+{
+    return [[OMHTTPPromise alloc] initWithURL:url
+                                       method:method
+                                   parameters:parameters
+                                      options:options].promise;
+}
+
 + (OMPromise *)get:(NSString *)urlString parameters:(NSDictionary *)parameters options:(NSDictionary *)options {
     return [OMHTTPPromise requestWithMethod:@"GET"
                                         url:[NSURL URLWithString:urlString]
@@ -90,17 +101,6 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 
 + (OMPromise *)get:(NSString *)urlString {
     return [OMHTTPPromise get:urlString parameters:nil options:nil];
-}
-
-+ (OMPromise *)requestWithMethod:(NSString *)method
-                             url:(NSURL *)url
-                      parameters:(NSDictionary *)parameters
-                         options:(NSDictionary *)options
-{
-    return [[OMHTTPPromise alloc] initWithURL:url
-                                       method:method
-                                   parameters:parameters
-                                      options:options].promise;
 }
 
 #pragma mark - NSURLConnectionDelegate

@@ -32,13 +32,19 @@ extern NSString *const OMHTTPSerializationURLEncoded;
 
 @interface OMHTTPPromise : OMDeferred
 
-+ (OMPromise *)get:(NSString *)urlString parameters:(NSDictionary *)parameters options:(NSDictionary *)options;
-+ (OMPromise *)get:(NSString *)urlString options:(NSDictionary *)options;
-+ (OMPromise *)get:(NSString *)urlString;
+///---------------------------------------------------------------------------------------
+/// @name Universal HTTP Request
+///---------------------------------------------------------------------------------------
 
 /** Perform a HTTP request.
 
- @param method The HTTP method to use.
+ The central method to create a HTTP request, start it and create a promise
+ which represents the outcome of the HTTP request.
+
+ There are convenience methods to simplify the process even further,
+ like get: or post:.
+
+ @param method The HTTP method to use. E.g. GET, POST, etc.
  @param url The URL of the resource to request.
  @param parameters Optional set of parameters.
  @param options ...
@@ -49,5 +55,13 @@ extern NSString *const OMHTTPSerializationURLEncoded;
                              url:(NSURL *)url
                       parameters:(NSDictionary *)parameters
                          options:(NSDictionary *)options;
+
+///---------------------------------------------------------------------------------------
+/// @name HTTP GET
+///---------------------------------------------------------------------------------------
+
++ (OMPromise *)get:(NSString *)urlString parameters:(NSDictionary *)parameters options:(NSDictionary *)options;
++ (OMPromise *)get:(NSString *)urlString options:(NSDictionary *)options;
++ (OMPromise *)get:(NSString *)urlString;
 
 @end
