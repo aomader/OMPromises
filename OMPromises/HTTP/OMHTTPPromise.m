@@ -135,7 +135,9 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
         self.response = (NSHTTPURLResponse *)response;
     }
 
-    [self progress:kLookupProgress];
+    if (self.state == OMPromiseStateUnfulfilled) {
+        [self progress:kLookupProgress];
+    }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
