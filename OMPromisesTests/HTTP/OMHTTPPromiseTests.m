@@ -26,7 +26,7 @@
 #import <XCTest/XCTest.h>
 
 #import "OMPromises.h"
-#import "OMHTTPPromise.h"
+#import "OMHTTPRequest.h"
 #import "OMHTTPResponse.h"
 #import "OMPromise+HTTP.h"
 
@@ -61,9 +61,9 @@
                              parameters:@{@"test": @"asdf"}
                                 options:nil];
     */
-    OMPromise *get = [OMHTTPPromise get:@"http://reaktor42.de/images/robot.png"
+    OMPromise *get = [OMHTTPRequest get:@"http://reaktor42.de/images/robot.png"
                              parameters:@{@"test": @"asdf"}
-                                options:nil];
+                                options:@{OMHTTPTimeout: @0.001}];
 
     __block int called = 0;
     [[get fulfilled:^(id data) {
@@ -74,6 +74,8 @@
     }];
 
     WAIT_UNTIL(called == 1, 10, @"should have been called");
+    
+    get = nil;
 }
 
 @end

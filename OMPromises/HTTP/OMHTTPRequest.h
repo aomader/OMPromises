@@ -1,5 +1,5 @@
 //
-// OMHTTPPromise.h
+// OMHTTPRequest.h
 // OMPromises
 //
 // Copyright (C) 2013,2014 Oliver Mader
@@ -25,12 +25,18 @@
 
 #import "OMPromises.h"
 
+
+extern NSString *const OMHTTPTimeout;
+
+extern NSString *const OMHTTPLookupProgress;
+
 // Serialization Option
 extern NSString *const OMHTTPSerialization;
 extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
 
-@interface OMHTTPPromise : OMDeferred
+
+@interface OMHTTPRequest : OMDeferred
 
 ///---------------------------------------------------------------------------------------
 /// @name Universal HTTP Request
@@ -46,10 +52,15 @@ extern NSString *const OMHTTPSerializationURLEncoded;
 
  @param method The HTTP method to use. E.g. GET, POST, etc.
  @param url The URL of the resource to request.
- @param parameters Optional set of parameters.
- @param options ...
- @return A promise that yields a OMHTTPResponse.
+ @param parameters Optional set of parameters. How these parameters are serialized into
+                   the body depends on the OMHTTPSerialization key.
+ @param options An optional set of HTTP headers including values and method specific
+                options like OMHTTPSerialization. Each non method specific option is
+                automatically treated as HTTP header and added to the request.
+ @return A promise that yields an OMHTTPResponse instance if successful.
  @see OMHTTPResponse
+ @see get:parameters:options:
+ @see post:parameters:options:
  */
 + (OMPromise *)requestWithMethod:(NSString *)method
                              url:(NSURL *)url
@@ -57,11 +68,27 @@ extern NSString *const OMHTTPSerializationURLEncoded;
                          options:(NSDictionary *)options;
 
 ///---------------------------------------------------------------------------------------
-/// @name HTTP GET
+/// @name Convenience Methods
 ///---------------------------------------------------------------------------------------
 
-+ (OMPromise *)get:(NSString *)urlString parameters:(NSDictionary *)parameters options:(NSDictionary *)options;
-+ (OMPromise *)get:(NSString *)urlString options:(NSDictionary *)options;
-+ (OMPromise *)get:(NSString *)urlString;
++ (OMPromise *)get:(NSString *)urlString
+        parameters:(NSDictionary *)parameters
+           options:(NSDictionary *)options;
+
++ (OMPromise *)post:(NSString *)urlString
+         parameters:(NSDictionary *)parameters
+            options:(NSDictionary *)options;
+
++ (OMPromise *)put:(NSString *)urlString
+        parameters:(NSDictionary *)parameters
+           options:(NSDictionary *)options;
+
++ (OMPromise *)head:(NSString *)urlString
+         parameters:(NSDictionary *)parameters
+            options:(NSDictionary *)options;
+
++ (OMPromise *)delete:(NSString *)urlString
+           parameters:(NSDictionary *)parameters
+              options:(NSDictionary *)options;
 
 @end
