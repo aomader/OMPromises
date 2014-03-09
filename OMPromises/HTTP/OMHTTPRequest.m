@@ -159,6 +159,12 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
     return request;
 }
 
++ (NSString *)interpolateString:(NSString *)string parameters:(NSDictionary *)parameters {
+#warning Interpolate strings like "foo={bar}" using the parameters.
+#warning Use that in the convenience methods!
+    return nil;
+}
+
 + (NSData *)buildURLEncodedData:(NSDictionary *)parameters {
 #warning add implementation
     return nil;
