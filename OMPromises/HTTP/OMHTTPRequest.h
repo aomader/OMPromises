@@ -23,8 +23,7 @@
 // THE SOFTWARE.
 //
 
-#import "OMPromises.h"
-
+#import "OMDeferred.h"
 
 extern NSString *const OMHTTPTimeout;
 
@@ -32,10 +31,14 @@ extern NSString *const OMHTTPLookupProgress;
 
 // Serialization Option
 extern NSString *const OMHTTPSerialization;
+extern NSString *const OMHTTPSerializationQueryString;
 extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
 
-
+/** Provides methods to create an OMPromise representing an HTTP request.
+ 
+ 
+ */
 @interface OMHTTPRequest : OMDeferred
 
 ///---------------------------------------------------------------------------------------

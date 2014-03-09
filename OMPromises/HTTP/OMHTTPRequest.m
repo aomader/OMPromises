@@ -33,6 +33,7 @@ static const float kDefaultLookupProgress = .05f;
 NSString *const OMHTTPTimeout = @"OMHTTPTimeout";
 NSString *const OMHTTPLookupProgress = @"OMHTTPLookupProgress";
 NSString *const OMHTTPSerialization = @"OMHTTPSerialization";
+NSString *const OMHTTPSerializationQueryString = @"querystring";
 NSString *const OMHTTPSerializationJSON = @"json";
 NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 
@@ -115,6 +116,13 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                      parameters:(NSDictionary *)parameters
                         options:(NSDictionary *)options
 {
+    // add query string to URL
+    if (parameters && [options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationQueryString]) {
+        NSString *queryString = [OMHTTPRequest buildQueryString:parameters];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%c%@", url.absoluteString,
+                                    url.query.length ? '&' : '?', queryString]];
+    }
+    
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
             initWithURL:url
             cachePolicy:NSURLRequestReloadIgnoringCacheData
@@ -129,14 +137,15 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
             contentType = @"application/json";
 #warning handle error
             request.HTTPBody = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
-        } else {
-#warning generate form data
+        } else if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationURLEncoded]) {
             contentType = @"application/x-www-form-urlencoded";
-            request.HTTPBody = nil;
+            request.HTTPBody = [OMHTTPRequest buildURLEncodedData:parameters];
         }
         
-        [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
-        [request setValue:[@(request.HTTPBody.length) stringValue] forHTTPHeaderField:@"Content-Length"];
+        if (request.HTTPBody) {
+            [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
+            [request setValue:[@(request.HTTPBody.length) stringValue] forHTTPHeaderField:@"Content-Length"];
+        }
     }
     
     // add http headers
@@ -148,6 +157,25 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
     }
     
     return request;
+}
+
++ (NSData *)buildURLEncodedData:(NSDictionary *)parameters {
+#warning add implementation
+    return nil;
+}
+
++ (NSString *)buildQueryString:(NSDictionary *)parameters {
+    NSMutableArray *pairs = [NSMutableArray arrayWithCapacity:parameters.count];
+    for (NSString *key in parameters.keyEnumerator) {
+        [pairs addObject:[NSString stringWithFormat:@"%@=%@",
+                          [OMHTTPRequest escapeString:key], [OMHTTPRequest escapeString:parameters[key]]]];
+    }
+    return [pairs componentsJoinedByString:@"&"];
+}
+
++ (NSString *)escapeString:(NSString *)string {
+    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
+        NULL, (CFStringRef)string, NULL, CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!"), kCFStringEncodingUTF8);
 }
 
 #pragma mark - Public Static Methods

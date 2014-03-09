@@ -26,9 +26,6 @@
 #import <XCTest/XCTest.h>
 
 #import "OMPromises.h"
-#import "OMHTTPRequest.h"
-#import "OMHTTPResponse.h"
-#import "OMPromise+HTTP.h"
 
 #define WAIT_UNTIL(condition, timeout, msg, ...) \
     { \
@@ -61,9 +58,9 @@
                              parameters:@{@"test": @"asdf"}
                                 options:nil];
     */
-    OMPromise *get = [OMHTTPRequest get:@"http://reaktor42.de/images/robot.png"
-                             parameters:@{@"test": @"asdf"}
-                                options:@{OMHTTPTimeout: @0.001}];
+    OMPromise *get = [OMHTTPRequest get:@"http://reaktor42.de/images/robot.png?foo=bar"
+                             parameters:@{@"test": @"asdf=?"}
+                                options:@{OMHTTPTimeout: @0.001, OMHTTPSerialization: OMHTTPSerializationQueryString}];
 
     __block int called = 0;
     [[get fulfilled:^(id data) {

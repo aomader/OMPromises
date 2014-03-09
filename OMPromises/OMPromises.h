@@ -25,3 +25,12 @@
 
 #import "OMDeferred.h"
 #import "OMPromise.h"
+
+// Include HTTP headers if possible.
+#if defined(__has_include)
+#if __has_include("OMHTTPRequest.h")
+#import "OMHTTPRequest.h"
+#import "OMHTTPResponse.h"
+#import "OMPromise+HTTP.h"
+#endif
+#endif
