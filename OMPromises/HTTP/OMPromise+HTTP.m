@@ -24,21 +24,28 @@
 //
 
 #import "OMPromise+HTTP.h"
-#import "OMHTTPResponse.h"
 
+#import "OMHTTPResponse.h"
 
 @implementation OMPromise (HTTP)
 
-- (OMPromise *)http_parseJSON {
+- (OMPromise *)httpParseText {
+#warning Check content-type as well as a charset and transform body to string.
+    return nil;
+}
+
+- (OMPromise *)httpParseImage {
+#warning Check content-type for UIImage readable and transform to UIImage.
+    return  nil;
+}
+
+- (OMPromise *)httpParseJSON {
+#warning Check for content-type, also account for possible versioned content types.
     return [self then:^id(OMHTTPResponse *response) {
         NSError *error = nil;
         id data = [NSJSONSerialization JSONObjectWithData:response.body options:0 error:&error];
         return error ?: data;
     }];
-}
-
-- (OMPromise *)http_parseText {
-    return nil;
 }
 
 @end

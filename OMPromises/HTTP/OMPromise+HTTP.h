@@ -27,14 +27,8 @@
 
 @interface OMPromise (HTTP)
 
-- (OMPromise *)http_parseJSON;
-
-- (OMPromise *)http_parseText;
-
-/*
-+ (OMPromise *)httpGet:(NSString *)urlString parameters:(NSDictionary *)parameters options:(NSDictionary *)options;
-+ (OMPromise *)httpGet:(NSString *)urlString options:(NSDictionary *)options;
-+ (OMPromise *)httpGet:(NSString *)urlString;
-*/
+- (OMPromise *)httpParseText;
+- (OMPromise *)httpParseImage;
+- (OMPromise *)httpParseJSON;
 
 @end
