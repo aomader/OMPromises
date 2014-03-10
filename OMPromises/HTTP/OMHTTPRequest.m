@@ -65,6 +65,12 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                        initWithRequest:[self requestForURL:url method:method parameters:parameters options:options]
                        delegate:self
                        startImmediately:YES];
+        
+        // cancellation support
+        __weak OMHTTPRequest *weakSelf = self;
+        [self cancelled:^(OMDeferred *_) {
+            [weakSelf.connection cancel];
+        }];
     }
     return self;
 }
