@@ -513,5 +513,17 @@ static dispatch_queue_t globalDefaultQueue = nil;
     self.cancelHandlers = nil;
 }
 
+#pragma mark - NSObject Overrides
+
+- (NSString *)debugDescription {
+    if (self.state == OMPromiseStateFulfilled) {
+        return [NSString stringWithFormat:@"<OMPromise: %p; state = fulfilled; result = %@>", self, self.result];
+    } else if (self.state == OMPromiseStateFailed) {
+        return [NSString stringWithFormat:@"<OMPromise: %p; state = failed; error = %@>", self, self.error];
+    } else {
+        return [NSString stringWithFormat:@"<OMPromise: %p; state = unfulfilled; progress = %.2f>", self, self.progress];
+    }
+}
+
 @end
 
