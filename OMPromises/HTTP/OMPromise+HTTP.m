@@ -25,7 +25,18 @@
 
 #import "OMPromise+HTTP.h"
 
+#import <UIKit/UIKit.h>
+
 #import "OMHTTPResponse.h"
+
+static const char *supportedImages[] = {
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "image/tiff",
+    "image/x-xbitmap",
+    "image/x-icon"
+};
 
 @implementation OMPromise (HTTP)
 
@@ -35,6 +46,24 @@
 }
 
 - (OMPromise *)httpParseImage {
+    return [self then:^id(OMHTTPResponse *response) {
+        BOOL supported = NO;
+        const char *contentType = [response.headers[@"Content-Type"] cStringUsingEncoding:NSUTF8StringEncoding];
+        for (NSUInteger i = 0; i < 6; ++i) {
+            if (strcasecmp(contentType, supportedImages[i]) == 0) {
+                supported = YES;
+                break;
+            }
+        }
+        
+        if (!supported) {
+#warning Check content-type as well as a charset and transform body to string.
+            return [NSError errorWithDomain:OMPromisesErrorDomain code:0 userInfo:nil];
+        }
+        
+        return [[UIImage alloc] initWithData:response.body];
+    }];
+    
 #warning Check content-type for UIImage readable and transform to UIImage.
     return  nil;
 }
