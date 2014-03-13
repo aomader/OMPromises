@@ -36,8 +36,6 @@ extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
 
 /** Provides methods to create an OMPromise representing an HTTP request.
- 
- 
  */
 @interface OMHTTPRequest : OMDeferred
 
@@ -45,13 +43,19 @@ extern NSString *const OMHTTPSerializationURLEncoded;
 /// @name Universal HTTP Request
 ///---------------------------------------------------------------------------------------
 
-/** Perform a HTTP request.
+/** Perform an HTTP request.
 
- The central method to create a HTTP request, start it and create a promise
- which represents the outcome of the HTTP request.
+ The central method to create an HTTP request, start it and create a promise
+ which represents the outcome of the respective request.
 
- There are convenience methods to simplify the process even further,
- like get: or post:.
+ There are convenience methods for the most common verbs to simplify the process even
+ further, like get:paramaters:options: or post:parameters:options:. These methods may
+ apply additional logic to provide sane defaults, have a look at the corresponding
+ documentation.
+ All covenience methods share the automated URL string interpolation in addition to
+ the final parameter serializtion: Each occurence of a string wrapped in curly braces
+ is replaced by the value found in the parameters dictionary identified by the wrapped
+ string. The pair is removed from the dictionary afterwards.
 
  @param method The HTTP method to use. E.g. GET, POST, etc.
  @param url The URL of the resource to request.
@@ -59,11 +63,14 @@ extern NSString *const OMHTTPSerializationURLEncoded;
                    the body depends on the OMHTTPSerialization key.
  @param options An optional set of HTTP headers including values and method specific
                 options like OMHTTPSerialization. Each non method specific option is
-                automatically treated as HTTP header and added to the request.
+                automatically treated as an HTTP header and added to the request.
  @return A promise that yields an OMHTTPResponse instance if successful.
  @see OMHTTPResponse
  @see get:parameters:options:
  @see post:parameters:options:
+ @see put:parameters:options:
+ @see head:parameters:options:
+ @see delete:parameters:options:
  */
 + (OMPromise *)requestWithMethod:(NSString *)method
                              url:(NSURL *)url
@@ -74,22 +81,40 @@ extern NSString *const OMHTTPSerializationURLEncoded;
 /// @name Convenience Methods
 ///---------------------------------------------------------------------------------------
 
+/** Convenience method to perform an HTTP GET request.
+ 
+ Uses OMHTTPSerializationQueryString if not otherwise specified for OMHTTPSerialization.
+ 
+ @see requestWithMethod:url:parameters:options:
+ */
 + (OMPromise *)get:(NSString *)urlString
         parameters:(NSDictionary *)parameters
            options:(NSDictionary *)options;
 
+/** Convenience method to perform an HTTP POST request.
+ @see requestWithMethod:url:parameters:options:
+ */
 + (OMPromise *)post:(NSString *)urlString
          parameters:(NSDictionary *)parameters
             options:(NSDictionary *)options;
 
+/** Convenience method to perform an HTTP PUT request.
+ @see requestWithMethod:url:parameters:options:
+ */
 + (OMPromise *)put:(NSString *)urlString
         parameters:(NSDictionary *)parameters
            options:(NSDictionary *)options;
 
+/** Convenience method to perform an HTTP HEAD request.
+ @see requestWithMethod:url:parameters:options:
+ */
 + (OMPromise *)head:(NSString *)urlString
          parameters:(NSDictionary *)parameters
             options:(NSDictionary *)options;
 
+/** Convenience method to perform an HTTP DELETE request.
+ @see requestWithMethod:url:parameters:options:
+ */
 + (OMPromise *)delete:(NSString *)urlString
            parameters:(NSDictionary *)parameters
               options:(NSDictionary *)options;

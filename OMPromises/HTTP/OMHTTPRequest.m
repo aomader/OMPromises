@@ -57,6 +57,8 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 {
     self = [super init];
     if (self) {
+        NSAssert(url, @"URL is required.");
+        NSAssert(method, @"Method is required.");
         NSAssert([url.scheme.lowercaseString hasPrefix:@"http"], @"Only HTTP(S) requests are supported.");
         
         _lookup = options[OMHTTPLookupProgress] ? [options[OMHTTPLookupProgress] floatValue] : kDefaultLookupProgress;
@@ -203,14 +205,63 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                                       options:options].promise;
 }
 
++ (OMPromise *)requestWithMethod:(NSString *)method
+                       urlString:(NSString *)urlString
+                      parameters:(NSDictionary *)parameters
+                         options:(NSDictionary *)options
+                  defaultOptions:(NSDictionary *)defaultOptions
+{
+    // merge default options
+    if (defaultOptions) {
+        NSMutableDictionary *mutableOptions = defaultOptions.mutableCopy;
+        [mutableOptions addEntriesFromDictionary:options];
+        options = mutableOptions;
+    }
+    
+    // interpoplate url string
+    if (parameters && parameters.count > 0) {
+        NSMutableDictionary *mutableParameters = parameters.mutableCopy;
+        NSMutableString *mutableUrlString = [NSMutableString stringWithCapacity:urlString.length];
+        
+        __block NSUInteger recentEnd = 0;
+        [[NSRegularExpression regularExpressionWithPattern:@"\\{\\w+\\}" options:0 error:nil]
+            enumerateMatchesInString:urlString options:0
+            range:NSMakeRange(0, urlString.length)
+            usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                [mutableUrlString appendString:[urlString substringWithRange:NSMakeRange(recentEnd, result.range.location - recentEnd)]];
+                recentEnd = result.range.location + result.range.length;
+                
+                NSString *key = [urlString substringWithRange:NSMakeRange(result.range.location + 1, result.range.length - 2)];
+                NSString *value = [OMHTTPRequest escapeString:parameters[key]];
+                
+                if (value) {
+                    [mutableUrlString appendString:value];
+                    [mutableParameters removeObjectForKey:key];
+                }
+            }];
+        
+        if (recentEnd > 0) {
+            [mutableUrlString appendString:[urlString substringFromIndex:recentEnd]];
+            urlString = mutableUrlString;
+            parameters = mutableParameters;
+        }
+    }
+    
+    return [OMHTTPRequest requestWithMethod:method
+                                        url:[NSURL URLWithString:urlString]
+                                 parameters:parameters
+                                    options:options];
+}
+
 + (OMPromise *)get:(NSString *)urlString
         parameters:(NSDictionary *)parameters
            options:(NSDictionary *)options
 {
     return [OMHTTPRequest requestWithMethod:@"GET"
-                                        url:[NSURL URLWithString:urlString]
+                                  urlString:urlString
                                  parameters:parameters
-                                    options:options];
+                                    options:options
+                             defaultOptions:@{OMHTTPSerialization: OMHTTPSerializationQueryString}];
 }
 
 + (OMPromise *)post:(NSString *)urlString
@@ -218,9 +269,10 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
             options:(NSDictionary *)options
 {
     return [OMHTTPRequest requestWithMethod:@"POST"
-                                        url:[NSURL URLWithString:urlString]
+                                  urlString:urlString
                                  parameters:parameters
-                                    options:options];
+                                    options:options
+                             defaultOptions:nil];
 }
 
 + (OMPromise *)put:(NSString *)urlString
@@ -228,9 +280,10 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
            options:(NSDictionary *)options
 {
     return [OMHTTPRequest requestWithMethod:@"PUT"
-                                        url:[NSURL URLWithString:urlString]
+                                  urlString:urlString
                                  parameters:parameters
-                                    options:options];
+                                    options:options
+                             defaultOptions:nil];
 }
 
 + (OMPromise *)head:(NSString *)urlString
@@ -238,9 +291,10 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
             options:(NSDictionary *)options
 {
     return [OMHTTPRequest requestWithMethod:@"HEAD"
-                                        url:[NSURL URLWithString:urlString]
+                                  urlString:urlString
                                  parameters:parameters
-                                    options:options];
+                                    options:options
+                             defaultOptions:nil];
 }
 
 + (OMPromise *)delete:(NSString *)urlString
@@ -248,9 +302,10 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
               options:(NSDictionary *)options
 {
     return [OMHTTPRequest requestWithMethod:@"DELETE"
-                                        url:[NSURL URLWithString:urlString]
+                                  urlString:urlString
                                  parameters:parameters
-                                    options:options];
+                                    options:options
+                             defaultOptions:nil];
 }
 
 @end
