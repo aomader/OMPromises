@@ -26,6 +26,7 @@
 		A1691F9917FBF2BE00C7FE5E /* OMDeferred.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9417FBF2AF00C7FE5E /* OMDeferred.m */; };
 		A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9617FBF2AF00C7FE5E /* OMPromise.m */; };
 		A1691FA817FC611300C7FE5E /* OMDeferredTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691FA717FC611300C7FE5E /* OMDeferredTests.m */; };
+		F915E8DE18D22FB9005AF59C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F915E8E018D22FB9005AF59C /* Localizable.strings */; };
 		F9D8D69018CC73A700358F27 /* OMHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = F9D8D68F18CC73A700358F27 /* OMHTTPRequest.m */; };
 		F9D8D69118CC73B400358F27 /* OMHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = F9D8D68F18CC73A700358F27 /* OMHTTPRequest.m */; };
 /* End PBXBuildFile section */
@@ -77,6 +78,7 @@
 		A1691F9617FBF2AF00C7FE5E /* OMPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMPromise.m; sourceTree = "<group>"; };
 		A1691F9C17FBF32800C7FE5E /* OMPromise+Protected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OMPromise+Protected.h"; sourceTree = "<group>"; };
 		A1691FA717FC611300C7FE5E /* OMDeferredTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMDeferredTests.m; sourceTree = "<group>"; };
+		F915E8DF18D22FB9005AF59C /* en */ = {isa = PBXFileReference; lastKnownFileType = file; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F9D8D68E18CC73A700358F27 /* OMHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMHTTPRequest.h; sourceTree = "<group>"; };
 		F9D8D68F18CC73A700358F27 /* OMHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMHTTPRequest.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -167,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				A1691F7017FBF1FA00C7FE5E /* Supporting Files */,
+				F915E8DB18D22F6D005AF59C /* Resources */,
 				A13BEEEF187DB8D8001755CE /* External */,
 				4480374473D2F6D57F433C16 /* HTTP */,
 				A1691F7217FBF1FA00C7FE5E /* OMPromises.h */,
@@ -205,6 +208,14 @@
 				A1691F8617FBF1FA00C7FE5E /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F915E8DB18D22F6D005AF59C /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F915E8E018D22FB9005AF59C /* Localizable.strings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,6 +308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1691F8817FBF1FA00C7FE5E /* InfoPlist.strings in Resources */,
+				F915E8DE18D22FB9005AF59C /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,6 +360,14 @@
 				A1691F8717FBF1FA00C7FE5E /* en */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		F915E8E018D22FB9005AF59C /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F915E8DF18D22FB9005AF59C /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

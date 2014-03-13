@@ -298,7 +298,9 @@ static dispatch_queue_t globalDefaultQueue = nil;
         self.state = OMPromiseStateFailed;
         self.error = [NSError errorWithDomain:OMPromisesErrorDomain
                                          code:OMPromisesCancelledError
-                                     userInfo:nil];
+                                     userInfo:@{
+                                         NSLocalizedDescriptionKey: NSLocalizedString(@"error_cancelled", nil)
+                                     }];
     }
 
     for (void (^cancelHandler)(OMDeferred *) in self.cancelHandlers) {
@@ -376,7 +378,9 @@ static dispatch_queue_t globalDefaultQueue = nil;
             if (++failed == promises.count) {
                 [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
                                                    code:OMPromisesCombinatorAnyNonFulfilledError
-                                               userInfo:nil]];
+                                               userInfo:@{
+                                                   NSLocalizedDescriptionKey: NSLocalizedString(@"error_combinator_any", nil)
+                                               }]];
             }
         }] progressed:^(float progress) {
             if (progress > deferred.progress) {
@@ -388,7 +392,9 @@ static dispatch_queue_t globalDefaultQueue = nil;
     if (promises.count == 0) {
         [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
                                            code:OMPromisesCombinatorAnyNonFulfilledError
-                                       userInfo:nil]];
+                                       userInfo:@{
+                                           NSLocalizedDescriptionKey: NSLocalizedString(@"error_combinator_any", nil)
+                                       }]];
     }
 
     return deferred.promise;
@@ -457,7 +463,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
                                    code:OMPromisesExceptionError
                                userInfo:@{
                                    NSUnderlyingErrorKey: exception,
-                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The supplied then/rescue block threw an exception: %@", exception]
+                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedString(@"error_exception", nil), exception]
                                }];
     }
     
