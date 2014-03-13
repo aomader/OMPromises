@@ -455,7 +455,10 @@ static dispatch_queue_t globalDefaultQueue = nil;
     @catch (NSException *exception) {
         next = [NSError errorWithDomain:OMPromisesErrorDomain
                                    code:OMPromisesExceptionError
-                               userInfo:@{NSUnderlyingErrorKey: exception}];
+                               userInfo:@{
+                                   NSUnderlyingErrorKey: exception,
+                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:@"The supplied then/rescue block threw an exception: %@", exception]
+                               }];
     }
     
     if ([next isKindOfClass:OMPromise.class]) {
