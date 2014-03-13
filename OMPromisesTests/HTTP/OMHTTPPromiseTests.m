@@ -58,9 +58,12 @@
                              parameters:@{@"test": @"asdf"}
                                 options:nil];
     */
-    OMPromise *get = [OMHTTPRequest get:@"http://reaktor42.de/images/robot.png?foo=bar"
-                             parameters:@{@"test": @"asdf=?"}
-                                options:@{OMHTTPTimeout: @0.001, OMHTTPSerialization: OMHTTPSerializationQueryString}];
+    OMPromise *get = [OMHTTPRequest get:@"http://reaktor42.de/images/robot.png?foo={bar}&newbar={bar}&test={nich1da}"
+                             parameters:@{@"bar": @"asdf=?"}
+                                options:@{OMHTTPTimeout: @3., OMHTTPSerialization: OMHTTPSerializationQueryString}];
+    //[get cancel];
+    
+    get = [get httpParseImage];
 
     __block int called = 0;
     [[get fulfilled:^(id data) {

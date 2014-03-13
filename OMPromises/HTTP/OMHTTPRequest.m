@@ -103,7 +103,10 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
             #warning proper error
         NSError *error = [NSError errorWithDomain:OMPromisesErrorDomain
                                              code:0
-                                         userInfo:@{@"statusCode": @(response.statusCode)}];
+                                         userInfo:@{
+                                             @"statusCode": @(response.statusCode),
+                                             NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedString(@"error_http_status", nil), response.statusCode]
+                                         }];
         [self connection:connection didFailWithError:error];
     } else {
         self.response = response;
@@ -117,81 +120,6 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                                                  body:self.data]];
 }
 
-#pragma mark - Private Helper Methods
-
-- (NSURLRequest *)requestForURL:(NSURL *)url
-                         method:(NSString *)method
-                     parameters:(NSDictionary *)parameters
-                        options:(NSDictionary *)options
-{
-    // add query string to URL
-    if (parameters && [options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationQueryString]) {
-        NSString *queryString = [OMHTTPRequest buildQueryString:parameters];
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%c%@", url.absoluteString,
-                                    url.query.length ? '&' : '?', queryString]];
-    }
-    
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
-            initWithURL:url
-            cachePolicy:NSURLRequestReloadIgnoringCacheData
-        timeoutInterval:options[OMHTTPTimeout] ? [options[OMHTTPTimeout] doubleValue] : kDefaultTimeoutInterval];
-    request.HTTPMethod = method;
-    
-    // generate body
-    if (parameters) {
-        NSString *contentType;
-        
-        if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationJSON]) {
-            contentType = @"application/json";
-#warning handle error
-            request.HTTPBody = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
-        } else if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationURLEncoded]) {
-            contentType = @"application/x-www-form-urlencoded";
-            request.HTTPBody = [OMHTTPRequest buildURLEncodedData:parameters];
-        }
-        
-        if (request.HTTPBody) {
-            [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
-            [request setValue:[@(request.HTTPBody.length) stringValue] forHTTPHeaderField:@"Content-Length"];
-        }
-    }
-    
-    // add http headers
-    NSArray *ownOptions = @[OMHTTPTimeout, OMHTTPLookupProgress, OMHTTPSerialization];
-    for (NSString *key in options.keyEnumerator) {
-        if (![ownOptions containsObject:key]) {
-            [request setValue:options[key] forHTTPHeaderField:key];
-        }
-    }
-    
-    return request;
-}
-
-+ (NSString *)interpolateString:(NSString *)string parameters:(NSDictionary *)parameters {
-#warning Interpolate strings like "foo={bar}" using the parameters.
-#warning Use that in the convenience methods!
-    return nil;
-}
-
-+ (NSData *)buildURLEncodedData:(NSDictionary *)parameters {
-#warning add implementation
-    return nil;
-}
-
-+ (NSString *)buildQueryString:(NSDictionary *)parameters {
-    NSMutableArray *pairs = [NSMutableArray arrayWithCapacity:parameters.count];
-    for (NSString *key in parameters.keyEnumerator) {
-        [pairs addObject:[NSString stringWithFormat:@"%@=%@",
-                          [OMHTTPRequest escapeString:key], [OMHTTPRequest escapeString:parameters[key]]]];
-    }
-    return [pairs componentsJoinedByString:@"&"];
-}
-
-+ (NSString *)escapeString:(NSString *)string {
-    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
-        NULL, (CFStringRef)string, NULL, CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!"), kCFStringEncodingUTF8);
-}
-
 #pragma mark - Public Static Methods
 
 + (OMPromise *)requestWithMethod:(NSString *)method
@@ -203,54 +131,6 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                                        method:method
                                    parameters:parameters
                                       options:options].promise;
-}
-
-+ (OMPromise *)requestWithMethod:(NSString *)method
-                       urlString:(NSString *)urlString
-                      parameters:(NSDictionary *)parameters
-                         options:(NSDictionary *)options
-                  defaultOptions:(NSDictionary *)defaultOptions
-{
-    // merge default options
-    if (defaultOptions) {
-        NSMutableDictionary *mutableOptions = defaultOptions.mutableCopy;
-        [mutableOptions addEntriesFromDictionary:options];
-        options = mutableOptions;
-    }
-    
-    // interpoplate url string
-    if (parameters && parameters.count > 0) {
-        NSMutableDictionary *mutableParameters = parameters.mutableCopy;
-        NSMutableString *mutableUrlString = [NSMutableString stringWithCapacity:urlString.length];
-        
-        __block NSUInteger recentEnd = 0;
-        [[NSRegularExpression regularExpressionWithPattern:@"\\{\\w+\\}" options:0 error:nil]
-            enumerateMatchesInString:urlString options:0
-            range:NSMakeRange(0, urlString.length)
-            usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-                [mutableUrlString appendString:[urlString substringWithRange:NSMakeRange(recentEnd, result.range.location - recentEnd)]];
-                recentEnd = result.range.location + result.range.length;
-                
-                NSString *key = [urlString substringWithRange:NSMakeRange(result.range.location + 1, result.range.length - 2)];
-                NSString *value = [OMHTTPRequest escapeString:parameters[key]];
-                
-                if (value) {
-                    [mutableUrlString appendString:value];
-                    [mutableParameters removeObjectForKey:key];
-                }
-            }];
-        
-        if (recentEnd > 0) {
-            [mutableUrlString appendString:[urlString substringFromIndex:recentEnd]];
-            urlString = mutableUrlString;
-            parameters = mutableParameters;
-        }
-    }
-    
-    return [OMHTTPRequest requestWithMethod:method
-                                        url:[NSURL URLWithString:urlString]
-                                 parameters:parameters
-                                    options:options];
 }
 
 + (OMPromise *)get:(NSString *)urlString
@@ -306,6 +186,124 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                                  parameters:parameters
                                     options:options
                              defaultOptions:nil];
+}
+
+#pragma mark - Private Helper Methods
+
++ (OMPromise *)requestWithMethod:(NSString *)method
+                       urlString:(NSString *)urlString
+                      parameters:(NSDictionary *)parameters
+                         options:(NSDictionary *)options
+                  defaultOptions:(NSDictionary *)defaultOptions
+{
+    // merge default options
+    if (defaultOptions) {
+        NSMutableDictionary *mutableOptions = defaultOptions.mutableCopy;
+        [mutableOptions addEntriesFromDictionary:options];
+        options = mutableOptions;
+    }
+    
+    // interpoplate url string
+    if (parameters && parameters.count > 0) {
+        NSMutableDictionary *mutableParameters = parameters.mutableCopy;
+        NSMutableString *mutableUrlString = [NSMutableString stringWithCapacity:urlString.length];
+        
+        __block NSUInteger recentEnd = 0;
+        [[NSRegularExpression regularExpressionWithPattern:@"\\{\\w+\\}" options:0 error:nil]
+            enumerateMatchesInString:urlString options:0
+            range:NSMakeRange(0, urlString.length)
+            usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                [mutableUrlString appendString:[urlString substringWithRange:NSMakeRange(recentEnd, result.range.location - recentEnd)]];
+                recentEnd = result.range.location + result.range.length;
+                
+                NSString *key = [urlString substringWithRange:NSMakeRange(result.range.location + 1, result.range.length - 2)];
+                NSString *value = [OMHTTPRequest escapeString:parameters[key]];
+                
+                if (value) {
+                    [mutableUrlString appendString:value];
+                    [mutableParameters removeObjectForKey:key];
+                }
+            }];
+        
+        if (recentEnd > 0) {
+            [mutableUrlString appendString:[urlString substringFromIndex:recentEnd]];
+            urlString = mutableUrlString;
+            parameters = mutableParameters;
+        }
+    }
+    
+    return [OMHTTPRequest requestWithMethod:method
+                                        url:[NSURL URLWithString:urlString]
+                                 parameters:parameters
+                                    options:options];
+}
+
+- (NSURLRequest *)requestForURL:(NSURL *)url
+                         method:(NSString *)method
+                     parameters:(NSDictionary *)parameters
+                        options:(NSDictionary *)options
+{
+    // add query string to URL
+    if (parameters && [options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationQueryString]) {
+        NSString *queryString = [OMHTTPRequest buildQueryString:parameters];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%c%@", url.absoluteString,
+                                    url.query.length ? '&' : '?', queryString]];
+    }
+    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc]
+                                    initWithURL:url
+                                    cachePolicy:NSURLRequestReloadIgnoringCacheData
+                                    timeoutInterval:options[OMHTTPTimeout] ? [options[OMHTTPTimeout] doubleValue] : kDefaultTimeoutInterval];
+    request.HTTPMethod = method;
+    
+    // generate body
+    if (parameters) {
+        NSString *contentType;
+        
+        if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationJSON]) {
+            contentType = @"application/json";
+            NSError *error = nil;
+            request.HTTPBody = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
+            NSAssert(!error, @"We should be able to serialize the JSON data but failed: %@", error);
+        } else if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationURLEncoded]) {
+            contentType = @"application/x-www-form-urlencoded";
+            request.HTTPBody = [OMHTTPRequest buildURLEncodedData:parameters];
+        }
+        
+        if (request.HTTPBody) {
+            [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
+            [request setValue:[@(request.HTTPBody.length) stringValue] forHTTPHeaderField:@"Content-Length"];
+        }
+    }
+    
+    // add http headers
+    NSArray *ownOptions = @[OMHTTPTimeout, OMHTTPLookupProgress, OMHTTPSerialization];
+    for (NSString *key in options.keyEnumerator) {
+        if (![ownOptions containsObject:key]) {
+            [request setValue:options[key] forHTTPHeaderField:key];
+        }
+    }
+    
+    return request;
+}
+
++ (NSData *)buildURLEncodedData:(NSDictionary *)parameters {
+#warning add implementation
+    return nil;
+}
+
++ (NSString *)buildQueryString:(NSDictionary *)parameters {
+    NSMutableArray *pairs = [NSMutableArray arrayWithCapacity:parameters.count];
+    for (NSString *key in parameters.keyEnumerator) {
+        [pairs addObject:[NSString stringWithFormat:@"%@=%@",
+            [OMHTTPRequest escapeString:key], [OMHTTPRequest escapeString:parameters[key]]]];
+    }
+    return [pairs componentsJoinedByString:@"&"];
+}
+
++ (NSString *)escapeString:(NSString *)string {
+    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
+        NULL, (CFStringRef)string, NULL, CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!"), kCFStringEncodingUTF8);
 }
 
 @end

@@ -15,6 +15,8 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |cs|
     cs.source_files = 'OMPromises/*.{h,m}', 'OMPromises/External/*.{h,m}'
     cs.public_header_files = 'OMPromises/{OMPromises,OMPromise,OMDeferred}.h'
+    cs.ios.resource_bundle = { 'OMPromises-iOS' => ['OMPromises/Resources/*.lproj'] }
+    cs.osx.resource_bundle = { 'OMPromises-OSX' => ['OMPromises/Resources/*.lproj'] }
   end
 
   s.subspec 'HTTP' do |hs|

@@ -83,7 +83,7 @@ extern NSString *const OMHTTPSerializationURLEncoded;
 
 /** Convenience method to perform an HTTP GET request.
  
- Uses OMHTTPSerializationQueryString if not otherwise specified for OMHTTPSerialization.
+ Uses OMHTTPSerializationQueryString for OMHTTPSerialization if not specified otherwise.
  
  @see requestWithMethod:url:parameters:options:
  */
@@ -92,6 +92,7 @@ extern NSString *const OMHTTPSerializationURLEncoded;
            options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP POST request.
+ 
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise *)post:(NSString *)urlString
@@ -99,6 +100,7 @@ extern NSString *const OMHTTPSerializationURLEncoded;
             options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP PUT request.
+ 
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise *)put:(NSString *)urlString
@@ -106,6 +108,7 @@ extern NSString *const OMHTTPSerializationURLEncoded;
            options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP HEAD request.
+ 
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise *)head:(NSString *)urlString
@@ -113,6 +116,7 @@ extern NSString *const OMHTTPSerializationURLEncoded;
             options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP DELETE request.
+ 
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise *)delete:(NSString *)urlString
