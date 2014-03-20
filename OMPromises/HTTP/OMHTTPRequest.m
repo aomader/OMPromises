@@ -26,6 +26,7 @@
 #import "OMHTTPRequest.h"
 
 #import "OMHTTPResponse.h"
+#import "OMResources.h"
 
 static const NSTimeInterval kDefaultTimeoutInterval = 20.;
 static const float kDefaultLookupProgress = .05f;
@@ -105,7 +106,7 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
                                              code:0
                                          userInfo:@{
                                              @"statusCode": @(response.statusCode),
-                                             NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedString(@"error_http_status", nil), response.statusCode]
+                                             NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i", response.statusCode)
                                          }];
         [self connection:connection didFailWithError:error];
     } else {

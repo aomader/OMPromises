@@ -27,6 +27,8 @@
 		A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691F9617FBF2AF00C7FE5E /* OMPromise.m */; };
 		A1691FA817FC611300C7FE5E /* OMDeferredTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1691FA717FC611300C7FE5E /* OMDeferredTests.m */; };
 		F915E8DE18D22FB9005AF59C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F915E8E018D22FB9005AF59C /* Localizable.strings */; };
+		F99888A918DAE0E80022C385 /* OMResources.m in Sources */ = {isa = PBXBuildFile; fileRef = F99888A818DAE0E80022C385 /* OMResources.m */; };
+		F99888AA18DAE0E80022C385 /* OMResources.m in Sources */ = {isa = PBXBuildFile; fileRef = F99888A818DAE0E80022C385 /* OMResources.m */; };
 		F9D8D69018CC73A700358F27 /* OMHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = F9D8D68F18CC73A700358F27 /* OMHTTPRequest.m */; };
 		F9D8D69118CC73B400358F27 /* OMHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = F9D8D68F18CC73A700358F27 /* OMHTTPRequest.m */; };
 /* End PBXBuildFile section */
@@ -78,7 +80,9 @@
 		A1691F9617FBF2AF00C7FE5E /* OMPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMPromise.m; sourceTree = "<group>"; };
 		A1691F9C17FBF32800C7FE5E /* OMPromise+Protected.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "OMPromise+Protected.h"; sourceTree = "<group>"; };
 		A1691FA717FC611300C7FE5E /* OMDeferredTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMDeferredTests.m; sourceTree = "<group>"; };
-		F915E8DF18D22FB9005AF59C /* en */ = {isa = PBXFileReference; lastKnownFileType = file; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F915E8DF18D22FB9005AF59C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F99888A718DAE0E80022C385 /* OMResources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMResources.h; sourceTree = "<group>"; };
+		F99888A818DAE0E80022C385 /* OMResources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMResources.m; sourceTree = "<group>"; };
 		F9D8D68E18CC73A700358F27 /* OMHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OMHTTPRequest.h; sourceTree = "<group>"; };
 		F9D8D68F18CC73A700358F27 /* OMHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMHTTPRequest.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -178,6 +182,8 @@
 				A1691F9517FBF2AF00C7FE5E /* OMPromise.h */,
 				A1691F9C17FBF32800C7FE5E /* OMPromise+Protected.h */,
 				A1691F9617FBF2AF00C7FE5E /* OMPromise.m */,
+				F99888A718DAE0E80022C385 /* OMResources.h */,
+				F99888A818DAE0E80022C385 /* OMResources.m */,
 			);
 			path = OMPromises;
 			sourceTree = "<group>";
@@ -289,6 +295,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				de,
 			);
 			mainGroup = A1691F6117FBF1FA00C7FE5E;
 			productRefGroup = A1691F6B17FBF1FA00C7FE5E /* Products */;
@@ -322,6 +329,7 @@
 				A13BEEF2187DB94C001755CE /* CTBlockDescription.m in Sources */,
 				A1691F9717FBF2AF00C7FE5E /* OMDeferred.m in Sources */,
 				A1691F9817FBF2AF00C7FE5E /* OMPromise.m in Sources */,
+				F99888A918DAE0E80022C385 /* OMResources.m in Sources */,
 				F9D8D69018CC73A700358F27 /* OMHTTPRequest.m in Sources */,
 				448037E00730509C87E2367B /* OMHTTPResponse.m in Sources */,
 				448036600F92C6B7EE8ADA8D /* OMPromise+HTTP.m in Sources */,
@@ -338,6 +346,7 @@
 				A1691F9A17FBF2BE00C7FE5E /* OMPromise.m in Sources */,
 				448035174A0482C519BFCBFE /* OMHTTPPromiseTests.m in Sources */,
 				44803F768BABA6FBDBFF78A3 /* OMHTTPResponse.m in Sources */,
+				F99888AA18DAE0E80022C385 /* OMResources.m in Sources */,
 				448033B974EB56400A72B339 /* OMPromise+HTTP.m in Sources */,
 				F9D8D69118CC73B400358F27 /* OMHTTPRequest.m in Sources */,
 			);

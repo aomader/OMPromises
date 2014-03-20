@@ -26,7 +26,8 @@
 #import "OMPromise.h"
 
 #import "CTBlockDescription.h"
-#import "OMPromises.h"
+#import "OMDeferred.h"
+#import "OMResources.h"
 
 NSString *const OMPromisesErrorDomain = @"de.reaktor42.OMPromises";
 
@@ -162,7 +163,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
             [deferred fail:error];
         }]
         fulfilled:^(id result) {
-            [OMPromise bind:deferred with:thenHandler using:result bias:(float)current/next fraction:(float)1/next];
+            [OMPromise bind:deferred with:thenHandler using:result bias:(float)current/next fraction:1.f/next];
         } on:queue];
     
     return deferred.promise;
@@ -184,7 +185,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
             [deferred fulfil:result];
         }]
         failed:^(NSError *error) {
-            [OMPromise bind:deferred with:rescueHandler using:error bias:self.progress fraction:1 - self.progress];
+            [OMPromise bind:deferred with:rescueHandler using:error bias:self.progress fraction:1.f - self.progress];
         } on:queue];
     
     return deferred.promise;
@@ -299,7 +300,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         self.error = [NSError errorWithDomain:OMPromisesErrorDomain
                                          code:OMPromisesCancelledError
                                      userInfo:@{
-                                         NSLocalizedDescriptionKey: NSLocalizedString(@"error_cancelled", nil)
+                                         NSLocalizedDescriptionKey: OMLocalizedString(@"error_cancelled")
                                      }];
     }
 
@@ -379,7 +380,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
                 [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
                                                    code:OMPromisesCombinatorAnyNonFulfilledError
                                                userInfo:@{
-                                                   NSLocalizedDescriptionKey: NSLocalizedString(@"error_combinator_any", nil)
+                                                   NSLocalizedDescriptionKey: OMLocalizedString(@"error_combinator_any")
                                                }]];
             }
         }] progressed:^(float progress) {
@@ -393,7 +394,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
                                            code:OMPromisesCombinatorAnyNonFulfilledError
                                        userInfo:@{
-                                           NSLocalizedDescriptionKey: NSLocalizedString(@"error_combinator_any", nil)
+                                           NSLocalizedDescriptionKey: OMLocalizedString(@"error_combinator_any")
                                        }]];
     }
 
@@ -463,7 +464,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
                                    code:OMPromisesExceptionError
                                userInfo:@{
                                    NSUnderlyingErrorKey: exception,
-                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedString(@"error_exception", nil), exception]
+                                   NSLocalizedDescriptionKey: OMLocalizedString(@"error_exception_%@", exception)
                                }];
     }
     
