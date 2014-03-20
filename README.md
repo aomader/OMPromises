@@ -1,4 +1,4 @@
-# OMPromises
+# OMPromises [![Supported Platforms](https://cocoapod-badges.herokuapp.com/p/OMPromises/badge.svg)](http://cocoadocs.org/docsets/OMPromises) [![Version](https://cocoapod-badges.herokuapp.com/v/OMPromises/badge.svg)](http://cocoadocs.org/docsets/OMPromises) [![Build Status](https://travis-ci.org/b52/OMPromises.png?branch=master)](https://travis-ci.org/b52/OMPromises)
 
 A tested and fully documented promises library inspired by [Promises/A] with
 certain additions and changes to better fit the common Objective-C patterns.
@@ -6,8 +6,6 @@ certain additions and changes to better fit the common Objective-C patterns.
 If you are completely unfamiliar with promises, I recommend you to read some
 articles and tutorials like one of [1], [2], [3] or [4]. Some method names
 might differ but the idea is mostly the same.
-
-[![Build Status](https://travis-ci.org/b52/OMPromises.png?branch=master)](https://travis-ci.org/b52/OMPromises)
 
 ## Features
 
