@@ -25,7 +25,7 @@
 
 #import "OMPromise+HTTP.h"
 
-#import <UIKit/UIKit.h>
+//#import <UIKit/UIKit.h>
 
 #import "OMHTTPResponse.h"
 
@@ -46,6 +46,7 @@ static const char *supportedImages[] = {
 }
 
 - (OMPromise *)httpParseImage {
+    /*
     return [self then:^id(OMHTTPResponse *response) {
         BOOL supported = NO;
         const char *contentType = [response.headers[@"Content-Type"] cStringUsingEncoding:NSUTF8StringEncoding];
@@ -63,6 +64,7 @@ static const char *supportedImages[] = {
         
         return [[UIImage alloc] initWithData:response.body];
     }];
+    */
     
 #warning Check content-type for UIImage readable and transform to UIImage.
     return  nil;

@@ -24,6 +24,10 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <Foundation/Foundation.h>
+
+
+#define FLT_EPSILON .0000001f
 
 #import "OMPromises.h"
 
