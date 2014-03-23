@@ -44,40 +44,6 @@
 
 @implementation OMHTTPPromiseTests
 
-- (void)setUp {
-    [super setUp];
-}
-
-- (void)tearDown {
-    [super tearDown];
-}
-
-- (void)testGet {
-        /*
-    OMPromise *get = [OMHTTPPromise get:@"http://headers.jsontest.com/"
-                             parameters:@{@"test": @"asdf"}
-                                options:nil];
-    */
-    OMPromise *get = [OMHTTPRequest get:@"http://reaktor42.de/images/robot.png?foo={bar}&newbar={bar}&test={nich1da}"
-                             parameters:@{@"bar": @"asdf=?"}
-                                options:@{OMHTTPTimeout: @3., OMHTTPSerialization: OMHTTPSerializationQueryString}];
-    //[get cancel];
-    
-    get = [get httpParseImage];
-
-    __block int called = 0;
-    [[get fulfilled:^(id data) {
-
-        called += 1;
-    }] failed:^(NSError *error) {
-        called += 1;
-    }];
-
-    WAIT_UNTIL(called == 1, 10, @"should have been called");
-    
-    get = nil;
-}
-
 - (void)testCustomHeaders {
     OMPromise *request = [OMHTTPRequest get:@"http://headers.jsontest.com"
                                  parameters:nil

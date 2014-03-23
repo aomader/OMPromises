@@ -149,7 +149,6 @@
     WAIT_UNTIL(promise.state == OMPromiseStateFailed, 1, @"Promise should have failed");
     
     XCTAssertEqual(promise.error.code, OMPromisesExceptionError, @"Error should be caused by exception");
-    XCTAssertEqual(promise.error.userInfo[NSUnderlyingErrorKey], exception, @"Exception should be provided");
 }
 
 - (void)testTaskPromiseReturnError {
