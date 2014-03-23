@@ -13,21 +13,21 @@ Pod::Spec.new do |s|
   s.default_subspec = 'Core'
 
   s.subspec 'Core' do |cs|
-    cs.source_files = 'OMPromises/*.{h,m}', 'OMPromises/External/*.{h,m}'
-    cs.public_header_files = 'OMPromises/{OMPromises,OMPromise,OMDeferred}.h'
-    cs.ios.resource_bundle = { 'OMPromises-Resources' => ['OMPromises/Resources/*.lproj'] }
-    cs.osx.resource_bundle = { 'OMPromises-Resources' => ['OMPromises/Resources/*.lproj'] }
+    cs.source_files = 'Classes/OMPromises.h', 'Classes/Core/*.{h,m}', 'Classes/Core/External/*.{h,m}'
+    cs.public_header_files = 'Classes/OMPromises.h', 'Classes/Core/{OMPromises,OMPromise,OMDeferred}.h'
+    cs.ios.resource_bundle = { 'OMPromises-Resources' => ['Resources/*.lproj'] }
+    cs.osx.resource_bundle = { 'OMPromises-Resources' => ['Resources/*.lproj'] }
   end
 
   s.subspec 'HTTP' do |hs|
     hs.dependency 'OMPromises/Core'
-    hs.source_files = 'OMPromises/HTTP/*.{h,m}'
-    hs.public_header_files = 'OMPromises/HTTP/*.h'
+    hs.source_files = 'Classes/OMHTTP.h', 'Classes/HTTP/*.{h,m}'
+    hs.public_header_files = 'Classes/OMHTTP.h', 'Classes/HTTP/*.h'
   end
 
   s.subspec 'Tests' do |ts|
     ts.dependency 'OMPromises/Core'
     ts.framework = 'XCTest'
-    ts.source_files = 'OMPromisesTests/*.{h,m}'
+    ts.source_files = 'Tests/*.{h,m}'
   end
 end

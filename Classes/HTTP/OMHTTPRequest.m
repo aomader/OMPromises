@@ -37,13 +37,15 @@ NSString *const OMHTTPSerialization = @"OMHTTPSerialization";
 NSString *const OMHTTPSerializationQueryString = @"querystring";
 NSString *const OMHTTPSerializationJSON = @"json";
 NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
+NSString *const OMHTTPResponseKey = @"response";
 
 @interface OMHTTPRequest () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
 @property(assign, nonatomic) float lookup;
 @property(nonatomic) NSURLConnection *connection;
-@property(nonatomic) NSHTTPURLResponse *response;
+@property(nonatomic) OMHTTPResponse *response;
 @property(nonatomic) NSMutableData *data;
+@property(assign, nonatomic) long long expectedContentLength;
 
 @end
 
@@ -63,7 +65,6 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
         NSAssert([url.scheme.lowercaseString hasPrefix:@"http"], @"Only HTTP(S) requests are supported.");
         
         _lookup = options[OMHTTPLookupProgress] ? [options[OMHTTPLookupProgress] floatValue] : kDefaultLookupProgress;
-        _data = [NSMutableData data];
         _connection = [[NSURLConnection alloc]
                        initWithRequest:[self requestForURL:url method:method parameters:parameters options:options]
                        delegate:self
@@ -89,14 +90,20 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     [self.data appendData:data];
     
-    if (self.response.expectedContentLength > 0) {
+    if (self.expectedContentLength > 0) {
         [self progress:self.lookup + (1 - self.lookup) *
-                (float)self.data.length / self.response.expectedContentLength];
+                (float)self.data.length / self.expectedContentLength];
     }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     NSAssert([response isKindOfClass:NSHTTPURLResponse.class], @"An NSHTTPURLResponse was expected!");
+    
+    self.expectedContentLength = response.expectedContentLength;
+    self.data = [NSMutableData dataWithCapacity:self.expectedContentLength > 0 ? self.expectedContentLength : 16];
+    self.response = [[OMHTTPResponse alloc] initWithCode:response.statusCode
+                                                 headers:response.allHeaderFields
+                                                    body:self.data];
     
     if (response.statusCode >= 400) {
         [connection cancel];
@@ -105,20 +112,17 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
         NSError *error = [NSError errorWithDomain:OMPromisesErrorDomain
                                              code:0
                                          userInfo:@{
-                                             @"statusCode": @(response.statusCode),
-                                             NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i", response.statusCode)
+                                             NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i", response.statusCode),
+                                             OMHTTPResponseKey: self.response
                                          }];
         [self connection:connection didFailWithError:error];
     } else {
-        self.response = response;
         [self progress:self.lookup];
     }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [self fulfil:[[OMHTTPResponse alloc] initWithCode:(NSUInteger)self.response.statusCode
-                                              headers:self.response.allHeaderFields
-                                                 body:self.data]];
+    [self fulfil:self.response];
 }
 
 #pragma mark - Public Static Methods
@@ -261,14 +265,16 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
     if (parameters) {
         NSString *contentType;
         
-        if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationJSON]) {
+        if (!options[OMHTTPSerialization] ||
+            [options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationURLEncoded])
+        {
+            contentType = @"application/x-www-form-urlencoded";
+            request.HTTPBody = [OMHTTPRequest buildURLEncodedData:parameters];
+        } else if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationJSON]) {
             contentType = @"application/json";
             NSError *error = nil;
             request.HTTPBody = [NSJSONSerialization dataWithJSONObject:parameters options:0 error:&error];
             NSAssert(!error, @"We should be able to serialize the JSON data but failed: %@", error);
-        } else if ([options[OMHTTPSerialization] isEqualToString:OMHTTPSerializationURLEncoded]) {
-            contentType = @"application/x-www-form-urlencoded";
-            request.HTTPBody = [OMHTTPRequest buildURLEncodedData:parameters];
         }
         
         if (request.HTTPBody) {

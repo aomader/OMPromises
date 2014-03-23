@@ -25,15 +25,38 @@
 
 #import "OMDeferred.h"
 
+/** Option key specifying the time interval before a request is considered timed out.
+ 
+ The value should be encoded as NSNumber containing an NSTimeInterval (double) describing
+ the timeout in seconds.
+ Defaults to `20.` if not specified otherwise.
+ */
 extern NSString *const OMHTTPTimeout;
 
+/** Option key specifying the workload unto the initial response.
+ 
+ This involves the whole process of performing the DNS lookup, upload the data (header
+ and possible payload) as well as waiting for the response containing at least the
+ header information.
+ Defaults to `.05f` if not specified otherwise.
+ */
 extern NSString *const OMHTTPLookupProgress;
 
-// Serialization Option
+/** Option key specifying the serialization format of the supplied parameters.
+ 
+ Possible values are OMHTTPSerializationQueryString, OMHTTPSerializationJSON and
+ OMHTTPSerializationURLEncoded. They specify the serialization into the URL as additional
+ query parameters, as JSON payload and as form URL-encoded payload respectively.
+ Defaults to OMHTTPSerializationURLEncoded if not specified otherwise.
+ */
 extern NSString *const OMHTTPSerialization;
 extern NSString *const OMHTTPSerializationQueryString;
 extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
+
+/** NSError userInfo key specifying the corresponding OMHTTPResponse instance.
+ */
+extern NSString *const OMHTTPResponseKey;
 
 /** Provides methods to create an OMPromise representing an HTTP request.
  */
@@ -64,6 +87,8 @@ extern NSString *const OMHTTPSerializationURLEncoded;
  @param options An optional set of HTTP headers including values and method specific
                 options like OMHTTPSerialization. Each non method specific option is
                 automatically treated as an HTTP header and added to the request.
+                Possible domain specific keys are OMHTTPTimeout, OMHTTPLookupProgress
+                and OMHTTPSerialization.
  @return A promise that yields an OMHTTPResponse instance if successful.
  @see OMHTTPResponse
  @see get:parameters:options:

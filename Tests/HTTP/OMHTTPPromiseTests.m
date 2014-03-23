@@ -78,4 +78,38 @@
     get = nil;
 }
 
+- (void)testCustomHeaders {
+    OMPromise *request = [OMHTTPRequest get:@"http://headers.jsontest.com"
+                                 parameters:nil
+                                    options:@{
+                                        @"X-Custom-Header": @"arr1",
+                                        @"Y-Custom-Header": @"arr2"
+                                    }].httpParseJSON;
+    
+    __block int called = 0;
+    [request fulfilled:^(NSDictionary *headers) {
+        XCTAssert([headers[@"X-Custom-Header"] isEqualToString:@"arr1"], @"We should have sent custom headers");
+        XCTAssert([headers[@"Y-Custom-Header"] isEqualToString:@"arr2"], @"We should have sent custom headers");
+        called += 1;
+    }];
+    
+    WAIT_UNTIL(called == 1, 10, @"should have finished successfully");
+}
+
+- (void)testUrlInterpolation {
+    OMPromise *request = [OMHTTPRequest get:@"http://echo.jsontest.com/{key}/{value}"
+                                 parameters:@{
+                                     @"key": @"arr",
+                                     @"value": @"hey"
+                                 } options:nil].httpParseJSON;
+    
+    __block int called = 0;
+    [request fulfilled:^(NSDictionary *data) {
+        XCTAssert([data[@"arr"] isEqualToString:@"hey"], @"We should have requested an interpolated url");
+        called += 1;
+    }];
+    
+    WAIT_UNTIL(called == 1, 10, @"should have finished successfully");
+}
+
 @end
