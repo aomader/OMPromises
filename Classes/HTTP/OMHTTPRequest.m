@@ -99,7 +99,7 @@ NSString *const OMHTTPResponseKey = @"response";
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     NSAssert([response isKindOfClass:NSHTTPURLResponse.class], @"An NSHTTPURLResponse was expected!");
     
-    self.expectedContentLength = (NSUInteger)response.expectedContentLength;
+    self.expectedContentLength = (NSUInteger)(response.expectedContentLength > 0 ? response.expectedContentLength : 0);
     self.data = [NSMutableData dataWithCapacity:self.expectedContentLength > 0 ? self.expectedContentLength : 16];
     self.response = [[OMHTTPResponse alloc] initWithCode:(NSUInteger)response.statusCode
                                                  headers:response.allHeaderFields
