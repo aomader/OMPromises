@@ -44,12 +44,18 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 @interface OMPromise ()
 
-@property NSMutableArray *fulfilHandlers;
-@property NSMutableArray *failHandlers;
-@property NSMutableArray *progressHandlers;
-@property NSMutableArray *cancelHandlers;
+@property(assign, nonatomic) OMPromiseState state;
+@property(nonatomic) NSError *error;
+@property(nonatomic) id result;
+@property(assign, nonatomic) float progress;
+@property(assign, nonatomic) BOOL cancellable;
 
-@property(assign) NSUInteger depth;
+@property(nonatomic) NSMutableArray *fulfilHandlers;
+@property(nonatomic) NSMutableArray *failHandlers;
+@property(nonatomic) NSMutableArray *progressHandlers;
+@property(nonatomic) NSMutableArray *cancelHandlers;
+
+@property(assign, nonatomic) NSUInteger depth;
 
 @end
 
@@ -63,30 +69,6 @@ static dispatch_queue_t globalDefaultQueue = nil;
         _depth = 1;
     }
     return self;
-}
-
-#pragma mark - Property Interaction
-
-- (void)setError:(NSError *)error {
-    _error = error;
-}
-
-- (void)setResult:(id)result {
-    _result = result;
-}
-
-- (void)setProgress:(float)progress {
-    _progress = progress;
-}
-
-- (void)setCancellable:(BOOL)cancellable {
-    _cancellable = cancellable;
-}
-
-- (void)setState:(OMPromiseState)state {
-    NSAssert(_state == OMPromiseStateUnfulfilled && state != OMPromiseStateUnfulfilled,
-             @"A state transition requires to go from Unfulfilled to either Fulfilled or Failed");
-    _state = state;
 }
 
 #pragma mark - Queue

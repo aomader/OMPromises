@@ -234,7 +234,7 @@ the cancel-handler.
 - (void)startDownloadAndAbort {
     OMPromise *dl = [self get100GofData];
     // dl.cancellable == YES
-    
+
     // ...
     // for an unknown reason we dont need it anymore
     [dl cancel];
@@ -267,31 +267,17 @@ images are fetched, you want to use them for further processing.
 Here is how you would accomplish such task using OMPromises:
 
 ```objc
-// create a promise that represents the outcome of the gravatar lookup
-OMPromise *(^getGravatar)(NSString *email) = ^(NSString *email) {
-    OMDeferred *deferred = [OMDeferred deferred];
+#import <OMPromises/OMPromises.h>
 
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:
-        [NSString stringWithFormat:@"http://www.gravatar.com/avatar/%@?d=404", email]]];
-    [NSURLConnection
-        sendAsynchronousRequest:request
-        queue:[NSOperationQueue mainQueue]
-        completionHandler:^(NSURLResponse *res, NSData *data, NSError *error) {
-            if (error != nil || [(NSHTTPURLResponse *)res statusCode] != 200) {
-                [deferred fail:nil];
-            } else {
-                [deferred fulfil:[UIImage imageWithData:data]];
-            }
-        }];
-    
-    return deferred.promise;
-};
-
+// lookup images in parallel
 NSMutableArray *promises = [NSMutableArray array];
 for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
                           @"9fcf5f5c3f289b330baff283b85f7705",
                           @"deadc0dedeadc0dedeadc0dedeadc0de"]) {
-    OMPromise *imagePromise = [getGravatar(email)
+    OMPromise *image = [[OMHTTPRequest
+                         get:@"http://www.gravatar.com/avatar/{hash}?d=404"
+                         parameters:@{@"hash": email}
+                         options:nil]
         rescue:^id(NSError *error) {
             // in case the promise failed, we supply a dummy image to use instead
             return [UIImage imageNamed:@"dummy_image.png"];

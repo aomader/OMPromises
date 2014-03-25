@@ -83,34 +83,34 @@ extern NSString *const OMPromisesErrorDomain;
 /** Current state.
 
  May only change from `OMPromiseStateUnfulfilled` to either `OMPromiseStateFailed` or
- `OMPRomiseStateFulfilled`.
+ `OMPromiseStateFulfilled`.
  */
-@property(assign, readonly) OMPromiseState state;
+@property(assign, readonly, nonatomic) OMPromiseState state;
 
 /** Maybe the promised result.
  
  Contains the result in case the promise has been fulfilled.
  */
-@property(readonly) id result;
+@property(readonly, nonatomic) id result;
 
 /** Maybe an error.
  
  Contains the reason in case the promise failed.
  */
-@property(readonly) NSError *error;
+@property(readonly, nonatomic) NSError *error;
 
 /** Progress of the underlying workload.
  
  Describes the progress of the underlying workload as a floating point number in range
  [0, 1]. It only increases.
  */
-@property(assign, readonly) float progress;
+@property(assign, readonly, nonatomic) float progress;
 
 /** Whether the underlying operation supports cancellation or not.
  
  In case cancellable is `YES`, it's safe to call cancel.
  */
-@property(assign, readonly) BOOL cancellable;
+@property(assign, readonly, nonatomic) BOOL cancellable;
 
 ///---------------------------------------------------------------------------------------
 /// @name Queue Management
@@ -144,7 +144,7 @@ extern NSString *const OMPromisesErrorDomain;
  @see globalDefaultQueue:
  @see on:
  */
-@property dispatch_queue_t defaultQueue;
+@property(nonatomic) dispatch_queue_t defaultQueue;
 
 /** Convenience method to set the defaultQueue and ease successive operations.
 

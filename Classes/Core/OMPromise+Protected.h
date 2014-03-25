@@ -29,14 +29,14 @@
 
 @interface OMPromise (Protected)
 
+@property(assign, nonatomic) OMPromiseState state;
+@property(nonatomic) NSError *error;
+@property(nonatomic) id result;
+@property(assign, nonatomic) float progress;
+
 @property(readonly) NSArray *fulfilHandlers;
 @property(readonly) NSArray *failHandlers;
 @property(readonly) NSArray *progressHandlers;
-
-- (void)setError:(NSError *)error;
-- (void)setResult:(id)result;
-- (void)setProgress:(float)progress;
-- (void)setState:(OMPromiseState)state;
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
 

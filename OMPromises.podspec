@@ -17,12 +17,14 @@ Pod::Spec.new do |s|
     cs.public_header_files = 'Classes/OMPromises.h', 'Classes/Core/{OMPromises,OMPromise,OMDeferred}.h'
     cs.ios.resource_bundle = { 'OMPromises-Resources' => ['Resources/*.lproj'] }
     cs.osx.resource_bundle = { 'OMPromises-Resources' => ['Resources/*.lproj'] }
+    cs.preserve_paths = 'Resources'
   end
 
   s.subspec 'HTTP' do |hs|
     hs.dependency 'OMPromises/Core'
     hs.source_files = 'Classes/OMHTTP.h', 'Classes/HTTP'
     hs.public_header_files = 'Classes/OMHTTP.h', 'Classes/HTTP/*.h'
+    hs.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => 'OMPROMISES_HTTP_AVAILABLE=1' }
   end
 
   s.subspec 'Tests' do |ts|

@@ -45,7 +45,7 @@ NSString *const OMHTTPResponseKey = @"response";
 @property(nonatomic) NSURLConnection *connection;
 @property(nonatomic) OMHTTPResponse *response;
 @property(nonatomic) NSMutableData *data;
-@property(assign, nonatomic) long long expectedContentLength;
+@property(assign, nonatomic) NSUInteger expectedContentLength;
 
 @end
 
@@ -99,9 +99,9 @@ NSString *const OMHTTPResponseKey = @"response";
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     NSAssert([response isKindOfClass:NSHTTPURLResponse.class], @"An NSHTTPURLResponse was expected!");
     
-    self.expectedContentLength = response.expectedContentLength;
+    self.expectedContentLength = (NSUInteger)response.expectedContentLength;
     self.data = [NSMutableData dataWithCapacity:self.expectedContentLength > 0 ? self.expectedContentLength : 16];
-    self.response = [[OMHTTPResponse alloc] initWithCode:response.statusCode
+    self.response = [[OMHTTPResponse alloc] initWithCode:(NSUInteger)response.statusCode
                                                  headers:response.allHeaderFields
                                                     body:self.data];
     
@@ -310,7 +310,7 @@ NSString *const OMHTTPResponseKey = @"response";
 
 + (NSString *)escapeString:(NSString *)string {
     return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
-        NULL, (CFStringRef)string, NULL, CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!"), kCFStringEncodingUTF8);
+        NULL, (__bridge CFStringRef)string, NULL, CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!"), kCFStringEncodingUTF8);
 }
 
 @end
