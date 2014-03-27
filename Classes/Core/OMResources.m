@@ -27,9 +27,9 @@
 
 #import "OMPromise.h"
 
-#ifdef TARGET_OS_IPHONE
+#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
 static NSString *const kBundleName = @"OMPromises-Resources-iOS";
-#elif defined(TARGET_OS_MAC)
+#else
 static NSString *const kBundleName = @"OMPromises-Resources-OSX";
 #endif
 
