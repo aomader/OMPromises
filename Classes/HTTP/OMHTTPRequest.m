@@ -31,13 +31,14 @@
 static const NSTimeInterval kDefaultTimeoutInterval = 20.;
 static const float kDefaultLookupProgress = .05f;
 
+NSString *const OMPromisesHTTPErrorDomain = @"de.reaktor42.OMPromises.HTTP";
+NSString *const OMHTTPResponseKey = @"response";
 NSString *const OMHTTPTimeout = @"OMHTTPTimeout";
 NSString *const OMHTTPLookupProgress = @"OMHTTPLookupProgress";
 NSString *const OMHTTPSerialization = @"OMHTTPSerialization";
 NSString *const OMHTTPSerializationQueryString = @"querystring";
 NSString *const OMHTTPSerializationJSON = @"json";
 NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
-NSString *const OMHTTPResponseKey = @"response";
 
 @interface OMHTTPRequest () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
@@ -82,7 +83,13 @@ NSString *const OMHTTPResponseKey = @"response";
 #pragma mark - NSURLConnectionDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [self fail:error];
+    [self fail:[NSError errorWithDomain:OMPromisesHTTPErrorDomain
+                                   code:OMPromisesHTTPRequestError
+                               userInfo:@{
+                                   NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_request_%@", error),
+                                   NSUnderlyingErrorKey: error,
+                                   OMHTTPResponseKey: self.response
+                               }]];
 }
 
 #pragma mark - NSURLConnectionDataDelegate Methods
@@ -108,14 +115,12 @@ NSString *const OMHTTPResponseKey = @"response";
     if (response.statusCode >= 400) {
         [connection cancel];
 
-            #warning proper error
-        NSError *error = [NSError errorWithDomain:OMPromisesErrorDomain
-                                             code:0
-                                         userInfo:@{
-                                             NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i", response.statusCode),
-                                             OMHTTPResponseKey: self.response
-                                         }];
-        [self connection:connection didFailWithError:error];
+        [self fail:[NSError errorWithDomain:OMPromisesHTTPErrorDomain
+                                       code:OMPromisesHTTPStatusError
+                                   userInfo:@{
+                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i", response.statusCode),
+                                       OMHTTPResponseKey: self.response
+                                   }]];
     } else {
         [self progress:self.lookup];
     }
@@ -208,7 +213,7 @@ NSString *const OMHTTPResponseKey = @"response";
         options = mutableOptions;
     }
     
-    // interpoplate url string
+    // interpolate url string
     if (parameters && parameters.count > 0) {
         NSMutableDictionary *mutableParameters = parameters.mutableCopy;
         NSMutableString *mutableUrlString = [NSMutableString stringWithCapacity:urlString.length];
@@ -295,8 +300,12 @@ NSString *const OMHTTPResponseKey = @"response";
 }
 
 + (NSData *)buildURLEncodedData:(NSDictionary *)parameters {
-#warning add implementation
-    return nil;
+    NSMutableArray *pairs = [NSMutableArray arrayWithCapacity:parameters.count];
+    for (NSString *key in parameters.keyEnumerator) {
+        [pairs addObject:[NSString stringWithFormat:@"%@=%@",
+             [OMHTTPRequest escapeFormString:key], [OMHTTPRequest escapeFormString:parameters[key]]]];
+    }
+    return [[pairs componentsJoinedByString:@"&"] dataUsingEncoding:NSASCIIStringEncoding];
 }
 
 + (NSString *)buildQueryString:(NSDictionary *)parameters {
@@ -311,6 +320,12 @@ NSString *const OMHTTPResponseKey = @"response";
 + (NSString *)escapeString:(NSString *)string {
     return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
         NULL, (__bridge CFStringRef)string, NULL, CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!"), kCFStringEncodingUTF8);
+}
+
++ (NSString *)escapeFormString:(NSString *)string {
+    NSString *str = (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(
+        NULL, (__bridge CFStringRef)string, CFSTR(" "), CFSTR("/%&=?$#+-~@<>|\\*,.()[]{}^!\n\r"), kCFStringEncodingUTF8);
+    return [str stringByReplacingOccurrencesOfString:@" " withString:@"+"];
 }
 
 @end

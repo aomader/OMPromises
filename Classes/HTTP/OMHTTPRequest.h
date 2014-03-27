@@ -25,6 +25,21 @@
 
 #import "OMDeferred.h"
 
+/** All HTTP package specific errors reside in this error domain.
+ */
+extern NSString *const OMPromisesHTTPErrorDomain;
+
+/** Possible error codes for OMPromisesHTTPErrorDomain errors.
+ */
+typedef NS_ENUM(NSInteger, OMPromisesHTTPErrorCodes) {
+    OMPromisesHTTPRequestError,
+    OMPromisesHTTPStatusError,
+};
+
+/** NSError userInfo key specifying the corresponding OMHTTPResponse instance.
+ */
+extern NSString *const OMHTTPResponseKey;
+
 /** Option key specifying the time interval before a request is considered timed out.
  
  The value should be encoded as NSNumber containing an NSTimeInterval (double) describing
@@ -54,10 +69,6 @@ extern NSString *const OMHTTPSerializationQueryString;
 extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
 
-/** NSError userInfo key specifying the corresponding OMHTTPResponse instance.
- */
-extern NSString *const OMHTTPResponseKey;
-
 /** Provides methods to create an OMPromise representing an HTTP request.
  */
 @interface OMHTTPRequest : OMDeferred
@@ -72,11 +83,11 @@ extern NSString *const OMHTTPResponseKey;
  which represents the outcome of the respective request.
 
  There are convenience methods for the most common verbs to simplify the process even
- further, like get:paramaters:options: or post:parameters:options:. These methods may
+ further, like get:parameters:options: or post:parameters:options:. These methods may
  apply additional logic to provide sane defaults, have a look at the corresponding
  documentation.
- All covenience methods share the automated URL string interpolation in addition to
- the final parameter serializtion: Each occurence of a string wrapped in curly braces
+ All convenience methods share the automated URL string interpolation in addition to
+ the final parameter serialization: Each occurrence of a string wrapped in curly braces
  is replaced by the value found in the parameters dictionary identified by the wrapped
  string. The pair is removed from the dictionary afterwards.
 
