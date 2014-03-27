@@ -27,6 +27,8 @@
 
 @implementation OMHTTPResponse
 
+#pragma mark - Init
+
 - (id)initWithCode:(NSUInteger)statusCode
     headers:(NSDictionary *)headers
     body:(NSData *)body
@@ -38,6 +40,13 @@
         _body = body;
     }
     return self;
+}
+
+#pragma mark - NSObject Overrides
+
+- (NSString *)debugDescription {
+    return [NSString stringWithFormat:@"<OMHTTPResponse: %p; status = %i; headers = %@; payload = %i bytes>",
+            (__bridge void *)self, self.statusCode, self.headers, self.body.length];
 }
 
 @end
