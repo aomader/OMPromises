@@ -15,8 +15,8 @@ Pod::Spec.new do |s|
   s.subspec 'Core' do |cs|
     cs.source_files = 'Classes/OMPromises.h', 'Classes/Core', 'Classes/Core/External'
     cs.public_header_files = 'Classes/OMPromises.h', 'Classes/Core/{OMPromises,OMPromise,OMDeferred}.h'
-    cs.ios.resource_bundle = { 'OMPromises-Resources' => ['Resources/*.lproj'] }
-    cs.osx.resource_bundle = { 'OMPromises-Resources' => ['Resources/*.lproj'] }
+    cs.ios.resource_bundle = { 'OMPromises-Resources-iOS' => ['Resources/*.lproj'] }
+    cs.osx.resource_bundle = { 'OMPromises-Resources-OSX' => ['Resources/*.lproj'] }
     cs.preserve_paths = 'Resources'
   end
 

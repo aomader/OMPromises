@@ -27,7 +27,11 @@
 
 #import "OMPromise.h"
 
-static NSString *const kBundleName = @"OMPromises-Resources";
+#ifdef TARGET_OS_IPHONE
+static NSString *const kBundleName = @"OMPromises-Resources-iOS";
+#elif defined(TARGET_OS_MAC)
+static NSString *const kBundleName = @"OMPromises-Resources-OSX";
+#endif
 
 NSBundle *OMResourcesBundle() {
     static NSBundle *resources = nil;
