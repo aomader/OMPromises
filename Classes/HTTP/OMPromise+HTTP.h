@@ -27,8 +27,10 @@
 
 @interface OMPromise (HTTP)
 
-- (OMPromise *)httpParseText;
-- (OMPromise *)httpParseImage;
+/** Convert an OMHTTPResponse containing JSON to the proper native data.
+
+ @return The promise yields an id type describing the parsed JSON.
+ */
 - (OMPromise *)httpParseJSON;
 
 @end

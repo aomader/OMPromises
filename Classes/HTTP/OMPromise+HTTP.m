@@ -25,57 +25,38 @@
 
 #import "OMPromise+HTTP.h"
 
-//#import <UIKit/UIKit.h>
-
+#import "OMResources.h"
+#import "OMHTTPRequest.h"
 #import "OMHTTPResponse.h"
-
-static const char *supportedImages[] = {
-    "image/gif",
-    "image/jpeg",
-    "image/png",
-    "image/tiff",
-    "image/x-xbitmap",
-    "image/x-icon"
-};
 
 @implementation OMPromise (HTTP)
 
-- (OMPromise *)httpParseText {
-#warning Check content-type as well as a charset and transform body to string.
-    return nil;
-}
-
-- (OMPromise *)httpParseImage {
-    /*
-    return [self then:^id(OMHTTPResponse *response) {
-        BOOL supported = NO;
-        const char *contentType = [response.headers[@"Content-Type"] cStringUsingEncoding:NSUTF8StringEncoding];
-        for (NSUInteger i = 0; i < 6; ++i) {
-            if (strcasecmp(contentType, supportedImages[i]) == 0) {
-                supported = YES;
-                break;
-            }
-        }
-        
-        if (!supported) {
-#warning Check content-type as well as a charset and transform body to string.
-            return [NSError errorWithDomain:OMPromisesErrorDomain code:0 userInfo:nil];
-        }
-        
-        return [[UIImage alloc] initWithData:response.body];
-    }];
-    */
-    
-#warning Check content-type for UIImage readable and transform to UIImage.
-    return  nil;
-}
-
 - (OMPromise *)httpParseJSON {
-#warning Check for content-type, also account for possible versioned content types.
     return [self then:^id(OMHTTPResponse *response) {
+        // check content type
+        if (![response.headers[@"Content-Type"] isEqualToString:@"application/json"]) {
+            return [NSError errorWithDomain:OMPromisesHTTPErrorDomain
+                                       code:OMPromisesHTTPContentTypeError
+                                   userInfo:@{
+                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_content_type_%@%@",
+                                           response.headers[@"Content-Type"], @"application/json")
+                                   }];
+        }
+
         NSError *error = nil;
         id data = [NSJSONSerialization JSONObjectWithData:response.body options:0 error:&error];
-        return error ?: data;
+
+        if (error) {
+            return [NSError errorWithDomain:OMPromisesHTTPErrorDomain
+                                       code:OMPromisesHTTPSerializationError
+                                   userInfo:@{
+                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_deserialization_%@%@",
+                                           @"JSON", error),
+                                       NSUnderlyingErrorKey: error
+                                   }];
+        }
+
+        return data;
     }];
 }
 

@@ -118,7 +118,8 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
         [self fail:[NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                        code:OMPromisesHTTPStatusError
                                    userInfo:@{
-                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i", response.statusCode),
+                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i%@",
+                                           response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]),
                                        OMHTTPResponseKey: self.response
                                    }]];
     } else {

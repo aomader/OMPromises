@@ -34,6 +34,8 @@ extern NSString *const OMPromisesHTTPErrorDomain;
 typedef NS_ENUM(NSInteger, OMPromisesHTTPErrorCodes) {
     OMPromisesHTTPRequestError,
     OMPromisesHTTPStatusError,
+    OMPromisesHTTPContentTypeError,
+    OMPromisesHTTPSerializationError
 };
 
 /** NSError userInfo key specifying the corresponding OMHTTPResponse instance.
