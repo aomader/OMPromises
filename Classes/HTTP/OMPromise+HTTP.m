@@ -34,7 +34,7 @@
 - (OMPromise *)httpParseJSON {
     return [self then:^id(OMHTTPResponse *response) {
         // check content type
-        if (![response.headers[@"Content-Type"] isEqualToString:@"application/json"]) {
+        if (![response.headers[@"Content-Type"] hasPrefix:@"application/json"]) {
             return [NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                        code:OMPromisesHTTPContentTypeError
                                    userInfo:@{
