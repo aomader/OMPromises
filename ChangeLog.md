@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.2.1 (03/29/2014)
+
+* Fix: Possible crash caused by improper chaining (#11)
+
 ## 0.2.0 (02/08/2014)
 
 * Fix: Make promises finally thread-safe
