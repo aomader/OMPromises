@@ -23,7 +23,6 @@
 // THE SOFTWARE.
 //
 
-
 /** Possible states of an OMPromise.
  */
 typedef NS_ENUM(NSInteger, OMPromiseState) {

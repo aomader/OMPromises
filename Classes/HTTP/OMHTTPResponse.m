@@ -45,8 +45,8 @@
 #pragma mark - NSObject Overrides
 
 - (NSString *)debugDescription {
-    return [NSString stringWithFormat:@"<OMHTTPResponse: %p; status = %i; headers = %@; payload = %i bytes>",
-            (__bridge void *)self, self.statusCode, self.headers, self.body.length];
+    return [NSString stringWithFormat:@"<OMHTTPResponse: %p; status = %@; headers = %@; payload = %@ bytes>",
+            (__bridge void *)self, @(self.statusCode), self.headers, @(self.body.length)];
 }
 
 @end
