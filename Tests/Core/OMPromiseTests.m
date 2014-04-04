@@ -1,5 +1,5 @@
 //
-// OMPromiseTests.h
+// OMPromiseTests.m
 // OMPromisesTests
 //
 // Copyright (C) 2013,2014 Oliver Mader
@@ -23,21 +23,7 @@
 // THE SOFTWARE.
 //
 
-#import <XCTest/XCTest.h>
-
-#import "OMPromises.h"
-
-#define WAIT_UNTIL(condition, timeout, msg, ...) \
-    { \
-        NSDate *date = [NSDate date]; \
-        while (!(condition)) { \
-            if ([date timeIntervalSinceNow] < -timeout) { \
-                XCTFail(msg); \
-                break;\
-            } \
-            usleep(10000); \
-        } \
-    }
+#import "OMTests.h"
 
 @interface OMPromisesTests : XCTestCase
 

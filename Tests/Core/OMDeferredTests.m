@@ -1,5 +1,5 @@
 //
-// OMDeferredTests.h
+// OMDeferredTests.m
 // OMPromisesTests
 //
 // Copyright (C) 2013,2014 Oliver Mader
@@ -23,12 +23,9 @@
 // THE SOFTWARE.
 //
 
-#import <XCTest/XCTest.h>
-
-#import "OMPromises.h"
+#import "OMTests.h"
 
 @interface OMDeferredTests : XCTestCase
-
 @end
 
 @implementation OMDeferredTests
