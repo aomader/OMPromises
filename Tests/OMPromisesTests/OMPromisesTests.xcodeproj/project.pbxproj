@@ -38,6 +38,7 @@
 		F9144E5718DF479B004CDFE4 /* OMDeferredTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMDeferredTests.m; sourceTree = "<group>"; };
 		F9144E5818DF479B004CDFE4 /* OMPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMPromiseTests.m; sourceTree = "<group>"; };
 		F9144E5A18DF479B004CDFE4 /* OMHTTPPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMHTTPPromiseTests.m; sourceTree = "<group>"; };
+		F95E6F5018EF3B0400350D71 /* OMTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OMTests.h; path = ../OMTests.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +138,7 @@
 			children = (
 				F9144E5618DF479B004CDFE4 /* Core */,
 				F9144E5918DF479B004CDFE4 /* HTTP */,
+				F95E6F5018EF3B0400350D71 /* OMTests.h */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
