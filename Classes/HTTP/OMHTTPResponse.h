@@ -23,6 +23,8 @@
 // THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
+
 /** Represents the outcome of a successful HTTP request operation.
  */
 @interface OMHTTPResponse : NSObject

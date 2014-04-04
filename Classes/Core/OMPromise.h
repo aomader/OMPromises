@@ -23,6 +23,8 @@
 // THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
+
 /** Possible states of an OMPromise.
  */
 typedef NS_ENUM(NSInteger, OMPromiseState) {

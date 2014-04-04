@@ -23,6 +23,8 @@
 // THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
+
 /** Lookup a localized format string.
  
  Searches for a localizable string in the corresponding resource bundle
