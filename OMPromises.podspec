@@ -32,5 +32,12 @@ Pod::Spec.new do |s|
     ts.dependency 'OMPromises/HTTP'
     ts.framework = 'XCTest'
     ts.source_files = 'Tests/{Core,HTTP}/*.{h,m}'
+    ts.prefix_header_contents = <<-EOS
+#if __IPHONE_OS_VERSION_MIN_REQUIRED
+#import <MobileCoreServices/MobileCoreServices.h>
+#else
+#import <CoreServices/CoreServices.h>
+#endif
+EOS
   end
 end
