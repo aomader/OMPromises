@@ -8,8 +8,4 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import <MobileCoreServices/MobileCoreServices.h>
-
-    #ifndef FLT_EPSILON
-        #define FLT_EPSILON __FLT_EPSILON__
-    #endif
 #endif
