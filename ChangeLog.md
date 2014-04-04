@@ -1,5 +1,19 @@
 # ChangeLog
 
+## 0.3.0 (04/04/2014)
+
+* Feature: New `defaultQueue` property on `OMPromise` inheriting from a
+  class wide `globalDefaultQueue` changeable through `setGlobalDefaultQueue:`
+* Feature: `on:` method to change the `defaultQueue` in a chainable fashion
+* Feature: New subspec `OMPromises/HTTP` provides means to create HTTP requests
+  through an OMPromise-based API, still considered **beta** though:
+  - `OMHTTPRequest` provides static methods to create HTTP requests
+  - `OMHTTPResponse` describes the possible outcome of such requests
+  - `OMPromise+HTTP` provides HTTP specific transformers, e.g. JSON parsing
+* Improvement: Provide `NSLocalizedDescription` values for all returned NSError
+  instances and add meaningful `debugDescription` implementations.
+* Improvement: General code quality improvements and restructuring
+
 ## 0.2.1 (03/29/2014)
 
 * Fix: Possible crash caused by improper chaining (#11)

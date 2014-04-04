@@ -20,6 +20,7 @@ The main features of OMPromises are listed below.
 * Optional support for cancellation
 * Queue based block execution if needed
 * Various combinators
+* **New:** Promise-based HTTP request API separated from the core
 
 ## Installation
 
@@ -27,7 +28,15 @@ The recommended approach for installing OMPromises is to use [CocoaPods] package
 manager.
 
 ```bash
-pod 'OMPromises', '~> 0.2.0'
+pod 'OMPromises', '~> 0.3.0'
+```
+
+If you want to make use of the new HTTP request API you also have to include
+the new subspec. Have a look at the corresponding [header](Classes/HTTP)
+files for more information.
+
+```bash
+pod 'OMPromises/HTTP', '~> 0.3.0'
 ```
 
 ## Documentation
@@ -127,9 +136,11 @@ callbacks for the same event.
         // called after 1 second, result == @1337
     }];
 
-OMPromise *networkRequest = [self get:@"http://google.com"];
+OMPromise *networkRequest = [OMHTTPRequest get:@"http://google.com"
+                                    parameters:nil
+                                       options:nil];
 [[[networkRequest
-    fulfilled:^(id result) {
+    fulfilled:^(OMHTTPResponse *response) {
         // called if the network request succeeded
     }]
     failed:^(NSError *error) {
