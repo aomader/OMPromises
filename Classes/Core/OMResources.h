@@ -34,4 +34,4 @@
  @param ... An optional set of format arguments.
  @return The formatted and localized string.
  */
-NSString *OMLocalizedString(NSString *key, ...);
+extern NSString *OMLocalizedString(NSString *key, ...);

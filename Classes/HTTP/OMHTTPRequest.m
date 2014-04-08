@@ -83,13 +83,18 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 #pragma mark - NSURLConnectionDelegate
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSMutableDictionary *userInfo = @{
+        NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_request_%@", error),
+        NSUnderlyingErrorKey: error
+    }.mutableCopy;
+
+    if (self.response) {
+        userInfo[OMHTTPResponseKey] = self.response;
+    }
+
     [self fail:[NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                    code:OMPromisesHTTPRequestError
-                               userInfo:@{
-                                   NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_request_%@", error),
-                                   NSUnderlyingErrorKey: error,
-                                   OMHTTPResponseKey: self.response
-                               }]];
+                               userInfo:userInfo]];
 }
 
 #pragma mark - NSURLConnectionDataDelegate Methods
