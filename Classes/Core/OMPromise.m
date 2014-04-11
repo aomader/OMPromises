@@ -254,7 +254,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         };
     }
     
-    if (self.progress > 0.f) {
+    if (self.progress > FLT_EPSILON) {
         progressHandler(self.progress);
     }
     

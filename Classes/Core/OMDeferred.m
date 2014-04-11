@@ -87,9 +87,9 @@
     
     @synchronized (self) {
         NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
-        NSAssert(self.progress <= progress, @"Progress can only increase");
+        NSAssert(self.progress <= progress + FLT_EPSILON, @"Progress must not decrease");
         
-        if (self.progress < progress) {
+        if (self.progress < progress - FLT_EPSILON) {
             self.progress = progress;
             progressHandlers = self.progressHandlers;
         }

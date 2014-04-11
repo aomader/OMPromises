@@ -92,6 +92,29 @@
     XCTAssertEqualWithAccuracy(deferred.progress, .2f, FLT_EPSILON, @"Progress shouldn't have changed");
 }
 
+- (void)testProgressPrecision {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    __block int called = 0;
+    [deferred.promise progressed:^(float progress) {
+        float values[] = {.1f, .1 + 2.f*FLT_EPSILON};
+        XCTAssertEqualWithAccuracy(values[called], progress, FLT_EPSILON, @"Unexpected progress");
+        called += 1;
+    }];
+    
+    [deferred progress:.1f];
+    XCTAssertEqual(called, 1, @"Should have progressed once");
+    
+    
+    XCTAssertNoThrow([deferred progress:.1f - FLT_EPSILON], @"We anticipate a certain error");
+    
+    [deferred progress:.1f + FLT_EPSILON];
+    XCTAssertEqual(called, 1, @"We dont progress if change is too small");
+    
+    [deferred progress:.1f + 2.f*FLT_EPSILON];
+    XCTAssertEqual(called, 2, @"Finally we progress if the change is large enough");
+}
+
 - (void)testCancelled {
     OMDeferred *deferred = [OMDeferred deferred];
     OMPromise *promise = deferred.promise;
@@ -118,4 +141,3 @@
 }
 
 @end
-
