@@ -115,6 +115,23 @@
     XCTAssertEqual(called, 2, @"Finally we progress if the change is large enough");
 }
 
+- (void)testTryFulfil {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    id result = @.1337f;
+    XCTAssertTrue([deferred tryFulfil:result]);
+
+    XCTAssertEqual(deferred.state, OMPromiseStateFulfilled, @"Should be Fulfilled by now");
+    XCTAssertEqual(deferred.result, result, @"There should be the supplied result by now");
+    XCTAssertNil(deferred.error, @"There shouldn't be an error");
+    XCTAssertEqualWithAccuracy(deferred.progress, 1.f, FLT_EPSILON, @"Progress should be 1");
+
+    id result2 = @.1338f;
+    XCTAssertFalse([deferred tryFulfil:result2]);
+
+    XCTAssertEqual(deferred.result, result, @"Result should be unchanged");
+}
+
 - (void)testCancelled {
     OMDeferred *deferred = [OMDeferred deferred];
     OMPromise *promise = deferred.promise;

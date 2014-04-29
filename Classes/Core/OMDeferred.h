@@ -94,6 +94,21 @@
 - (void)progress:(float)progress;
 
 ///---------------------------------------------------------------------------------------
+/// @name Safely trying to change state
+///---------------------------------------------------------------------------------------
+
+/** Tries to finalize the deferred by settings its state to OMPromiseStateFulfilled.
+
+ Tries to set the state similar to fulfil: but doesn't throw an exception if the
+ promise is not unfulfilled anymore.
+
+ @param result Result to set and propagate.
+ @return Whether the operation was successful or not.
+ @see fulfil:
+ */
+- (BOOL)tryFulfil:(id)result;
+
+///---------------------------------------------------------------------------------------
 /// @name Cancellation
 ///---------------------------------------------------------------------------------------
 

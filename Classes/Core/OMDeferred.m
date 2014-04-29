@@ -103,6 +103,17 @@
     }
 }
 
+- (BOOL)tryFulfil:(id)result {
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled) {
+            [self fulfil:result];
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
 #pragma mark - Cancellation
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
