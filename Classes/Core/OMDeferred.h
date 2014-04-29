@@ -108,6 +108,17 @@
  */
 - (BOOL)tryFulfil:(id)result;
 
+/** Tries to finalize the deferred by settings its state to OMPromiseStateFailed.
+
+ Tries to set the state similar to fail: but doesn't throw an exception if the
+ promise is not unfulfilled anymore.
+
+ @param error Error to set and propagate.
+ @return Whether the operation was successful or not.
+ @see fail:
+ */
+- (BOOL)tryFail:(NSError *)error;
+
 ///---------------------------------------------------------------------------------------
 /// @name Cancellation
 ///---------------------------------------------------------------------------------------

@@ -114,6 +114,17 @@
     return NO;
 }
 
+- (BOOL)tryFail:(NSError *)error {
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled) {
+            [self fail:error];
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
 #pragma mark - Cancellation
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {

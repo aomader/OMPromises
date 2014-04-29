@@ -132,6 +132,23 @@
     XCTAssertEqual(deferred.result, result, @"Result should be unchanged");
 }
 
+- (void)testTryFail {
+    OMDeferred *deferred = [OMDeferred deferred];
+
+    NSError *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:0 userInfo:nil];
+    XCTAssertTrue([deferred tryFail:error]);
+
+    XCTAssertEqual(deferred.state, OMPromiseStateFailed, @"Should be Failed by now");
+    XCTAssertEqual(deferred.error, error, @"There should be the supplied error by now");
+    XCTAssertNil(deferred.result, @"There shouldn't be an result");
+    XCTAssertEqualWithAccuracy(deferred.progress, 0.f, FLT_EPSILON, @"Progress should be unchanged");
+
+    NSError *error2 = [NSError errorWithDomain:NSPOSIXErrorDomain code:1 userInfo:nil];
+    XCTAssertFalse([deferred tryFail:error2]);
+
+    XCTAssertEqual(deferred.error, error, @"Error should be unchanged");
+}
+
 - (void)testCancelled {
     OMDeferred *deferred = [OMDeferred deferred];
     OMPromise *promise = deferred.promise;
