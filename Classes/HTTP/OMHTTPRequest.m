@@ -247,6 +247,9 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
             parameters = mutableParameters;
         }
     }
+
+    // trim leading/trailing whitespace
+    urlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     return [OMHTTPRequest requestWithMethod:method
                                         url:[NSURL URLWithString:urlString]
