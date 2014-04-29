@@ -119,6 +119,17 @@
  */
 - (BOOL)tryFail:(NSError *)error;
 
+/** Tries to update the progress.
+
+ Tries to update the progress similar to progress:, but doesn't throw an exception
+ if the value is less than the current value or the promise is not unfulfilled anymore.
+
+ @param progress Progress to set and propagate.
+ @return Whether the operation was successful or not.
+ @see progress:
+ */
+- (BOOL)tryProgress:(float)progress;
+
 ///---------------------------------------------------------------------------------------
 /// @name Cancellation
 ///---------------------------------------------------------------------------------------

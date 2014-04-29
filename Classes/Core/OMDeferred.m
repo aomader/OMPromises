@@ -125,6 +125,17 @@
     return NO;
 }
 
+- (BOOL)tryProgress:(float)progress {
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled && progress > self.progress + FLT_EPSILON) {
+            [self progress:progress];
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
 #pragma mark - Cancellation
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
