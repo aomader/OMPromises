@@ -43,6 +43,12 @@
  It's important to understand that the OMDeferred/OMPromise is sealed, once its stated
  has been changed by calling fulfil: or fail:. After that calls to progress:, fulfil:
  or fail: result in an exception.
+
+ There are safe variants of the state changing methods namely tryFulfil:, tryFail:
+ and tryProgress:. They will never throw an exception but describe the outcome of
+ the operation by their return values. Although that sounds convenient you should not
+ use them unless it's absolutely necessary. Most of the time you find better ways and
+ structure your code and execution paths better if you use the three main functions.
  */
 @interface OMDeferred : OMPromise
 
