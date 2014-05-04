@@ -68,12 +68,16 @@ extern NSString *const OMPromisesErrorDomain;
  block has to return a value, either a promise or any other value, which is used to
  determine the outcome of the newly returned promise. If the promise fails the 
  block isn't called and the returned promise fails as well.
-
  If you want to build a chain in case the promise fails, you use rescue:. It's very
  similar to then:, but the supplied block is called in case the promise fails.
  
- To build more complex structures you might use one combinator of chain:initial:,
- all: or any:.
+ To build more complex structures you might use one combinator of join:, chain:initial:,
+ all: or any:. See the corresponding method documentation for more information.
+ 
+ We have two blocking methods which are designed for testing purposes and should only
+ be used in testing scenarios and not in production code. The methods
+ waitForResultWithin: and waitForErrorWithin: block the current execution until a certain
+ state is reached within a certain interval.
  */
 @interface OMPromise : NSObject
 
