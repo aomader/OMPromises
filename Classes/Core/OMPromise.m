@@ -451,7 +451,36 @@ static dispatch_queue_t globalDefaultQueue = nil;
         
         if (seconds >= 0. && runtime > seconds) {
             @throw [NSException exceptionWithName:@"WaitingForFufilledPromise"
-                                           reason:@"The promise didn't get fulfilled within time."
+                                           reason:@"The promise didn't get fulfilled in time."
+                                         userInfo:nil];
+        }
+        
+        NSTimeInterval waiting = seconds >= 0. ? MIN(seconds - runtime, kTestingIntervalPrecision) : kTestingIntervalPrecision;
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:waiting]];
+    }
+    
+    return nil;
+}
+
+- (NSError *)waitForErrorWithin:(NSTimeInterval)seconds {
+    NSDate *start = [NSDate date];
+    
+    while (42) {
+        if (self.state == OMPromiseStateFailed) {
+            return self.error;
+        }
+        
+        if (self.state == OMPromiseStateFulfilled) {
+            @throw [NSException exceptionWithName:@"WaitingForFailedPromise"
+                                           reason:@"The promise got fulfilled instead of failing."
+                                         userInfo:nil];
+        }
+        
+        NSTimeInterval runtime = -start.timeIntervalSinceNow;
+        
+        if (seconds >= 0. && runtime > seconds) {
+            @throw [NSException exceptionWithName:@"WaitingForFailedPromise"
+                                           reason:@"The promise didn't fail in time."
                                          userInfo:nil];
         }
         
