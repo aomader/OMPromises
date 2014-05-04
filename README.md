@@ -268,6 +268,7 @@ combination assuming an equal distribution of workload over all supplied promise
 * `chain:initial:` - Equal to applying multiple chaining/callback calls
 * `all:` - Waits for all promises to get fulfilled, fails in case any promise fails.
 * `any:` - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
+* `collect:` - Collects **all** outcomes of the supplied promises, thus it never fails.
 
 ## Demonstration
 
@@ -285,10 +286,9 @@ NSMutableArray *promises = [NSMutableArray array];
 for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
                           @"9fcf5f5c3f289b330baff283b85f7705",
                           @"deadc0dedeadc0dedeadc0dedeadc0de"]) {
-    OMPromise *image = [[OMHTTPRequest
-                         get:@"http://www.gravatar.com/avatar/{hash}?d=404"
-                         parameters:@{@"hash": email}
-                         options:nil]
+    OMPromise *image = [[OMHTTPRequest get:@"http://gravatar.com/avatar/{hash}?d=404"
+                                parameters:@{@"hash": email}
+                                   options:nil]
         rescue:^id(NSError *error) {
             // in case the promise failed, we supply a dummy image to use instead
             return [UIImage imageNamed:@"dummy_image.png"];
