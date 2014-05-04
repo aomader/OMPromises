@@ -1052,6 +1052,24 @@
     XCTAssertEqual(all.state, OMPromiseStateFailed, @"All should have failed");
 }
 
+#pragma mark - Testing
+
+- (void)testWaitForResultWithin {
+    OMPromise *failed = [OMPromise promiseWithError:self.error];
+    XCTAssertThrows([failed waitForResultWithin:10.], @"Waiting on a failed promise should throw");
+    
+    OMPromise *fulfilled = [OMPromise promiseWithResult:self.result];
+    XCTAssertEqual([fulfilled waitForResultWithin:10.], self.result, @"Should yield result of fulfilled promise");
+    
+    OMPromise *promise = [OMPromise promiseWithResult:self.result2 after:3.5];
+    XCTAssertThrows([promise waitForResultWithin:3.], @"Fulfilling not in time should throw");
+    
+    NSDate *tic = [NSDate date];
+    OMPromise *promise2 = [OMPromise promiseWithResult:self.result2 after:3.5];
+    XCTAssertEqual([promise2 waitForResultWithin:4.], self.result2, @"Should yield result of fulfilled promise");
+    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, 3.5, .15, @"Should be more or less exact in timing");
+}
+
 #pragma clang diagnostics pop
 
 @end

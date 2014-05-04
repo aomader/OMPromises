@@ -40,6 +40,8 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     OMPromiseHandlerRescue
 };
 
+static const NSTimeInterval kTestingIntervalPrecision = .1;
+
 static dispatch_queue_t globalDefaultQueue = nil;
 
 @interface OMPromise ()
@@ -427,6 +429,37 @@ static dispatch_queue_t globalDefaultQueue = nil;
     }
     
     return deferred.promise;
+}
+
+#pragma mark - Testing
+
+- (id)waitForResultWithin:(NSTimeInterval)seconds {
+    NSDate *start = [NSDate date];
+    
+    while (42) {
+        if (self.state == OMPromiseStateFulfilled) {
+            return self.result;
+        }
+        
+        if (self.state == OMPromiseStateFailed) {
+            @throw [NSException exceptionWithName:@"WaitingForFufilledPromise"
+                                           reason:@"The promise failed instead of getting fulfilled."
+                                         userInfo:@{NSUnderlyingErrorKey: self.error}];
+        }
+        
+        NSTimeInterval runtime = -start.timeIntervalSinceNow;
+        
+        if (seconds >= 0. && runtime > seconds) {
+            @throw [NSException exceptionWithName:@"WaitingForFufilledPromise"
+                                           reason:@"The promise didn't get fulfilled within time."
+                                         userInfo:nil];
+        }
+        
+        NSTimeInterval waiting = seconds >= 0. ? MIN(seconds - runtime, kTestingIntervalPrecision) : kTestingIntervalPrecision;
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:waiting]];
+    }
+    
+    return nil;
 }
 
 #pragma mark - Private Helper Methods

@@ -399,5 +399,20 @@ extern NSString *const OMPromisesErrorDomain;
  */
 + (OMPromise *)all:(NSArray *)promises;
 
+///---------------------------------------------------------------------------------------
+/// @name Testing
+///---------------------------------------------------------------------------------------
+
+/** Wait for the promise to get fulfilled within a certain interval.
+ 
+ Blocks the current execution until the promise got fulfilled or the time is up,
+ in which case it throws an exception. Throws also an exception when the promise fails.
+ You should use this method only for testing purposes and nothing more.
+ 
+ @param seconds The waiting interval, -1. for infinity.
+ @return The result of the promise.
+ */
+- (id)waitForResultWithin:(NSTimeInterval)seconds;
+
 @end
 
