@@ -396,7 +396,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         for (OMPromise *promise in promises) {
             sum += promise.progress;
         }
-        [deferred progress:(sum / promises.count)];
+        [deferred tryProgress:(sum / promises.count)];
     };
 
     for (NSUInteger i = 0; i < promises.count; ++i) {
@@ -426,6 +426,54 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
     if (promises.count == 0) {
         [deferred fulfil:results];
+    }
+    
+    return deferred.promise;
+}
+
++ (OMPromise *)collect:(NSArray *)promises {
+    OMDeferred *deferred = [OMDeferred deferred];
+    
+    NSMutableArray *outcomes = [NSMutableArray arrayWithCapacity:promises.count];
+    __block NSUInteger collected = 0;
+    
+    void (^updateProgress)() = ^{
+        float sum = 0;
+        for (OMPromise *promise in promises) {
+            sum += (promise.state == OMPromiseStateUnfulfilled) ? promise.progress : 1.f;
+        }
+        [deferred tryProgress:(sum / promises.count)];
+    };
+    
+    void (^updateOutcomes)(NSUInteger, id) = ^(NSUInteger idx, id obj) {
+        if (obj != nil) {
+            outcomes[idx] = obj;
+        }
+        
+        if (++collected == promises.count) {
+            [deferred fulfil:outcomes];
+        } else {
+            updateProgress();
+        }
+    };
+    
+    for (NSUInteger i = 0; i < promises.count; ++i) {
+        [outcomes addObject:[NSNull null]];
+        
+        [[[(OMPromise *)promises[i]
+            fulfilled:^(id result) {
+                updateOutcomes(i, result);
+            }]
+            failed:^(NSError *error) {
+                updateOutcomes(i, error);
+            }]
+            progressed:^(float progress) {
+                updateProgress();
+            }];
+    }
+    
+    if (promises.count == 0) {
+        [deferred fulfil:outcomes];
     }
     
     return deferred.promise;

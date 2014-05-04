@@ -72,7 +72,7 @@ extern NSString *const OMPromisesErrorDomain;
  similar to then:, but the supplied block is called in case the promise fails.
  
  To build more complex structures you might use one combinator of join:, chain:initial:,
- all: or any:. See the corresponding method documentation for more information.
+ all:, any: or collect:. See the corresponding method documentation for more information.
  
  We have two blocking methods which are designed for testing purposes and should only
  be used in testing scenarios and not in production code. The methods
@@ -402,6 +402,19 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  */
 + (OMPromise *)all:(NSArray *)promises;
+
+/** Collects the outcome of all promises.
+ 
+ Once all promises either failed or got fulfilled, the new promise gets fulfilled
+ with an array containing the outcome of all supplied promises in order.
+ Values of `nil` are replaced with `NSNull.null`.
+ The new promise never fails and its progress is determined by an equal distribution
+ amonst the supplied promises.
+ 
+ @param promises A sequence of promises.
+ @return A new promise yielding an array containing all outcomes in order.
+ */
++ (OMPromise *)collect:(NSArray *)promises;
 
 ///---------------------------------------------------------------------------------------
 /// @name Testing

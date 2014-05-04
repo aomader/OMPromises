@@ -1052,6 +1052,36 @@
     XCTAssertEqual(all.state, OMPromiseStateFailed, @"All should have failed");
 }
 
+- (void)testCollectEmpty {
+    OMPromise *collected = [OMPromise collect:@[]];
+    
+    XCTAssertEqual(collected.state, OMPromiseStateFulfilled, @"Collected should be fulfilled");
+    XCTAssertTrue([collected.result isEqualToArray:@[]], @"Collected should cumulate all results");
+}
+
+- (void)testCollect {
+    OMDeferred *deferred1 = [OMDeferred deferred];
+    OMDeferred *deferred2 = [OMDeferred deferred];
+    
+    OMPromise *collected = [OMPromise collect:@[deferred1.promise, deferred2.promise, [OMPromise promiseWithResult:nil]]];
+    
+    XCTAssertEqualWithAccuracy(collected.progress, 1/3.f, FLT_EPSILON, @"Equal distribution of workload");
+    
+    [deferred1 progress:.5f];
+    XCTAssertEqualWithAccuracy(collected.progress, 1/2.f, FLT_EPSILON, @"Equal distribution of workload");
+    
+    [deferred1 fail:self.error];
+    XCTAssertEqual(collected.state, OMPromiseStateUnfulfilled, @"Collected should not have failed");
+    XCTAssertEqualWithAccuracy(collected.progress, 2/3.f, FLT_EPSILON, @"Equal distribution of workload");
+    
+    [deferred2 progress:.5f];
+    XCTAssertEqualWithAccuracy(collected.progress, 5/6.f, FLT_EPSILON, @"Equal distribution of workload");
+    
+    [deferred2 fulfil:self.result];
+    XCTAssertEqual(collected.state, OMPromiseStateFulfilled, @"Collected should be fulfilled");
+    XCTAssertTrue([collected.result isEqualToArray:(@[self.error, self.result, NSNull.null])], @"Collected should cumulate all results");
+}
+
 #pragma mark - Testing
 
 - (void)testWaitForResultWithin {
