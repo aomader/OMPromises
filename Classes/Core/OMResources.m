@@ -61,6 +61,10 @@ NSBundle *OMLocalizedStrings() {
 
 NSString *OMLocalizedString(NSString *key, ...) {
     NSString *format = [OMLocalizedStrings() localizedStringForKey:key value:@"" table:nil];
+
+    if (format == nil || [format isEqualToString:key]) {
+        return key;
+    }
     
     va_list args;
     va_start(args, key);
