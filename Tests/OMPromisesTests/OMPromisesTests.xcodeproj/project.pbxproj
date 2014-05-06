@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9A28AA0FE9C245F4AFB2F173 /* libPods-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F24761EC2240C4940A0E53 /* libPods-ios.a */; };
+		A17BAE7319193F5F00D38B1E /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
 		A1ACB60C19193A0A00E18BF8 /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
 		F9144E3218DF4761004CDFE4 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9144E3118DF4760004CDFE4 /* XCTest.framework */; };
 		F9144E3418DF4761004CDFE4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9144E3318DF4761004CDFE4 /* Foundation.framework */; };
@@ -331,6 +332,7 @@
 				F9144E5C18DF479B004CDFE4 /* OMDeferredTests.m in Sources */,
 				F9144E6018DF479B004CDFE4 /* OMHTTPPromiseTests.m in Sources */,
 				F9144E5E18DF479B004CDFE4 /* OMPromiseTests.m in Sources */,
+				A17BAE7319193F5F00D38B1E /* OMResourcesTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,7 +24,9 @@
 //
 
 #import "OMTests.h"
-#import "OMResources.h"
+
+// OMResources.h is not public, thus we have to define it manually
+extern NSString *OMLocalizedString(NSString *key, ...);
 
 @interface OMResourcesTests : XCTestCase
 @end
