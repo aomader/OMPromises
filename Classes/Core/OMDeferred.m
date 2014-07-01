@@ -96,9 +96,11 @@
         
     }
     
-    @synchronized (progressHandlers) {
-        for (void (^progressHandler)(float) in progressHandlers) {
-            progressHandler(progress);
+    if (progressHandlers) {
+        @synchronized (progressHandlers) {
+            for (void (^progressHandler)(float) in progressHandlers) {
+                progressHandler(progress);
+            }
         }
     }
 }
