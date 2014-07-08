@@ -44,6 +44,10 @@ static const NSTimeInterval kTestingIntervalPrecision = .1;
 
 static dispatch_queue_t globalDefaultQueue = nil;
 
+@interface OMLazyDeferred : OMDeferred
+@property (nonatomic, strong) void(^task)(OMDeferred*);
+@end
+
 @interface OMPromise ()
 
 @property(assign, nonatomic) OMPromiseState state;
@@ -99,6 +103,15 @@ static dispatch_queue_t globalDefaultQueue = nil;
         then:^(id _) {
             return task();
         } on:queue];
+}
+
++ (OMPromise*)promiseWithLazyTask:(void (^)(OMDeferred*))task
+{
+    NSCParameterAssert(task != nil);
+    
+    OMLazyDeferred* lazy = [[OMLazyDeferred alloc] init];
+    lazy.task = task;
+    return lazy;
 }
 
 + (OMPromise *)promiseWithResult:(id)result {
@@ -628,3 +641,61 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 @end
 
+@implementation OMLazyDeferred
+
+- (void)dispatchTask
+{
+    @synchronized(self)
+    {
+        if (self.task)
+        {
+            self.task(self);
+            self.task = nil;
+        }
+    }
+}
+
+- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue
+{
+    [self dispatchTask];
+    return [super fulfilled:fulfilHandler on:queue];
+}
+
+- (OMPromise*)failed:(void (^)(NSError *))failHandler on:(dispatch_queue_t)queue
+{
+    [self dispatchTask];
+    return [super failed:failHandler on:queue];
+}
+
+- (OMPromise*)progressed:(void (^)(float))progressHandler on:(dispatch_queue_t)queue
+{
+    [self dispatchTask];
+    return [super progressed:progressHandler on:queue];
+}
+
+- (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue
+{
+    return [OMPromise promiseWithLazyTask:^(OMDeferred* deferredResult)
+            {
+                [self dispatchTask];
+                
+                NSUInteger current = self.depth;
+                NSUInteger next = self.depth + 1;
+                
+                deferredResult.promise.depth = next;
+                
+                [[[self
+                   progressed:^(float progress) {
+                       [deferredResult progress:progress * ((float)current/next)];
+                   }]
+                  failed:^(NSError *error) {
+                      [deferredResult fail:error];
+                  }]
+                 fulfilled:^(id result) {
+                     [OMPromise bind:deferredResult with:thenHandler using:result bias:(float)current/next fraction:1.f/next];
+                 } on:queue];
+                
+            }];
+}
+
+@end

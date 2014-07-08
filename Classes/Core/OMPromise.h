@@ -49,6 +49,8 @@ typedef NS_ENUM(NSInteger, OMPromisesErrorCodes) {
  */
 extern NSString *const OMPromisesErrorDomain;
 
+@class OMDeferred;
+
 /** OMPromise proxies the outcome of a long-running asynchronous operation. It's
  a read-only object which is described essentially by state. The state defines
  how to interpret the values kept in result, error and progress.
@@ -183,6 +185,13 @@ extern NSString *const OMPromisesErrorDomain;
  @see promiseWithTask:
  */
 + (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
+
+/** Create a promise with a task that is evaluated lazily - not until a listener is attached
+ 
+ @param task The task describing the outcome of the promise.
+ @return A new promise.
+ */
++ (OMPromise*)promiseWithLazyTask:(void (^)(OMDeferred*))task;
 
 /** Create a fulfilled promise.
  
