@@ -344,6 +344,26 @@ extern NSString *const OMPromisesErrorDomain;
  */
 - (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue;
 
+/** Register a block to be called once the promise changed its state.
+
+ The block is executed when the promise got fulfilled or failed. It might be used for
+ finalizing tasks which should be executed always.
+
+ @param alwaysHandler Block to be called.
+ @return The promise itself.
+ */
+- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler;
+
+/** Similar to always:, but executes the supplied block asynchronously on a specific queue.
+
+ @param alwaysHandler Block to be called.
+ @param queue Context in which the block is executed
+ @return The promise itself.
+ @see always:
+ */
+- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler
+                   on:(dispatch_queue_t)queue;
+
 ///---------------------------------------------------------------------------------------
 /// @name Cancellation
 ///---------------------------------------------------------------------------------------

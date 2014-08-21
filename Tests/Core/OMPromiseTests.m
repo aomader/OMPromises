@@ -373,6 +373,28 @@
     WAIT_UNTIL(called == 1, 1, @"Not called within 1 sec");
 }
 
+- (void)testAlways {
+    __block int called = 0;
+
+    [[OMPromise promiseWithResult:self.result] always:^(OMPromiseState state, id result, NSError *error) {
+        XCTAssertEqual(state, OMPromiseStateFulfilled, @"Should be fulfilled");
+        XCTAssertEqual(result, self.result, @"Should contain result");
+        XCTAssertNil(error, @"No error");
+        called += 1;
+    }];
+
+    XCTAssertEqual(called, 1, @"Always handler should have been called");
+
+    [[OMPromise promiseWithError:self.error] always:^(OMPromiseState state, id result, NSError *error) {
+        XCTAssertEqual(state, OMPromiseStateFailed, @"Should have failed");
+        XCTAssertEqual(error, self.error, @"Should contain error");
+        XCTAssertNil(result, @"No result");
+        called += 1;
+    }];
+
+    XCTAssertEqual(called, 2, @"Always handler should have been called");
+}
+
 #pragma mark - Bind
 
 - (void)testThenReturnPromise {

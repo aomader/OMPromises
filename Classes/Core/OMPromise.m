@@ -274,6 +274,20 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return self;
 }
 
+- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler {
+    return [self always:alwaysHandler on:self.defaultQueue];
+}
+
+- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler
+                   on:(dispatch_queue_t)queue
+{
+    return [[self fulfilled:^(id result) {
+        alwaysHandler(OMPromiseStateFulfilled, result, nil);
+    } on:queue] failed:^(NSError *error) {
+        alwaysHandler(OMPromiseStateFailed, nil, error);
+    } on:queue];
+}
+
 #pragma mark - Cancellation
 
 - (void)cancel {
