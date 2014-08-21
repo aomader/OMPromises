@@ -1,7 +1,7 @@
 language: objective-c
 before_script:
     - brew update
-    - brew upgrade xctool
+    - brew upgrade xctool || true
     - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
     - cd $TRAVIS_BUILD_DIR/Tests/OMPromisesTests && pod install
 script: cd $TRAVIS_BUILD_DIR/Tests/OMPromisesTests && ./run_tests.sh
