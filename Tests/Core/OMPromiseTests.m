@@ -1082,6 +1082,33 @@
     XCTAssertTrue([collected.result isEqualToArray:(@[self.error, self.result, NSNull.null])], @"Collected should cumulate all results");
 }
 
+- (void)testRelay {
+    OMDeferred *from = [OMDeferred deferred];
+    OMDeferred *to = [OMDeferred deferred];
+
+    [from.promise relay:to];
+
+    [from progress:.5f];
+    XCTAssertEqualWithAccuracy(to.promise.progress, .5f, FLT_EPSILON, @"Should relay progress");
+
+    [from fulfil:self.result];
+    XCTAssertEqualWithAccuracy(to.promise.progress, 1.f, FLT_EPSILON, @"Should relay progress");
+    XCTAssertEqual(to.promise.result, self.result, @"Should relay result");
+    XCTAssertEqual(to.promise.state, OMPromiseStateFulfilled, @"Deferred should be done now.");
+}
+
+- (void)testRelayWithFulfilledDeferred {
+    OMDeferred *from = [OMDeferred deferred];
+    OMDeferred *to = [OMDeferred deferred];
+
+    [from.promise relay:to];
+    [to fulfil:self.result];
+
+    [from fail:self.error];
+    XCTAssertEqual(to.promise.state, OMPromiseStateFulfilled, @"Should not change nor crash");
+    XCTAssertNil(to.promise.error, @"Should not change nor crash");
+}
+
 #pragma mark - Testing
 
 - (void)testWaitForResultWithin {

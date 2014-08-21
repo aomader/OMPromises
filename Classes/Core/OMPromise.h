@@ -25,6 +25,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class OMDeferred;
+
 /** Possible states of an OMPromise.
  */
 typedef NS_ENUM(NSInteger, OMPromiseState) {
@@ -72,7 +74,8 @@ extern NSString *const OMPromisesErrorDomain;
  similar to then:, but the supplied block is called in case the promise fails.
  
  To build more complex structures you might use one combinator of join:, chain:initial:,
- all:, any: or collect:. See the corresponding method documentation for more information.
+ all:, any:, collect: or relay:. See the corresponding method documentation for more
+ information.
  
  We have two blocking methods which are designed for testing purposes and should only
  be used in testing scenarios and not in production code. The methods
@@ -415,6 +418,16 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise yielding an array containing all outcomes in order.
  */
 + (OMPromise *)collect:(NSArray *)promises;
+
+/** Relays all promise events to a deferred.
+
+  Relays state transitions as well as progress notifications to the supplied
+  deferred, if possible.
+
+  @param deferred The deferred to be controlled.
+  @return The promise itself.
+ */
+- (OMPromise *)relay:(OMDeferred *)deferred;
 
 ///---------------------------------------------------------------------------------------
 /// @name Testing

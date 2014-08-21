@@ -479,6 +479,18 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return deferred.promise;
 }
 
+- (OMPromise *)relay:(OMDeferred *)deferred {
+    NSAssert(deferred != nil, @"The deferred is required.");
+
+    return [[[self fulfilled:^(id value) {
+        [deferred tryFulfil:value];
+    }] failed:^(NSError *error) {
+        [deferred tryFail:error];
+    }] progressed:^(float progress) {
+        [deferred tryProgress:progress];
+    }];
+}
+
 #pragma mark - Testing
 
 - (id)waitForResultWithin:(NSTimeInterval)seconds {

@@ -269,6 +269,7 @@ combination assuming an equal distribution of workload over all supplied promise
 * `all:` - Waits for all promises to get fulfilled, fails in case any promise fails.
 * `any:` - Gets fulfilled if any one of the supplied promises does, otherwise it fails.
 * `collect:` - Collects **all** outcomes of the supplied promises, thus it never fails.
+* `relay:` - Relay all promise events to another deferred.
 
 ## Demonstration
 
