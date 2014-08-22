@@ -645,16 +645,19 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 - (void)dispatchTask
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        @synchronized(self)
+    @synchronized(self)
+    {
+        if (self.task)
         {
-            if (self.task)
+            void (^taskCopy)(OMDeferred*) = self.task;
+            self.task = nil;
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^
             {
-                self.task(self);
-                self.task = nil;
-            }
+                taskCopy(self);
+            });            
         }
-    });    
+    }
 }
 
 - (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue
