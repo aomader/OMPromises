@@ -30,6 +30,10 @@
 
 @implementation OMDeferredTests
 
+- (void)setUp {
+    [OMPromise setGlobalLogType:OMPromiseLogTypeAll];
+}
+
 - (void)testInitialValues {
     OMDeferred *deferred = [OMDeferred deferred];
     

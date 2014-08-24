@@ -27,6 +27,11 @@
 
 @class OMDeferred;
 
+/** Provide the possibility to remove all logging related code at compile-time
+ to reduce the potential overhead. Just #undef the macro to do so.
+ */
+#define OMPROMISES_LOGGING 1
+
 /** Possible states of an OMPromise.
  */
 typedef NS_ENUM(NSInteger, OMPromiseState) {
@@ -34,6 +39,16 @@ typedef NS_ENUM(NSInteger, OMPromiseState) {
     OMPromiseStateFailed = 1,
     OMPromiseStateFulfilled = 2
 };
+
+#ifdef OMPROMISES_LOGGING
+typedef NS_ENUM(NSUInteger, OMPromiseLogType) {
+    OMPromiseLogTypeNone = 0,
+    OMPromiseLogTypeProgressed = 1,
+    OMPromiseLogTypeFulfilled = 2,
+    OMPromiseLogTypeFailed = 4,
+    OMPromiseLogTypeAll = 7
+};
+#endif
 
 /** Codes used for errors that lie in the domain of OMPromisesErrorDomain.
  */
@@ -448,6 +463,27 @@ extern NSString *const OMPromisesErrorDomain;
   @return The promise itself.
  */
 - (OMPromise *)relay:(OMDeferred *)deferred;
+
+///---------------------------------------------------------------------------------------
+/// @name Logging
+///---------------------------------------------------------------------------------------
+
+#ifdef OMPROMISES_LOGGING
+
++ (void)setGlobalLogHandler:(void (^)(NSString *))globalLogHandler;
+
++ (void)setGlobalLogType:(OMPromiseLogType)globalLogType;
++ (OMPromiseLogType)globalLogType;
+
+@property(copy, nonatomic) NSString *logName;
+@property(assign, nonatomic) NSUInteger logType;
+
+- (OMPromise *)logFulfilled;
+- (OMPromise *)logFailed;
+- (OMPromise *)logProgressed;
+- (OMPromise *)logAll;
+
+#endif
 
 ///---------------------------------------------------------------------------------------
 /// @name Testing

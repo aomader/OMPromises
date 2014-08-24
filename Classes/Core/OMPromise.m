@@ -44,6 +44,13 @@ static const NSTimeInterval kTestingIntervalPrecision = .1;
 
 static dispatch_queue_t globalDefaultQueue = nil;
 
+#ifdef OMPROMISES_LOGGING
+static void (^globalLogHandler)(NSString *) = ^(NSString *message) {
+    NSLog(@"%@", message);
+};
+static OMPromiseLogType globalLogType = OMPromiseLogTypeNone;
+#endif
+
 @interface OMPromise ()
 
 @property(assign, nonatomic) OMPromiseState state;
@@ -69,6 +76,9 @@ static dispatch_queue_t globalDefaultQueue = nil;
     self = [super init];
     if (self) {
         _depth = 1;
+#ifdef OMPROMISES_LOGGING
+        _logName = [NSString stringWithFormat:@"OMPromise<%p>", (void *)self];
+#endif
     }
     return self;
 }
@@ -504,6 +514,50 @@ static dispatch_queue_t globalDefaultQueue = nil;
         [deferred tryProgress:progress];
     }];
 }
+
+#pragma mark - Logging
+
+#ifdef OMPROMISES_LOGGING
+
++ (void)setGlobalLogHandler:(void (^)(NSString *))logHandler {
+    globalLogHandler = logHandler;
+}
+
++ (void)setGlobalLogType:(OMPromiseLogType)logType {
+    globalLogType = logType;
+}
+
++ (OMPromiseLogType)globalLogType {
+    return globalLogType;
+}
+
+- (OMPromise *)logFulfilled {
+    self.logType |= OMPromiseLogTypeFulfilled;
+    return self;
+}
+
+- (OMPromise *)logFailed {
+    self.logType |= OMPromiseLogTypeFailed;
+    return self;
+}
+
+- (OMPromise *)logProgressed {
+    self.logType |= OMPromiseLogTypeProgressed;
+    return self;
+}
+
+- (OMPromise *)logAll {
+    self.logType |= OMPromiseLogTypeAll;
+    return self;
+}
+
+- (void)log:(NSString *)message type:(OMPromiseLogType)type {
+    if (((self.logType | globalLogType) & type) && globalLogHandler) {
+        globalLogHandler([NSString stringWithFormat:@"%@: %@", self.logName, message]);
+    }
+}
+
+#endif
 
 #pragma mark - Testing
 

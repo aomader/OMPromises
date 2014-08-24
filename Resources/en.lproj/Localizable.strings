@@ -5,3 +5,6 @@
 "error_http_request_%@" = "Failed to perform HTTP request: %@";
 "error_http_content_type_%@%@" = "Found Content-Type %@ but expected %@.";
 "error_http_deserialization_%@%@" = "Failed to deserialize %@ data: %@";
+"log_progressed_%f" = "Updated the progress to %.1f%%";
+"log_failed_%@" = "Failed with error %@";
+"log_fulfilled_%@" = "Fulfilled with result %@";

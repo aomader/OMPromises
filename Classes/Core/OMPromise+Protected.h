@@ -42,5 +42,9 @@
 
 - (void)cleanup;
 
+#ifdef OMPROMISES_LOGGING
+- (void)log:(NSString *)message type:(OMPromiseLogType)type;
+#endif
+
 @end
 

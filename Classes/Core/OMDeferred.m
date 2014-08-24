@@ -59,6 +59,11 @@
         self.result = result;
         self.state = OMPromiseStateFulfilled;
     }
+
+#ifdef OMPROMISES_LOGGING
+    [self log:OMLocalizedString(@"log_fulfilled_%@", result)
+         type:OMPromiseLogTypeFulfilled];
+#endif
     
     for (void (^fulfilHandler)(id) in self.fulfilHandlers) {
         fulfilHandler(result);
@@ -74,6 +79,11 @@
         self.error = error;
         self.state = OMPromiseStateFailed;
     }
+
+#ifdef OMPROMISES_LOGGING
+    [self log:OMLocalizedString(@"log_failed_%@", error)
+         type:OMPromiseLogTypeFailed];
+#endif
     
     for (void (^failHandler)(NSError *) in self.failHandlers) {
         failHandler(error);
@@ -93,8 +103,12 @@
             self.progress = progress;
             progressHandlers = self.progressHandlers;
         }
-        
     }
+
+#ifdef OMPROMISES_LOGGING
+    [self log:OMLocalizedString(@"log_progressed_%f", progress * 100.f)
+         type:OMPromiseLogTypeProgressed];
+#endif
     
     if (progressHandlers) {
         @synchronized (progressHandlers) {
