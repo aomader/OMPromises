@@ -26,6 +26,7 @@
 #import "OMDeferred.h"
 
 #import "OMPromise+Protected.h"
+#import "OMResources.h"
 
 @implementation OMDeferred
 
