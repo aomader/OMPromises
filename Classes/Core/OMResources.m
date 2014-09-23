@@ -48,9 +48,12 @@ NSBundle *OMResourcesBundle() {
 
 NSBundle *OMLocalizedStrings() {
     NSBundle *resources = OMResourcesBundle();
+
+    NSMutableArray *languages = [NSLocale preferredLanguages].mutableCopy;
+    [languages addObject:@"en"];
     
-    for (NSString *locale in [NSLocale preferredLanguages]) {
-        NSString *path = [resources pathForResource:locale ofType:@"lproj"];
+    for (NSString *language in languages) {
+        NSString *path = [resources pathForResource:language ofType:@"lproj"];
         if (path) {
             return [NSBundle bundleWithPath:path];
         }
