@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.author       = { 'Oliver Mader' => 'b52@reaktor42.de' }
   s.ios.deployment_target = '5.0'
   s.osx.deployment_target = '10.7'
-  s.source       = { :git => 'https://github.com/b52/OMPromises.git', :tag => s.version.to_s }
+  s.source       = { :git => 'https://github.com/jhollida24/OMPromises.git', :tag => s.version.to_s }
   s.requires_arc = true
 
   s.default_subspec = 'Core'
