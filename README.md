@@ -28,7 +28,7 @@ The recommended approach for installing OMPromises is to use [CocoaPods] package
 manager.
 
 ```bash
-pod 'OMPromises', '~> 0.3.0'
+pod 'OMPromises', '~> 0.4.0'
 ```
 
 If you want to make use of the new HTTP request API you also have to include
@@ -36,7 +36,7 @@ the new subspec. Have a look at the corresponding [header](Classes/HTTP)
 files for more information.
 
 ```bash
-pod 'OMPromises/HTTP', '~> 0.3.0'
+pod 'OMPromises/HTTP', '~> 0.4.0'
 ```
 
 ## Documentation

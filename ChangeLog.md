@@ -1,5 +1,20 @@
 # ChangeLog
 
+## 0.4.0 (07/24/2015)
+
+* Fix: Possible crash caused by missing response object (#26)
+* Fix: Anticipating rounding errors in progress checks (#16)
+* Fix: Potential crashes caused by improper resource management (#25, #19)
+* Feature: Add safe methods to perform state changes and adjustments,
+  i.e., `tryFulfil:`, `tryFail:` and `tryProgress:`.
+* Feature: Add methods `waitForResultWithin:` and `waitForErrorWithin:` to
+  simplify testing asynchronous code.
+* Feature: Add new `collect:` combinator: it collects all outcomes of the
+  supplied promises, i.e., errors and values. Thus it never fails.
+* Feature: Add new `relay:` combinator: Relays all promise events to a
+  specified deferred.
+* Feature: Add new `always:` and `always:on:` callback handlers.
+
 ## 0.3.0 (04/04/2014)
 
 * Feature: New `defaultQueue` property on `OMPromise` inheriting from a
