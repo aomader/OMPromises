@@ -518,7 +518,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         if (self.state == OMPromiseStateFailed) {
             @throw [NSException exceptionWithName:@"WaitingForFufilledPromise"
                                            reason:@"The promise failed instead of getting fulfilled."
-                                         userInfo:@{NSUnderlyingErrorKey: self.error}];
+                                         userInfo:self.error ? @{NSUnderlyingErrorKey: self.error} : nil];
         }
         
         NSTimeInterval runtime = -start.timeIntervalSinceNow;
