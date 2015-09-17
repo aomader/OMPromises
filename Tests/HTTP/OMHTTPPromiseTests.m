@@ -30,6 +30,8 @@
 
 @implementation OMHTTPPromiseTests
 
+#warning Don't rely on external sources, better mock the request.
+/*
 - (void)testCustomHeaders {
     OMPromise *request = [OMHTTPRequest get:@"http://headers.jsontest.com"
                                  parameters:nil
@@ -63,5 +65,6 @@
     
     WAIT_UNTIL(called == 1, 10, @"should have finished successfully");
 }
+*/
 
 @end
