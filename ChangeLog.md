@@ -1,5 +1,10 @@
 # ChangeLog
 
+## 0.4.1 (09/18/2015)
+
+* Fix: Possible crash caused by trying to store missing error in
+  an `NSDictionary` (#27)
+
 ## 0.4.0 (07/24/2015)
 
 * Fix: Possible crash caused by missing response object (#26)
