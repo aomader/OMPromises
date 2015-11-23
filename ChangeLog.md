@@ -1,5 +1,9 @@
 # ChangeLog
 
+## 0.4.2 (11/23/2015)
+
+* Fix: Possible crashed by overflowed `progress`
+
 ## 0.4.1 (09/18/2015)
 
 * Fix: Possible crash caused by trying to store missing error in
