@@ -2,7 +2,7 @@
 // OMPromise.h
 // OMPromises
 //
-// Copyright (C) 2013,2014 Oliver Mader
+// Copyright (C) 2013-2015 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@
 
 /** Finalizes the deferred by settings its state to OMPromiseStateFulfilled.
  
- Implicitly sets the progress to 1.
+ Implicitly sets the progress to 1.0f.
  
  @param result Result to set and propagate.
  @see fail:
@@ -93,7 +93,7 @@
 /** Update the progress.
  
  The new progress has to be higher than the previous one. Equal values are skipped,
- but lower values raise an exception.
+ but lower values raise an exception. The progress must be less than or equal to 1.0f.
  
  @param progress Higher progress to set and propagate.
  */
