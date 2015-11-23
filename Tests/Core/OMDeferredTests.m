@@ -90,6 +90,8 @@
     
     XCTAssertThrows([deferred progress:.1f], @"Must not decrease progress");
     XCTAssertEqualWithAccuracy(deferred.progress, .2f, FLT_EPSILON, @"Progress shouldn't have changed");
+    
+    XCTAssertThrows([deferred progress:1.1f], @"Progress must not exceed 1.0f");
 }
 
 - (void)testProgressPrecision {
@@ -113,6 +115,9 @@
     
     [deferred progress:.1f + 2.f*FLT_EPSILON];
     XCTAssertEqual(called, 2, @"Finally we progress if the change is large enough");
+    
+    [deferred progress:1.0f + FLT_EPSILON];
+    XCTAssertEqual(deferred.progress, 1.0f);
 }
 
 - (void)testTryFulfil {
