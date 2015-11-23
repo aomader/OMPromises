@@ -103,8 +103,8 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
     [self.data appendData:data];
     
     if (self.expectedContentLength > 0) {
-        [self progress:self.lookup + (1 - self.lookup) *
-                (float)self.data.length / self.expectedContentLength];
+        [self progress:MIN(1.0f, self.lookup + (1 - self.lookup) *
+                (float)self.data.length / self.expectedContentLength)];
     }
 }
 
