@@ -99,7 +99,7 @@
     
     __block int called = 0;
     [deferred.promise progressed:^(float progress) {
-        float values[] = {.1f, .1 + 2.f*FLT_EPSILON};
+        float values[] = {.1f, .1 + 2.f*FLT_EPSILON, 1.0f};
         XCTAssertEqualWithAccuracy(values[called], progress, FLT_EPSILON, @"Unexpected progress");
         called += 1;
     }];
