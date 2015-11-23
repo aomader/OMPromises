@@ -2,7 +2,7 @@
 // OMPromise.h
 // OMPromises
 //
-// Copyright (C) 2013,2014 Oliver Mader
+// Copyright (C) 2013-2015 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -88,9 +88,10 @@
     @synchronized (self) {
         NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
         NSAssert(self.progress <= progress + FLT_EPSILON, @"Progress must not decrease");
+        NSAssert(progress <= 1.0f + FLT_EPSILON, @"Progress must be in range (0, 1]");
         
         if (self.progress < progress - FLT_EPSILON) {
-            self.progress = progress;
+            self.progress = MIN(1.0f, progress);
             progressHandlers = self.progressHandlers;
         }
         
