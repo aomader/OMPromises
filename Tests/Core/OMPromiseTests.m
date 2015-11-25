@@ -1165,6 +1165,37 @@
     XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, 3.5, .15, @"Should be more or less exact in timing");
 }
 
+- (void)testThen_registeringListenersDownstreamEvaluatesLazily
+{
+    __block BOOL eval1 = NO;
+    __block BOOL eval2 = NO;
+    __block BOOL eval3 = NO;
+    
+    OMPromise* promise = [[[OMPromise promiseWithLazyTask:^(OMDeferred *deferredResult)
+    {
+        eval1 = YES;
+        [deferredResult fulfil:nil];
+    }] then:^id(id result)
+    {
+        return [OMPromise promiseWithLazyTask:^(OMDeferred *deferredResult2)
+        {
+            eval2 = YES;
+            [deferredResult2 fulfil:nil];
+        }];
+    }] then:^id(id result)
+    {
+        eval3 = YES;
+        return nil;
+    }];
+    
+    XCTAssertTrue(!eval1 && !eval2 && !eval3, @"none of these should be evaluated yet");
+    
+    [promise fulfilled:^(id result)
+     {
+         XCTAssertTrue(eval1 && eval2 && eval3, @"all 3 must have evaluated");
+     }];
+}
+
 #pragma clang diagnostics pop
 
 @end
