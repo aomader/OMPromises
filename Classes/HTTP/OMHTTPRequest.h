@@ -71,6 +71,8 @@ extern NSString *const OMHTTPSerializationQueryString;
 extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
 
+@class OMHTTPResponse;
+
 /** Provides methods to create an OMPromise representing an HTTP request.
  */
 @interface OMHTTPRequest : OMDeferred
@@ -110,10 +112,10 @@ extern NSString *const OMHTTPSerializationURLEncoded;
  @see head:parameters:options:
  @see delete:parameters:options:
  */
-+ (OMPromise *)requestWithMethod:(NSString *)method
-                             url:(NSURL *)url
-                      parameters:(NSDictionary *)parameters
-                         options:(NSDictionary *)options;
++ (OMPromise<OMHTTPResponse *> *)requestWithMethod:(NSString *)method
+                                               url:(NSURL *)url
+                                        parameters:(NSDictionary *)parameters
+                                           options:(NSDictionary *)options;
 
 ///---------------------------------------------------------------------------------------
 /// @name Convenience Methods
@@ -125,40 +127,40 @@ extern NSString *const OMHTTPSerializationURLEncoded;
  
  @see requestWithMethod:url:parameters:options:
  */
-+ (OMPromise *)get:(NSString *)urlString
-        parameters:(NSDictionary *)parameters
-           options:(NSDictionary *)options;
++ (OMPromise<OMHTTPResponse *> *)get:(NSString *)urlString
+                          parameters:(NSDictionary *)parameters
+                             options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP POST request.
  
  @see requestWithMethod:url:parameters:options:
  */
-+ (OMPromise *)post:(NSString *)urlString
-         parameters:(NSDictionary *)parameters
-            options:(NSDictionary *)options;
++ (OMPromise<OMHTTPResponse *> *)post:(NSString *)urlString
+                           parameters:(NSDictionary *)parameters
+                              options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP PUT request.
  
  @see requestWithMethod:url:parameters:options:
  */
-+ (OMPromise *)put:(NSString *)urlString
-        parameters:(NSDictionary *)parameters
-           options:(NSDictionary *)options;
++ (OMPromise<OMHTTPResponse *> *)put:(NSString *)urlString
+                          parameters:(NSDictionary *)parameters
+                             options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP HEAD request.
  
  @see requestWithMethod:url:parameters:options:
  */
-+ (OMPromise *)head:(NSString *)urlString
-         parameters:(NSDictionary *)parameters
-            options:(NSDictionary *)options;
++ (OMPromise<OMHTTPResponse *> *)head:(NSString *)urlString
+                           parameters:(NSDictionary *)parameters
+                              options:(NSDictionary *)options;
 
 /** Convenience method to perform an HTTP DELETE request.
  
  @see requestWithMethod:url:parameters:options:
  */
-+ (OMPromise *)delete:(NSString *)urlString
-           parameters:(NSDictionary *)parameters
-              options:(NSDictionary *)options;
++ (OMPromise<OMHTTPResponse *> *)delete:(NSString *)urlString
+                             parameters:(NSDictionary *)parameters
+                                options:(NSDictionary *)options;
 
 @end

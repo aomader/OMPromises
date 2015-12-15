@@ -50,7 +50,7 @@
  use them unless it's absolutely necessary. Most of the time you find better ways and
  structure your code and execution paths better if you use the three main functions.
  */
-@interface OMDeferred : OMPromise
+@interface OMDeferred<ResultType> : OMPromise<ResultType>
 
 ///---------------------------------------------------------------------------------------
 /// @name Creation
@@ -81,7 +81,7 @@
  @param result Result to set and propagate.
  @see fail:
  */
-- (void)fulfil:(id)result;
+- (void)fulfil:(ResultType)result;
 
 /** Finalizes the deferred by settings its state to OMPromiseStateFailed.
  
@@ -112,7 +112,7 @@
  @return Whether the operation was successful or not.
  @see fulfil:
  */
-- (BOOL)tryFulfil:(id)result;
+- (BOOL)tryFulfil:(ResultType)result;
 
 /** Tries to finalize the deferred by settings its state to OMPromiseStateFailed.
 

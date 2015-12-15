@@ -82,7 +82,7 @@ extern NSString *const OMPromisesErrorDomain;
  waitForResultWithin: and waitForErrorWithin: block the current execution until a certain
  state is reached within a certain interval.
  */
-@interface OMPromise : NSObject
+@interface OMPromise<__covariant ResultType> : NSObject
 
 ///---------------------------------------------------------------------------------------
 /// @name Current state
@@ -99,7 +99,7 @@ extern NSString *const OMPromisesErrorDomain;
  
  Contains the result in case the promise has been fulfilled.
  */
-@property(readonly, nonatomic) id result;
+@property(readonly, nonatomic) ResultType result;
 
 /** Maybe an error.
  
@@ -176,7 +176,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see promiseWithTask:on:
  */
-+ (OMPromise *)promiseWithTask:(id (^)())task;
++ (OMPromise<ResultType> *)promiseWithTask:(id (^)())task;
 
 /** Similar to promiseWithTask:, but executes the block on a specific queue.
  
@@ -185,7 +185,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see promiseWithTask:
  */
-+ (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
++ (OMPromise<ResultType> *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
 
 /** Create a fulfilled promise.
  
@@ -194,7 +194,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param result The value to fulfil the promise.
  @return A fulfilled promise.
  */
-+ (OMPromise *)promiseWithResult:(id)result;
++ (OMPromise<ResultType> *)promiseWithResult:(ResultType)result;
 
 /** Create a promise which gets fulfilled after a certain delay.
 
@@ -205,14 +205,14 @@ extern NSString *const OMPromisesErrorDomain;
  @return A promise that will get fulfilled.
  @see promiseWithResult:
  */
-+ (OMPromise *)promiseWithResult:(id)result after:(NSTimeInterval)delay;
++ (OMPromise<ResultType> *)promiseWithResult:(ResultType)result after:(NSTimeInterval)delay;
 
 /** Create a failed promise.
  
  @param error Reason why the promise failed.
  @return A failed promise.
  */
-+ (OMPromise *)promiseWithError:(NSError *)error;
++ (OMPromise<ResultType> *)promiseWithError:(NSError *)error;
 
 /** Create a promise which fails after a certain delay.
 
@@ -223,7 +223,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A promise that will fail.
  @see promiseWithError:
  */
-+ (OMPromise *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay;
++ (OMPromise<ResultType> *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay;
 
 ///---------------------------------------------------------------------------------------
 /// @name Building promise chains
@@ -249,7 +249,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see rescue:
  */
-- (OMPromise *)then:(id (^)(id result))thenHandler;
+- (OMPromise *)then:(id (^)(ResultType result))thenHandler;
 
 /** Similar to then:, but executes the supplied block asynchronously on a specific queue.
  
@@ -258,7 +258,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see then:
  */
-- (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue;
+- (OMPromise *)then:(id (^)(ResultType result))thenHandler on:(dispatch_queue_t)queue;
 
 /** Create a new promise by binding the error reason to another promise.
 
@@ -293,7 +293,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param fulfilHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler;
+- (OMPromise *)fulfilled:(void (^)(ResultType result))fulfilHandler;
 
 /** Similar to fulfilled:, but executes the supplied block asynchronously on a specific
  queue.
@@ -303,7 +303,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see fulfilled:
  */
-- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue;
+- (OMPromise *)fulfilled:(void (^)(ResultType result))fulfilHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise fails.
  
@@ -352,7 +352,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param alwaysHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler;
+- (OMPromise *)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler;
 
 /** Similar to always:, but executes the supplied block asynchronously on a specific queue.
 
@@ -361,7 +361,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see always:
  */
-- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler
+- (OMPromise *)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler
                    on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
@@ -463,7 +463,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The result of the promise.
  @see waitForErrorWithin:
  */
-- (id)waitForResultWithin:(NSTimeInterval)seconds;
+- (ResultType)waitForResultWithin:(NSTimeInterval)seconds;
 
 /** Wait for the promise to fail within a certain interval.
  

@@ -27,11 +27,11 @@
 
 #import "OMDeferred.h"
 
-@interface OMPromise (Protected)
+@interface OMPromise<__covariant ResultType> (Protected)
 
 @property(assign, nonatomic) OMPromiseState state;
 @property(nonatomic) NSError *error;
-@property(nonatomic) id result;
+@property(nonatomic) ResultType result;
 @property(assign, nonatomic) float progress;
 
 @property(readonly) NSArray *fulfilHandlers;
