@@ -25,6 +25,8 @@
 
 #import "OMPromise.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface OMPromise (HTTP)
 
 /** Convert an OMHTTPResponse containing JSON to the proper native data.
@@ -34,3 +36,5 @@
 - (OMPromise *)httpParseJSON;
 
 @end
+
+NS_ASSUME_NONNULL_END

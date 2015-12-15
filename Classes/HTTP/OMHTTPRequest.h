@@ -25,6 +25,8 @@
 
 #import "OMDeferred.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** All HTTP package specific errors reside in this error domain.
  */
 extern NSString *const OMPromisesHTTPErrorDomain;
@@ -114,8 +116,8 @@ extern NSString *const OMHTTPSerializationURLEncoded;
  */
 + (OMPromise<OMHTTPResponse *> *)requestWithMethod:(NSString *)method
                                                url:(NSURL *)url
-                                        parameters:(NSDictionary *)parameters
-                                           options:(NSDictionary *)options;
+                                        parameters:(nullable NSDictionary *)parameters
+                                           options:(nullable NSDictionary *)options;
 
 ///---------------------------------------------------------------------------------------
 /// @name Convenience Methods
@@ -128,39 +130,41 @@ extern NSString *const OMHTTPSerializationURLEncoded;
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise<OMHTTPResponse *> *)get:(NSString *)urlString
-                          parameters:(NSDictionary *)parameters
-                             options:(NSDictionary *)options;
+                          parameters:(nullable NSDictionary *)parameters
+                             options:(nullable NSDictionary *)options;
 
 /** Convenience method to perform an HTTP POST request.
  
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise<OMHTTPResponse *> *)post:(NSString *)urlString
-                           parameters:(NSDictionary *)parameters
-                              options:(NSDictionary *)options;
+                           parameters:(nullable NSDictionary *)parameters
+                              options:(nullable NSDictionary *)options;
 
 /** Convenience method to perform an HTTP PUT request.
  
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise<OMHTTPResponse *> *)put:(NSString *)urlString
-                          parameters:(NSDictionary *)parameters
-                             options:(NSDictionary *)options;
+                          parameters:(nullable NSDictionary *)parameters
+                             options:(nullable NSDictionary *)options;
 
 /** Convenience method to perform an HTTP HEAD request.
  
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise<OMHTTPResponse *> *)head:(NSString *)urlString
-                           parameters:(NSDictionary *)parameters
-                              options:(NSDictionary *)options;
+                           parameters:(nullable NSDictionary *)parameters
+                              options:(nullable NSDictionary *)options;
 
 /** Convenience method to perform an HTTP DELETE request.
  
  @see requestWithMethod:url:parameters:options:
  */
 + (OMPromise<OMHTTPResponse *> *)delete:(NSString *)urlString
-                             parameters:(NSDictionary *)parameters
-                                options:(NSDictionary *)options;
+                             parameters:(nullable NSDictionary *)parameters
+                                options:(nullable NSDictionary *)options;
 
 @end
+
+NS_ASSUME_NONNULL_END

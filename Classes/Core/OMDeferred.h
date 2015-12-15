@@ -25,6 +25,8 @@
 
 #import "OMPromise.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** An OMDeferred is an abstract construct to control the outcome of an aligned
  OMPromise, which is used to proxy the outcome of an asynchronous operation.
 
@@ -81,14 +83,14 @@
  @param result Result to set and propagate.
  @see fail:
  */
-- (void)fulfil:(ResultType)result;
+- (void)fulfil:(nullable ResultType)result;
 
 /** Finalizes the deferred by settings its state to OMPromiseStateFailed.
  
  @param error Error to set and propagate.
  @see fulfil:
  */
-- (void)fail:(NSError *)error;
+- (void)fail:(nullable NSError *)error;
 
 /** Update the progress.
  
@@ -112,7 +114,7 @@
  @return Whether the operation was successful or not.
  @see fulfil:
  */
-- (BOOL)tryFulfil:(ResultType)result;
+- (BOOL)tryFulfil:(nullable ResultType)result;
 
 /** Tries to finalize the deferred by settings its state to OMPromiseStateFailed.
 
@@ -123,7 +125,7 @@
  @return Whether the operation was successful or not.
  @see fail:
  */
-- (BOOL)tryFail:(NSError *)error;
+- (BOOL)tryFail:(nullable NSError *)error;
 
 /** Tries to update the progress.
 
@@ -153,3 +155,4 @@
 
 @end
 
+NS_ASSUME_NONNULL_END

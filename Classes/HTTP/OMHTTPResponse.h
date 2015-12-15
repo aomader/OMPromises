@@ -25,6 +25,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** Represents the outcome of a successful HTTP request operation.
  */
 @interface OMHTTPResponse : NSObject
@@ -32,9 +34,9 @@
 /** Use this method to set the properties.
  Once initialized, the object is sealed.
  */
-- (id)initWithCode:(NSUInteger)statusCode
-           headers:(NSDictionary *)headers
-              body:(NSData *)body;
+- (instancetype)initWithCode:(NSUInteger)statusCode
+                     headers:(NSDictionary *)headers
+                        body:(NSData *)body;
 
 /** The HTTP status code of the response.
  */
@@ -46,6 +48,8 @@
 
 /** The body of the response.
  */
-@property(readonly, nonatomic) NSData *body;
+@property(readonly, nonatomic, nullable) NSData *body;
 
 @end
+
+NS_ASSUME_NONNULL_END

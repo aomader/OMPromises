@@ -27,6 +27,8 @@
 
 @class OMDeferred;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** Possible states of an OMPromise.
  */
 typedef NS_ENUM(NSInteger, OMPromiseState) {
@@ -99,13 +101,13 @@ extern NSString *const OMPromisesErrorDomain;
  
  Contains the result in case the promise has been fulfilled.
  */
-@property(readonly, nonatomic) ResultType result;
+@property(readonly, nonatomic, nullable) ResultType result;
 
 /** Maybe an error.
  
  Contains the reason in case the promise failed.
  */
-@property(readonly, nonatomic) NSError *error;
+@property(readonly, nonatomic, nullable) NSError *error;
 
 /** Progress of the underlying workload.
  
@@ -194,7 +196,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param result The value to fulfil the promise.
  @return A fulfilled promise.
  */
-+ (OMPromise<ResultType> *)promiseWithResult:(ResultType)result;
++ (OMPromise<ResultType> *)promiseWithResult:(nullable ResultType)result;
 
 /** Create a promise which gets fulfilled after a certain delay.
 
@@ -205,14 +207,14 @@ extern NSString *const OMPromisesErrorDomain;
  @return A promise that will get fulfilled.
  @see promiseWithResult:
  */
-+ (OMPromise<ResultType> *)promiseWithResult:(ResultType)result after:(NSTimeInterval)delay;
++ (OMPromise<ResultType> *)promiseWithResult:(nullable ResultType)result after:(NSTimeInterval)delay;
 
 /** Create a failed promise.
  
  @param error Reason why the promise failed.
  @return A failed promise.
  */
-+ (OMPromise<ResultType> *)promiseWithError:(NSError *)error;
++ (OMPromise<ResultType> *)promiseWithError:(nullable NSError *)error;
 
 /** Create a promise which fails after a certain delay.
 
@@ -223,7 +225,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A promise that will fail.
  @see promiseWithError:
  */
-+ (OMPromise<ResultType> *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay;
++ (OMPromise<ResultType> *)promiseWithError:(nullable NSError *)error after:(NSTimeInterval)delay;
 
 ///---------------------------------------------------------------------------------------
 /// @name Building promise chains
@@ -397,7 +399,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param initial Initial result supplied to the first handler block.
  @return A new promise describing the whole chain.
  */
-+ (OMPromise *)chain:(NSArray *)thenHandlers initial:(id)result;
++ (OMPromise *)chain:(NSArray *)thenHandlers initial:(nullable id)result;
 
 /** Race for the first fulfilled promise in parallel.
 
@@ -480,3 +482,4 @@ extern NSString *const OMPromisesErrorDomain;
 
 @end
 
+NS_ASSUME_NONNULL_END
