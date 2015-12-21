@@ -25,10 +25,14 @@
 
 #import "OMResources.h"
 
+#import <TargetConditionals.h>
+
 #import "OMPromise.h"
 
-#ifdef __IPHONE_OS_VERSION_MAX_ALLOWED
+#if TARGET_OS_IOS
 static NSString *const kBundleName = @"OMPromises-Resources-iOS";
+#elif TARGET_OS_TV
+static NSString *const kBundleName = @"OMPromises-Resources-tvOS";
 #else
 static NSString *const kBundleName = @"OMPromises-Resources-OSX";
 #endif

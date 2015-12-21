@@ -1146,7 +1146,7 @@
     NSDate *tic = [NSDate date];
     OMPromise *promise2 = [OMPromise promiseWithResult:self.result2 after:.5];
     XCTAssertEqual([promise2 waitForResultWithin:1.], self.result2, @"Should yield result of fulfilled promise");
-    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, .5, .25, @"Should be more or less exact in timing");
+    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, .5, .35, @"Should be more or less exact in timing");
 }
 
 - (void)testWaitForErrorWithin {
@@ -1162,7 +1162,7 @@
     NSDate *tic = [NSDate date];
     OMPromise *promise2 = [OMPromise promiseWithError:self.error after:.5];
     XCTAssertEqual([promise2 waitForErrorWithin:1.], self.error, @"Should yield error of failed promise");
-    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, .5, .25, @"Should be more or less exact in timing");
+    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, .5, .35, @"Should be more or less exact in timing");
 }
 
 #pragma clang diagnostics pop
