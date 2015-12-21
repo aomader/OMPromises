@@ -29,10 +29,10 @@
 
 #import "OMPromise.h"
 
-#if TARGET_OS_IOS
-static NSString *const kBundleName = @"OMPromises-Resources-iOS";
-#elif TARGET_OS_TV
+#if TARGET_OS_TV
 static NSString *const kBundleName = @"OMPromises-Resources-tvOS";
+#elif TARGET_OS_IOS
+static NSString *const kBundleName = @"OMPromises-Resources-iOS";
 #else
 static NSString *const kBundleName = @"OMPromises-Resources-OSX";
 #endif
