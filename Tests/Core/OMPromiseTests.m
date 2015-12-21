@@ -1140,13 +1140,13 @@
     OMPromise *fulfilled = [OMPromise promiseWithResult:self.result];
     XCTAssertEqual([fulfilled waitForResultWithin:10.], self.result, @"Should yield result of fulfilled promise");
     
-    OMPromise *promise = [OMPromise promiseWithResult:self.result2 after:3.5];
-    XCTAssertThrows([promise waitForResultWithin:3.], @"Fulfilling not in time should throw");
+    OMPromise *promise = [OMPromise promiseWithResult:self.result2 after:.5];
+    XCTAssertThrows([promise waitForResultWithin:.25], @"Fulfilling not in time should throw");
     
     NSDate *tic = [NSDate date];
-    OMPromise *promise2 = [OMPromise promiseWithResult:self.result2 after:3.5];
-    XCTAssertEqual([promise2 waitForResultWithin:4.], self.result2, @"Should yield result of fulfilled promise");
-    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, 3.5, .15, @"Should be more or less exact in timing");
+    OMPromise *promise2 = [OMPromise promiseWithResult:self.result2 after:.5];
+    XCTAssertEqual([promise2 waitForResultWithin:1.], self.result2, @"Should yield result of fulfilled promise");
+    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, .5, .25, @"Should be more or less exact in timing");
 }
 
 - (void)testWaitForErrorWithin {
@@ -1156,13 +1156,13 @@
     OMPromise *failed = [OMPromise promiseWithError:self.error];
     XCTAssertEqual([failed waitForErrorWithin:10.], self.error, @"Should yield error of failed promise");
     
-    OMPromise *promise = [OMPromise promiseWithError:self.error after:3.5];
-    XCTAssertThrows([promise waitForErrorWithin:3.], @"Failing not in time should throw");
+    OMPromise *promise = [OMPromise promiseWithError:self.error after:.5];
+    XCTAssertThrows([promise waitForErrorWithin:.25], @"Failing not in time should throw");
     
     NSDate *tic = [NSDate date];
-    OMPromise *promise2 = [OMPromise promiseWithError:self.error after:3.5];
-    XCTAssertEqual([promise2 waitForErrorWithin:4.], self.error, @"Should yield error of failed promise");
-    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, 3.5, .15, @"Should be more or less exact in timing");
+    OMPromise *promise2 = [OMPromise promiseWithError:self.error after:.5];
+    XCTAssertEqual([promise2 waitForErrorWithin:1.], self.error, @"Should yield error of failed promise");
+    XCTAssertEqualWithAccuracy(-tic.timeIntervalSinceNow, .5, .25, @"Should be more or less exact in timing");
 }
 
 #pragma clang diagnostics pop
