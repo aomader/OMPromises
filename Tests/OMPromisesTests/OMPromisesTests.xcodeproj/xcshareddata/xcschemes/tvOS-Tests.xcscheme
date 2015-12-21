@@ -14,9 +14,9 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F9144E2D18DF4760004CDFE4"
-               BuildableName = "iOS-Tests.xctest"
-               BlueprintName = "iOS-Tests"
+               BlueprintIdentifier = "6C475BA21C2847A800057B48"
+               BuildableName = "tvOS-Tests.xctest"
+               BlueprintName = "tvOS-Tests"
                ReferencedContainer = "container:OMPromisesTests.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F9144E2D18DF4760004CDFE4"
-               BuildableName = "iOS-Tests.xctest"
-               BlueprintName = "iOS-Tests"
+               BlueprintIdentifier = "6C475BA21C2847A800057B48"
+               BuildableName = "tvOS-Tests.xctest"
+               BlueprintName = "tvOS-Tests"
                ReferencedContainer = "container:OMPromisesTests.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -55,9 +55,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F9144E2D18DF4760004CDFE4"
-            BuildableName = "iOS-Tests.xctest"
-            BlueprintName = "iOS-Tests"
+            BlueprintIdentifier = "6C475BA21C2847A800057B48"
+            BuildableName = "tvOS-Tests.xctest"
+            BlueprintName = "tvOS-Tests"
             ReferencedContainer = "container:OMPromisesTests.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -70,6 +70,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "6C475BA21C2847A800057B48"
+            BuildableName = "tvOS-Tests.xctest"
+            BlueprintName = "tvOS-Tests"
+            ReferencedContainer = "container:OMPromisesTests.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

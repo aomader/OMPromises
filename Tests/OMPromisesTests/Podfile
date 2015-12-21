@@ -9,3 +9,9 @@ target :osx do
   link_with 'OS-X-Tests'
   pod 'OMPromises/HTTP', :path => '../../'
 end
+
+target :tvos do
+  platform :tvos, '9.0'
+  link_with 'tvOS-Tests'
+  pod 'OMPromises/HTTP', :path => '../../'
+end
