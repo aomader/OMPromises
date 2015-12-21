@@ -7,7 +7,7 @@ xctool -workspace OMPromisesTests.xcworkspace -scheme OS-X-Tests -sdk macosx -co
 osx_tests=$?
 
 # xctool doesnt support tvOS, thus we just built it for now
-xctool -workspace OMPromisesTests.xcworkspace -scheme tvOS-Tests -sdk appletvos -configuration Debug build ONLY_ACTIVE_ARCH=NO
+xctool -workspace OMPromisesTests.xcworkspace -scheme tvOS-Tests -sdk appletvos -configuration Debug build ONLY_ACTIVE_ARCH=NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 tvos_tests=$?
 
 exit `expr $ios_tests + $osx_tests + $tvos_tests`
