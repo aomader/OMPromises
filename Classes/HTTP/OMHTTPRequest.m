@@ -69,11 +69,17 @@ NSString *const OMHTTPAllowInvalidCertificates = @"allowinvalidcertificates";
         
         _lookup = options[OMHTTPLookupProgress] ? [options[OMHTTPLookupProgress] floatValue] : kDefaultLookupProgress;
         _allowInvalidCertificates = [(options[OMHTTPAllowInvalidCertificates] ?: @NO) boolValue];
-        _connection = [[NSURLConnection alloc]
-                       initWithRequest:[self requestForURL:url method:method parameters:parameters options:options]
-                       delegate:self
-                       startImmediately:YES];
-        
+
+        NSURLRequest *request = [self requestForURL:url method:method parameters:parameters options:options];
+
+        _connection  = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+
+        // make sure that the feedback queue is available all the time
+        // TODO: Switch to NSURLSession and use a custom queue for these events.
+        [_connection scheduleInRunLoop:[NSRunLoop mainRunLoop]
+                               forMode:NSDefaultRunLoopMode];
+        [_connection start];
+
         // cancellation support
         __weak OMHTTPRequest *weakSelf = self;
         [self cancelled:^(OMDeferred *_) {
