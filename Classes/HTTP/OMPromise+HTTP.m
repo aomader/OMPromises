@@ -33,13 +33,20 @@
 
 - (OMPromise *)httpParseJSON {
     return [self then:^id(OMHTTPResponse *response) {
+        NSString *pattern = @"application/(?:(vnd\\.[0-9a-zA-Z\\.]+)\\+)?json(?:;.*)?";
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
+                                                                               options:NSRegularExpressionCaseInsensitive
+                                                                                 error:nil];
+
+        NSString *contentType = response.headers[@"Content-Type"];
+
         // check content type
-        if (![response.headers[@"Content-Type"] hasPrefix:@"application/json"]) {
+        if ([regex firstMatchInString:contentType options:0 range:NSMakeRange(0, contentType.length)] == nil) {
             return [NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                        code:OMPromisesHTTPContentTypeError
                                    userInfo:@{
                                        NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_content_type_%@%@",
-                                           response.headers[@"Content-Type"], @"application/json")
+                                           contentType, @"application/json")
                                    }];
         }
 
