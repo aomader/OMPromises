@@ -73,6 +73,12 @@ extern NSString *const OMHTTPSerializationQueryString;
 extern NSString *const OMHTTPSerializationJSON;
 extern NSString *const OMHTTPSerializationURLEncoded;
 
+/** Option key specifying whether invalid SSL/TLs certificates should be allowed.
+
+ Requires a boolean wrapped in an @p NSNumber. Defaults to @p NO.
+ */
+extern NSString *const OMHTTPAllowInvalidCertificates;
+
 @class OMHTTPResponse;
 
 /** Provides methods to create an OMPromise representing an HTTP request.

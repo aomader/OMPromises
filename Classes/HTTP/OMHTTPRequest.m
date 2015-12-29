@@ -39,6 +39,7 @@ NSString *const OMHTTPSerialization = @"OMHTTPSerialization";
 NSString *const OMHTTPSerializationQueryString = @"querystring";
 NSString *const OMHTTPSerializationJSON = @"json";
 NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
+NSString *const OMHTTPAllowInvalidCertificates = @"allowinvalidcertificates";
 
 @interface OMHTTPRequest () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
@@ -47,6 +48,7 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 @property(nonatomic) OMHTTPResponse *response;
 @property(nonatomic) NSMutableData *data;
 @property(assign, nonatomic) NSUInteger expectedContentLength;
+@property(nonatomic) BOOL allowInvalidCertificates;
 
 @end
 
@@ -66,6 +68,7 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
         NSAssert([url.scheme.lowercaseString hasPrefix:@"http"], @"Only HTTP(S) requests are supported.");
         
         _lookup = options[OMHTTPLookupProgress] ? [options[OMHTTPLookupProgress] floatValue] : kDefaultLookupProgress;
+        _allowInvalidCertificates = [(options[OMHTTPAllowInvalidCertificates] ?: @NO) boolValue];
         _connection = [[NSURLConnection alloc]
                        initWithRequest:[self requestForURL:url method:method parameters:parameters options:options]
                        delegate:self
@@ -81,6 +84,23 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
 }
 
 #pragma mark - NSURLConnectionDelegate
+
+- (void)connection:(NSURLConnection *)connection
+        willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    if (self.allowInvalidCertificates &&
+            [challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust])
+    {
+        NSLog(@"Ignoring SSL");
+
+        [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]
+             forAuthenticationChallenge:challenge];
+
+        return;
+    }
+
+    [challenge.sender performDefaultHandlingForAuthenticationChallenge:challenge];
+}
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     NSMutableDictionary *userInfo = @{
@@ -298,7 +318,8 @@ NSString *const OMHTTPSerializationURLEncoded = @"urlencoded";
     }
     
     // add http headers
-    NSArray *ownOptions = @[OMHTTPTimeout, OMHTTPLookupProgress, OMHTTPSerialization];
+    NSSet *ownOptions = [NSSet setWithObjects:OMHTTPTimeout, OMHTTPLookupProgress, OMHTTPSerialization,
+            OMHTTPAllowInvalidCertificates, nil];
     for (NSString *key in options.keyEnumerator) {
         if (![ownOptions containsObject:key]) {
             [request setValue:options[key] forHTTPHeaderField:key];
