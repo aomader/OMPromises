@@ -97,8 +97,6 @@ NSString *const OMHTTPAllowInvalidCertificates = @"allowinvalidcertificates";
     if (self.allowInvalidCertificates &&
             [challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust])
     {
-        NSLog(@"Ignoring SSL");
-
         [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]
              forAuthenticationChallenge:challenge];
 
