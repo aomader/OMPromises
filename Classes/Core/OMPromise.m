@@ -46,11 +46,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 @interface OMPromise ()
 
-@property(assign, nonatomic) OMPromiseState state;
+@property(nonatomic) OMPromiseState state;
 @property(nonatomic) NSError *error;
 @property(nonatomic) id result;
-@property(assign, nonatomic) float progress;
-@property(assign, nonatomic) BOOL cancellable;
+@property(nonatomic) float progress;
+@property(nonatomic) BOOL cancellable;
 
 @property(nonatomic) NSMutableArray *fulfilHandlers;
 @property(nonatomic) NSMutableArray *failHandlers;
@@ -69,6 +69,8 @@ static dispatch_queue_t globalDefaultQueue = nil;
     self = [super init];
     if (self) {
         _depth = 1;
+        _defaultQueue = [OMPromise globalDefaultQueue];
+        _progress = 0.f;
     }
     return self;
 }
@@ -302,8 +304,8 @@ static dispatch_queue_t globalDefaultQueue = nil;
                                      }];
     }
 
-    for (void (^cancelHandler)(OMDeferred *) in self.cancelHandlers) {
-        cancelHandler((OMDeferred *)self);
+    for (void (^cancelHandler)() in self.cancelHandlers) {
+        cancelHandler();
     }
     
     for (void (^failHandler)(NSError *) in self.failHandlers) {
@@ -313,7 +315,98 @@ static dispatch_queue_t globalDefaultQueue = nil;
     [self cleanup];
 }
 
-- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
+#pragma mark - Internal Methods
+
+- (void)fulfil:(id)result {
+    [self progress:1.f];
+
+    @synchronized (self) {
+        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only get fulfilled while being Unfulfilled");
+
+        self.result = result;
+        self.state = OMPromiseStateFulfilled;
+    }
+
+    for (void (^fulfilHandler)(id) in self.fulfilHandlers) {
+        fulfilHandler(result);
+    }
+
+    [self cleanup];
+}
+
+- (void)fail:(NSError *)error {
+    @synchronized (self) {
+        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only fail while being Unfulfilled");
+
+        self.error = error;
+        self.state = OMPromiseStateFailed;
+    }
+
+    for (void (^failHandler)(NSError *) in self.failHandlers) {
+        failHandler(error);
+    }
+
+    [self cleanup];
+}
+
+- (void)progress:(float)progress {
+    NSArray *progressHandlers = nil;
+
+    @synchronized (self) {
+        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
+        NSAssert(self.progress <= progress + FLT_EPSILON, @"Progress must not decrease");
+        NSAssert(progress <= 1.0f + FLT_EPSILON, @"Progress must be in range (0, 1]");
+
+        if (self.progress < progress - FLT_EPSILON) {
+            self.progress = MIN(1.0f, progress);
+            progressHandlers = self.progressHandlers;
+        }
+
+    }
+
+    if (progressHandlers) {
+        @synchronized (progressHandlers) {
+            for (void (^progressHandler)(float) in progressHandlers) {
+                progressHandler(progress);
+            }
+        }
+    }
+}
+
+- (BOOL)tryFulfil:(id)result {
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled) {
+            [self fulfil:result];
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (BOOL)tryFail:(NSError *)error {
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled) {
+            [self fail:error];
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (BOOL)tryProgress:(float)progress {
+    @synchronized (self) {
+        if (self.state == OMPromiseStateUnfulfilled && progress > self.progress + FLT_EPSILON) {
+            [self progress:progress];
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (void)cancelled:(void (^)())cancelHandler {
     @synchronized (self) {
         if (self.state == OMPromiseStateUnfulfilled) {
             if (self.cancelHandlers == nil) {
@@ -370,9 +463,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
     for (OMPromise *promise in promises) {
         [[[promise fulfilled:^(id result) {
-            if (deferred.state == OMPromiseStateUnfulfilled) {
-                [deferred fulfil:result];
-            }
+            [deferred tryFulfil:result];
         }] failed:^(NSError *error) {
             if (++failed == promises.count) {
                 [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
@@ -382,9 +473,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
                                                }]];
             }
         }] progressed:^(float progress) {
-            if (progress > deferred.progress) {
-                [deferred progress:progress];
-            }
+            [deferred tryProgress:progress];
         }];
     }
 
@@ -416,7 +505,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
     for (NSUInteger i = 0; i < promises.count; ++i) {
         [results addObject:[NSNull null]];
         [[[(OMPromise *)promises[i] fulfilled:^(id result) {
-            if (deferred.state == OMPromiseStateUnfulfilled) {
+            if (deferred.promise.state == OMPromiseStateUnfulfilled) {
                 updateProgress();
                 
                 if (result != nil) {
@@ -424,15 +513,13 @@ static dispatch_queue_t globalDefaultQueue = nil;
                 }
 
                 if (++done == promises.count) {
-                    [deferred fulfil:results];
+                    [deferred tryFulfil:results];
                 }
             }
         }] failed:^(NSError *error) {
-            if (deferred.state == OMPromiseStateUnfulfilled) {
-                [deferred fail:error];
-            }
+            [deferred tryFail:error];
         }] progressed:^(float progress) {
-            if (deferred.state == OMPromiseStateUnfulfilled) {
+            if (deferred.promise.state == OMPromiseStateUnfulfilled) {
                 updateProgress();
             }
         }];

@@ -1,8 +1,8 @@
 //
-// OMPromise.h
+// OMDeferred.m
 // OMPromises
 //
-// Copyright (C) 2013-2015 Oliver Mader
+// Copyright (C) 2013-2016 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 
 #import "OMDeferred.h"
 
-#import "OMPromise+Protected.h"
+#import "OMPromise+Internal.h"
 
 @implementation OMDeferred
 
@@ -34,8 +34,7 @@
 - (id)init {
     self = [super init];
     if (self) {
-        self.defaultQueue = [OMPromise globalDefaultQueue];
-        self.progress = 0.f;
+        _promise = [(id)[OMPromise alloc] init];
     }
     return self;
 }
@@ -46,103 +45,36 @@
 
 #pragma mark - Public Methods
 
-- (OMPromise *)promise {
-    return self;
-}
-
 - (void)fulfil:(id)result {
-    [self progress:1.f];
-    
-    @synchronized (self) {
-        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only get fulfilled while being Unfulfilled");
-        
-        self.result = result;
-        self.state = OMPromiseStateFulfilled;
-    }
-    
-    for (void (^fulfilHandler)(id) in self.fulfilHandlers) {
-        fulfilHandler(result);
-    }
-
-    [self cleanup];
+    [self.promise fulfil:result];
 }
 
 - (void)fail:(NSError *)error {
-    @synchronized (self) {
-        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only fail while being Unfulfilled");
-        
-        self.error = error;
-        self.state = OMPromiseStateFailed;
-    }
-    
-    for (void (^failHandler)(NSError *) in self.failHandlers) {
-        failHandler(error);
-    }
-
-    [self cleanup];
+    [self.promise fail:error];
 }
 
 - (void)progress:(float)progress {
-    NSArray *progressHandlers = nil;
-    
-    @synchronized (self) {
-        NSAssert(self.state == OMPromiseStateUnfulfilled, @"Can only progress while being Unfulfilled");
-        NSAssert(self.progress <= progress + FLT_EPSILON, @"Progress must not decrease");
-        NSAssert(progress <= 1.0f + FLT_EPSILON, @"Progress must be in range (0, 1]");
-        
-        if (self.progress < progress - FLT_EPSILON) {
-            self.progress = MIN(1.0f, progress);
-            progressHandlers = self.progressHandlers;
-        }
-        
-    }
-    
-    if (progressHandlers) {
-        @synchronized (progressHandlers) {
-            for (void (^progressHandler)(float) in progressHandlers) {
-                progressHandler(progress);
-            }
-        }
-    }
+    [self.promise progress:progress];
 }
 
 - (BOOL)tryFulfil:(id)result {
-    @synchronized (self) {
-        if (self.state == OMPromiseStateUnfulfilled) {
-            [self fulfil:result];
-            return YES;
-        }
-    }
-
-    return NO;
+    return [self.promise tryFulfil:result];
 }
 
 - (BOOL)tryFail:(NSError *)error {
-    @synchronized (self) {
-        if (self.state == OMPromiseStateUnfulfilled) {
-            [self fail:error];
-            return YES;
-        }
-    }
-
-    return NO;
+    return [self.promise tryFail:error];
 }
 
 - (BOOL)tryProgress:(float)progress {
-    @synchronized (self) {
-        if (self.state == OMPromiseStateUnfulfilled && progress > self.progress + FLT_EPSILON) {
-            [self progress:progress];
-            return YES;
-        }
-    }
-
-    return NO;
+    return [self.promise tryProgress:progress];
 }
 
 #pragma mark - Cancellation
 
 - (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler {
-    [super cancelled:cancelHandler];
+    [self.promise cancelled:^{
+        cancelHandler(self);
+    }];
 }
 
 @end

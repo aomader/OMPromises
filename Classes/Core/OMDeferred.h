@@ -1,8 +1,8 @@
 //
-// OMPromise.h
+// OMDeferred.h
 // OMPromises
 //
-// Copyright (C) 2013-2015 Oliver Mader
+// Copyright (C) 2013-2016 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  use them unless it's absolutely necessary. Most of the time you find better ways and
  structure your code and execution paths better if you use the three main functions.
  */
-@interface OMDeferred<ResultType> : OMPromise<ResultType>
+@interface OMDeferred<ResultType> : NSObject
 
 ///---------------------------------------------------------------------------------------
 /// @name Creation
@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Proxies the outcome of the underlying bunch of work.
  */
-- (OMPromise *)promise;
+@property(readonly, nonatomic) OMPromise *promise;
 
 ///---------------------------------------------------------------------------------------
 /// @name Change state

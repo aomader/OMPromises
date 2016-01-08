@@ -1,8 +1,8 @@
 //
-// OMPromise+Protected.h
+// OMPromise+Internal.h
 // OMPromises
 //
-// Copyright (C) 2013,2014 Oliver Mader
+// Copyright (C) 2013-2016 Oliver Mader
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,22 +25,20 @@
 
 #import "OMPromise.h"
 
-#import "OMDeferred.h"
+@class OMDeferred;
 
-@interface OMPromise<__covariant ResultType> (Protected)
+NS_ASSUME_NONNULL_BEGIN
 
-@property(assign, nonatomic) OMPromiseState state;
-@property(nonatomic) NSError *error;
-@property(nonatomic) ResultType result;
-@property(assign, nonatomic) float progress;
+@interface OMPromise<__covariant ResultType> (Internal)
 
-@property(readonly) NSArray *fulfilHandlers;
-@property(readonly) NSArray *failHandlers;
-@property(readonly) NSArray *progressHandlers;
-
-- (void)cancelled:(void (^)(OMDeferred *deferred))cancelHandler;
-
-- (void)cleanup;
+- (void)fulfil:(id)result;
+- (void)fail:(NSError *)error;
+- (void)progress:(float)progress;
+- (BOOL)tryFulfil:(id)result;
+- (BOOL)tryFail:(NSError *)error;
+- (BOOL)tryProgress:(float)progress;
+- (void)cancelled:(void (^)())cancelHandler;
 
 @end
 
+NS_ASSUME_NONNULL_END
