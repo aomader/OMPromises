@@ -89,7 +89,7 @@ one call of either `fulfil:` or `fail:` on the deferred.
 
 ```objc
 - (OMPromise *)workIntensiveButSynchronousMethod {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // do your long-running task, eventually provide information about the progress..
@@ -235,7 +235,7 @@ the cancel-handler.
 
 ```objc
 - (OMPromise *)get100GofData {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     [deferred cancelled:^(OMDeferred *this) {
         // cancel the download..
     }];

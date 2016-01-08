@@ -31,7 +31,7 @@
 @implementation OMDeferredTests
 
 - (void)testInitialValues {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     XCTAssertEqual(deferred.promise.state, OMPromiseStateUnfulfilled, @"Should initially be Unfulfilled");
     XCTAssertNil(deferred.promise.result, @"There shouldn't be a result yet");
@@ -41,7 +41,7 @@
 }
 
 - (void)testFulfil {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     id result = @.1337f;
     [deferred fulfil:result];
@@ -57,7 +57,7 @@
 }
 
 - (void)testFail {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     NSError *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:0 userInfo:nil];
     [deferred fail:error];
@@ -73,7 +73,7 @@
 }
 
 - (void)testProgress {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     [deferred progress:.1f];
     
@@ -95,7 +95,7 @@
 }
 
 - (void)testProgressPrecision {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     __block int called = 0;
     [deferred.promise progressed:^(float progress) {
@@ -121,7 +121,7 @@
 }
 
 - (void)testTryFulfil {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     id result = @.1337f;
     XCTAssertTrue([deferred tryFulfil:result]);
@@ -138,7 +138,7 @@
 }
 
 - (void)testTryFail {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     NSError *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:0 userInfo:nil];
     XCTAssertTrue([deferred tryFail:error]);
@@ -155,7 +155,7 @@
 }
 
 - (void)testTryProgress {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     XCTAssertTrue([deferred tryProgress:.1f], @"TryProgress should update larger values");
 
@@ -181,7 +181,7 @@
 }
 
 - (void)testCancelled {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     OMPromise *promise = deferred.promise;
     
     __block int cancelled = 0;

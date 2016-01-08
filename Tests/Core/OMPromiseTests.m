@@ -63,7 +63,7 @@
     [OMPromise setGlobalDefaultQueue:mainQueue];
     XCTAssertEqual([OMPromise globalDefaultQueue], mainQueue, @"Global default queue should be overridable");
 
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     XCTAssertEqual(deferred.promise.defaultQueue, mainQueue, @"defalultQueue should inherit the globalDefaultQueue");
 }
 
@@ -184,7 +184,7 @@
 }
 
 - (void)testBindsOnNotAlreadyFulfilledPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0, progressCalled = 0;
     [[[deferred.promise fulfilled:^(id result) {
@@ -222,7 +222,7 @@
 }
 
 - (void)testBindsOnNotAlreadyFailedPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0;
     [[[deferred.promise fulfilled:^(id result) {
@@ -240,14 +240,14 @@
 }
 
 - (void)testNoInitialProgress {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     [deferred.promise progressed:^(float progress) {
         XCTFail(@"there shouldnt be any progress");
     }];
 }
 
 - (void)testInitialProgress {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     [deferred progress:.5f];
     
@@ -261,7 +261,7 @@
 }
 
 - (void)testIncreasingProgress {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0;
     [deferred.promise progressed:^(float progress) {
@@ -282,7 +282,7 @@
 }
 
 - (void)testMultipleBindsOnNotAlreadyFulfilledPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called1 = 0, called2 = 0;
     [[deferred.promise fulfilled:^(id result) {
@@ -301,7 +301,7 @@
 }
 
 - (void)testMultipleBindsOnNotAlreadyFailedPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called1 = 0, called2 = 0;
     [[deferred.promise failed:^(NSError *error) {
@@ -320,7 +320,7 @@
 }
 
 - (void)testFulfilledQueue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
         
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
@@ -338,7 +338,7 @@
 }
 
 - (void)testFailedQueue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
@@ -356,7 +356,7 @@
 }
 
 - (void)testProgressedQueue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
@@ -398,10 +398,10 @@
 #pragma mark - Bind
 
 - (void)testThenReturnPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
-    OMDeferred *nextDeferred = [OMDeferred deferred];
+    OMDeferred *nextDeferred = [OMDeferred new];
     OMPromise *nextPromise = [[[deferred.promise then:^(id result) {
         XCTAssertEqual(result, self.result, @"Supplied result should be identical to the one passed to fulfil:");
         called += 1;
@@ -439,7 +439,7 @@
 }
 
 - (void)testThenReturnAlreadyFulfilledPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     OMPromise *promise = [deferred.promise then:^id(id _) {
         return [OMPromise promiseWithResult:self.result2];
@@ -451,7 +451,7 @@
 }
 
 - (void)testThenReturnValue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0, calledFulfil = 0;
     OMPromise *nextPromise = [[[deferred.promise then:^(id result) {
@@ -472,7 +472,7 @@
 }
 
 - (void)testThenReturnError {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     __block int called = 0, calledFailed = 0;
     OMPromise *nextPromise = [[deferred.promise then:^id(id result) {
@@ -491,9 +491,9 @@
 }
 
 - (void)testThenProgressChain {
-    OMDeferred *deferred1 = [OMDeferred deferred];
-    OMDeferred *deferred2 = [OMDeferred deferred];
-    OMDeferred *deferred3 = [OMDeferred deferred];
+    OMDeferred *deferred1 = [OMDeferred new];
+    OMDeferred *deferred2 = [OMDeferred new];
+    OMDeferred *deferred3 = [OMDeferred new];
     
     __block int called = 0;
     [[[deferred1.promise then:^(id result) {
@@ -526,7 +526,7 @@
 }
 
 - (void)testThenQueue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
@@ -545,10 +545,10 @@
 }
 
 - (void)testRescueReturnPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0, calledProgress = 0, calledFulfil = 0, calledFail = 0;
-    OMDeferred *nextDeferred = [OMDeferred deferred];
+    OMDeferred *nextDeferred = [OMDeferred new];
     OMPromise *nextPromise = [[[deferred.promise rescue:^(NSError *error) {
         XCTAssertEqual(error, self.error, @"Supplied error should be identical to the one passed to fail:");
         called += 1;
@@ -585,7 +585,7 @@
 }
 
 - (void)testRescueReturnValue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block int called = 0, calledFulfil = 0;
     OMPromise *nextPromise = [[[deferred.promise rescue:^(NSError *error) {
@@ -606,7 +606,7 @@
 }
 
 - (void)testRescueReturnError {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     __block int called = 0, calledFailed = 0;
     OMPromise *nextPromise = [[deferred.promise rescue:^(NSError *error) {
@@ -625,8 +625,8 @@
 }
 
 - (void)testRescueProxyProgress {
-    OMDeferred *deferred = [OMDeferred deferred];
-    OMDeferred *nextDeferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
+    OMDeferred *nextDeferred = [OMDeferred new];
     
     __block int calledProgress = 0;
     OMPromise *nextPromise = [[deferred.promise rescue:^(NSError *error) {
@@ -652,7 +652,7 @@
 }
 
 - (void)testRescueQueue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     XCTAssertNotEqual(queue, dispatch_get_current_queue(), @"Current queue shouldnt be dispatch queue");
@@ -673,12 +673,12 @@
 #pragma mark - Cancellation
 
 - (void)testCancelException {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     XCTAssertThrows([deferred.promise cancel], @"Deferred must explicitly made cancellable");
 }
 
 - (void)testCancelSuccess {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     OMPromise *promise = deferred.promise;
     
     [deferred cancelled:^(id _){}];
@@ -702,7 +702,7 @@
 #pragma mark - Combinators & Transformers
 
 - (void)testJoinOnlyOneLevel {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     OMPromise *original = deferred.promise;
     
     OMPromise *joined  = [original join];
@@ -714,8 +714,8 @@
 }
 
 - (void)testJoinFulfil {
-    OMDeferred *deferredOuter = [OMDeferred deferred];
-    OMDeferred *deferredInner = [OMDeferred deferred];
+    OMDeferred *deferredOuter = [OMDeferred new];
+    OMDeferred *deferredInner = [OMDeferred new];
     OMPromise *promiseOuter = deferredOuter.promise;
     OMPromise *promiseInner = deferredInner.promise;
     
@@ -739,7 +739,7 @@
 }
 
 - (void)testJoinFailOuter {
-    OMDeferred *deferredOuter = [OMDeferred deferred];
+    OMDeferred *deferredOuter = [OMDeferred new];
     OMPromise *promiseOuter = deferredOuter.promise;
     
     OMPromise *joined = [promiseOuter join];
@@ -755,8 +755,8 @@
 }
 
 - (void)testJoinFailInner {
-    OMDeferred *deferredOuter = [OMDeferred deferred];
-    OMDeferred *deferredInner = [OMDeferred deferred];
+    OMDeferred *deferredOuter = [OMDeferred new];
+    OMDeferred *deferredInner = [OMDeferred new];
     OMPromise *promiseOuter = deferredOuter.promise;
     OMPromise *promiseInner = deferredInner.promise;
     
@@ -786,7 +786,7 @@
 }
 
 - (void)testChainFulfil {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     OMPromise *chain = [OMPromise chain:@[
         ^id(id result) {
@@ -809,7 +809,7 @@
 }
 
 - (void)testGenericChainFulfil {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     __block id resultFulfilled1;
     __block id resultFulfilled2;
@@ -865,7 +865,7 @@
 }
 
 - (void)testChainFail {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     OMPromise *chain = [OMPromise chain:@[
         ^id(id result) {
@@ -887,8 +887,8 @@
 }
 
 - (void)testGenericChainFail {
-    OMDeferred *deferred = [OMDeferred deferred];
-    OMDeferred *deferred1 = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
+    OMDeferred *deferred1 = [OMDeferred new];
     
     __block int progressed = 0, progressed1 = 0, progressed2 = 0;
     __block id fulfilled = nil;
@@ -959,7 +959,7 @@
 }
 
 - (void)testChainInitialPromise {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     __block int called = 0;
     OMPromise *chain = [OMPromise chain:@[
@@ -990,9 +990,9 @@
 }
 
 - (void)testAnyFulfil {
-    OMDeferred *deferred1 = [OMDeferred deferred];
-    OMDeferred *deferred2 = [OMDeferred deferred];
-    OMDeferred *deferred3 = [OMDeferred deferred];
+    OMDeferred *deferred1 = [OMDeferred new];
+    OMDeferred *deferred2 = [OMDeferred new];
+    OMDeferred *deferred3 = [OMDeferred new];
 
     OMPromise *any = [OMPromise any:@[deferred1.promise, deferred2.promise, deferred3.promise]];
 
@@ -1015,8 +1015,8 @@
 }
 
 - (void)testAnyFail {
-    OMDeferred *deferred1 = [OMDeferred deferred];
-    OMDeferred *deferred2 = [OMDeferred deferred];
+    OMDeferred *deferred1 = [OMDeferred new];
+    OMDeferred *deferred2 = [OMDeferred new];
 
     OMPromise *any = [OMPromise any:@[deferred1.promise, deferred2.promise]];
 
@@ -1038,7 +1038,7 @@
 }
 
 - (void)testAllFulfil {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     OMPromise *all = [OMPromise all:@[deferred.promise, [OMPromise promiseWithResult:self.result]]];
 
@@ -1055,8 +1055,8 @@
 }
 
 - (void)testAllFail {
-    OMDeferred *deferred1 = [OMDeferred deferred];
-    OMDeferred *deferred2 = [OMDeferred deferred];
+    OMDeferred *deferred1 = [OMDeferred new];
+    OMDeferred *deferred2 = [OMDeferred new];
 
     OMPromise *all = [OMPromise all:@[deferred1.promise, [OMPromise promiseWithResult:self.result], deferred2.promise]];
 
@@ -1082,8 +1082,8 @@
 }
 
 - (void)testCollect {
-    OMDeferred *deferred1 = [OMDeferred deferred];
-    OMDeferred *deferred2 = [OMDeferred deferred];
+    OMDeferred *deferred1 = [OMDeferred new];
+    OMDeferred *deferred2 = [OMDeferred new];
     
     OMPromise *collected = [OMPromise collect:@[deferred1.promise, deferred2.promise, [OMPromise promiseWithResult:nil]]];
     
@@ -1105,8 +1105,8 @@
 }
 
 - (void)testRelay {
-    OMDeferred *from = [OMDeferred deferred];
-    OMDeferred *to = [OMDeferred deferred];
+    OMDeferred *from = [OMDeferred new];
+    OMDeferred *to = [OMDeferred new];
 
     [from.promise relay:to];
 
@@ -1120,8 +1120,8 @@
 }
 
 - (void)testRelayWithFulfilledDeferred {
-    OMDeferred *from = [OMDeferred deferred];
-    OMDeferred *to = [OMDeferred deferred];
+    OMDeferred *from = [OMDeferred new];
+    OMDeferred *to = [OMDeferred new];
 
     [from.promise relay:to];
     [to fulfil:self.result];

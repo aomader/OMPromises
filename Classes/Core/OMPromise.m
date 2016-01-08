@@ -104,25 +104,25 @@ static dispatch_queue_t globalDefaultQueue = nil;
 }
 
 + (OMPromise *)promiseWithResult:(id)result {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     [deferred fulfil:result];
     return deferred.promise;
 }
 
 + (OMPromise *)promiseWithResult:(id)result after:(NSTimeInterval)delay {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     [deferred performSelector:@selector(fulfil:) withObject:result afterDelay:delay];
     return deferred.promise;
 }
 
 + (OMPromise *)promiseWithError:(NSError *)error {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     [deferred fail:error];
     return deferred.promise;
 }
 
 + (OMPromise *)promiseWithError:(NSError *)error after:(NSTimeInterval)delay {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     [deferred performSelector:@selector(fail:) withObject:error afterDelay:delay];
     return deferred.promise;
 }
@@ -134,7 +134,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 }
 
 - (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     NSUInteger current = self.depth;
     NSUInteger next = self.depth + 1;
@@ -160,7 +160,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 }
 
 - (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     deferred.promise.depth = self.depth;
     
     [[[self
@@ -457,7 +457,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 }
 
 + (OMPromise *)any:(NSArray *)promises {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     __block NSUInteger failed = 0;
 
@@ -489,7 +489,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 }
 
 + (OMPromise *)all:(NSArray *)promises {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
 
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:promises.count];
     __block NSUInteger done = 0;
@@ -533,7 +533,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 }
 
 + (OMPromise *)collect:(NSArray *)promises {
-    OMDeferred *deferred = [OMDeferred deferred];
+    OMDeferred *deferred = [OMDeferred new];
     
     NSMutableArray *outcomes = [NSMutableArray arrayWithCapacity:promises.count];
     __block NSUInteger collected = 0;
