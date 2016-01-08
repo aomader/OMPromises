@@ -83,6 +83,9 @@ extern NSString *const OMPromisesErrorDomain;
  be used in testing scenarios and not in production code. The methods
  waitForResultWithin: and waitForErrorWithin: block the current execution until a certain
  state is reached within a certain interval.
+
+ **Note:** Creating an instance of `OMPromise` yourself is in most of the cases useless,
+ since the promise will never change any of its properties.
  */
 @interface OMPromise<__covariant ResultType> : NSObject
 
