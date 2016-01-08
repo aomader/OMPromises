@@ -95,7 +95,7 @@ extern NSString *const OMPromisesErrorDomain;
  May only change from `OMPromiseStateUnfulfilled` to either `OMPromiseStateFailed` or
  `OMPromiseStateFulfilled`.
  */
-@property(assign, readonly, nonatomic) OMPromiseState state;
+@property(readonly, nonatomic) OMPromiseState state;
 
 /** Maybe the promised result.
  
@@ -114,13 +114,13 @@ extern NSString *const OMPromisesErrorDomain;
  Describes the progress of the underlying workload as a floating point number in range
  [0, 1]. It only increases.
  */
-@property(assign, readonly, nonatomic) float progress;
+@property(readonly, nonatomic) float progress;
 
 /** Whether the underlying operation supports cancellation or not.
  
  In case cancellable is `YES`, it's safe to call cancel.
  */
-@property(assign, readonly, nonatomic) BOOL cancellable;
+@property(readonly, nonatomic) BOOL cancellable;
 
 ///---------------------------------------------------------------------------------------
 /// @name Queue Management
@@ -161,7 +161,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The current promise.
  @see defaultQueue
  */
-- (OMPromise *)on:(dispatch_queue_t)queue;
+- (instancetype)on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
 /// @name Creation
@@ -295,7 +295,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param fulfilHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)fulfilled:(void (^)(ResultType result))fulfilHandler;
+- (instancetype)fulfilled:(void (^)(ResultType result))fulfilHandler;
 
 /** Similar to fulfilled:, but executes the supplied block asynchronously on a specific
  queue.
@@ -305,7 +305,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see fulfilled:
  */
-- (OMPromise *)fulfilled:(void (^)(ResultType result))fulfilHandler on:(dispatch_queue_t)queue;
+- (instancetype)fulfilled:(void (^)(ResultType result))fulfilHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise fails.
  
@@ -314,7 +314,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param failHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)failed:(void (^)(NSError *error))failHandler;
+- (instancetype)failed:(void (^)(NSError *error))failHandler;
 
 /** Similar to failed:, but executes the supplied block asynchronously on a specific queue.
  
@@ -323,7 +323,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see failed:
  */
-- (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue;
+- (instancetype)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise progresses.
  
@@ -334,7 +334,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param progressHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)progressed:(void (^)(float progress))progressHandler;
+- (instancetype)progressed:(void (^)(float progress))progressHandler;
 
 /** Similar to progressed:, but executes the supplied block asynchronously on a specific
  queue.
@@ -344,7 +344,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see progressed:
  */
-- (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue;
+- (instancetype)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called once the promise changed its state.
 
@@ -354,7 +354,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param alwaysHandler Block to be called.
  @return The promise itself.
  */
-- (OMPromise *)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler;
+- (instancetype)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler;
 
 /** Similar to always:, but executes the supplied block asynchronously on a specific queue.
 
@@ -363,8 +363,8 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see always:
  */
-- (OMPromise *)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler
-                   on:(dispatch_queue_t)queue;
+- (instancetype)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler
+                    on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
 /// @name Cancellation
@@ -449,7 +449,7 @@ extern NSString *const OMPromisesErrorDomain;
   @param deferred The deferred to be controlled.
   @return The promise itself.
  */
-- (OMPromise *)relay:(OMDeferred *)deferred;
+- (instancetype)relay:(OMDeferred *)deferred;
 
 ///---------------------------------------------------------------------------------------
 /// @name Testing
@@ -465,7 +465,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The result of the promise.
  @see waitForErrorWithin:
  */
-- (ResultType)waitForResultWithin:(NSTimeInterval)seconds;
+- (nullable ResultType)waitForResultWithin:(NSTimeInterval)seconds;
 
 /** Wait for the promise to fail within a certain interval.
  
@@ -478,7 +478,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The error of the promise.
  @see waitForResultWithin:
  */
-- (NSError *)waitForErrorWithin:(NSTimeInterval)seconds;
+- (nullable NSError *)waitForErrorWithin:(NSTimeInterval)seconds;
 
 @end
 

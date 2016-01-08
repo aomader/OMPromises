@@ -57,7 +57,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 @property(nonatomic) NSMutableArray *progressHandlers;
 @property(nonatomic) NSMutableArray *cancelHandlers;
 
-@property(assign, nonatomic) NSUInteger depth;
+@property(nonatomic) NSUInteger depth;
 
 @end
 
@@ -179,11 +179,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 #pragma mark - Callbacks
 
-- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler {
+- (instancetype)fulfilled:(void (^)(id result))fulfilHandler {
     return [self fulfilled:fulfilHandler on:self.defaultQueue];
 }
 
-- (OMPromise *)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue {
+- (instancetype)fulfilled:(void (^)(id result))fulfilHandler on:(dispatch_queue_t)queue {
     if (queue != nil) {
         fulfilHandler = ^(id result) {
             dispatch_async(queue, ^{
@@ -212,11 +212,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return self;
 }
 
-- (OMPromise *)failed:(void (^)(NSError *error))failHandler {
+- (instancetype)failed:(void (^)(NSError *error))failHandler {
     return [self failed:failHandler on:self.defaultQueue];
 }
 
-- (OMPromise *)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue {
+- (instancetype)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue {
     if (queue != nil) {
         failHandler = ^(NSError *error) {
             dispatch_async(queue, ^{
@@ -245,11 +245,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return self;
 }
 
-- (OMPromise *)progressed:(void (^)(float progress))progressHandler {
+- (instancetype)progressed:(void (^)(float progress))progressHandler {
     return [self progressed:progressHandler on:self.defaultQueue];
 }
 
-- (OMPromise *)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue {
+- (instancetype)progressed:(void (^)(float progress))progressHandler on:(dispatch_queue_t)queue {
     if (queue != nil) {
         progressHandler = ^(float progress) {
             dispatch_async(queue, ^{
@@ -276,11 +276,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return self;
 }
 
-- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler {
+- (instancetype)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler {
     return [self always:alwaysHandler on:self.defaultQueue];
 }
 
-- (OMPromise *)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler
+- (instancetype)always:(void (^)(OMPromiseState state, id result, NSError *error))alwaysHandler
                    on:(dispatch_queue_t)queue
 {
     return [[self fulfilled:^(id result) {
@@ -580,7 +580,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return deferred.promise;
 }
 
-- (OMPromise *)relay:(OMDeferred *)deferred {
+- (instancetype)relay:(OMDeferred *)deferred {
     NSAssert(deferred != nil, @"The deferred is required.");
 
     return [[[self fulfilled:^(id value) {
