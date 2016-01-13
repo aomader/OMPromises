@@ -708,7 +708,7 @@
     OMPromise *joined  = [original join];
     XCTAssertEqual(joined.state, OMPromiseStateUnfulfilled, @"Joined promise should be unfulfilled");
     
-    [deferred fulfil:self.result];
+    [deferred fulfil:[OMPromise promiseWithResult:self.result]];
     XCTAssertEqual(joined.state, OMPromiseStateFulfilled, @"Joined promise should be fulfilled");
     XCTAssertEqual(joined.result, self.result, @"Joined promise should have original result");
 }

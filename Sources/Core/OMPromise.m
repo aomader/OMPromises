@@ -421,6 +421,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 - (OMPromise *)join {
     return [self then:^(OMPromise *next) {
+        NSAssert([next isKindOfClass:OMPromise.class], @"The joined promise should yield a promise itself");
         return next;
     }];
 }
