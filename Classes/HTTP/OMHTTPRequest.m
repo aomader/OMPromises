@@ -26,7 +26,6 @@
 #import "OMHTTPRequest.h"
 
 #import "OMHTTPResponse.h"
-#import "OMResources.h"
 
 static const NSTimeInterval kDefaultTimeoutInterval = 20.;
 static const float kDefaultLookupProgress = .05f;
@@ -108,7 +107,7 @@ NSString *const OMHTTPAllowInvalidCertificates = @"allowinvalidcertificates";
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     NSMutableDictionary *userInfo = @{
-        NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_request_%@", error),
+        NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to perform HTTP request: %@", error],
         NSUnderlyingErrorKey: error
     }.mutableCopy;
 
@@ -147,8 +146,8 @@ NSString *const OMHTTPAllowInvalidCertificates = @"allowinvalidcertificates";
         [self fail:[NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                        code:OMPromisesHTTPStatusError
                                    userInfo:@{
-                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_status_%i%@",
-                                           response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]),
+                                       NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Server responded with status code %i: %@.",
+                                           response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]],
                                        OMHTTPResponseKey: self.response
                                    }]];
     } else {

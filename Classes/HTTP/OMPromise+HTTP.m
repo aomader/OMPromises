@@ -25,7 +25,6 @@
 
 #import "OMPromise+HTTP.h"
 
-#import "OMResources.h"
 #import "OMHTTPRequest.h"
 #import "OMHTTPResponse.h"
 
@@ -45,8 +44,8 @@
             return [NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                        code:OMPromisesHTTPContentTypeError
                                    userInfo:@{
-                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_content_type_%@%@",
-                                           contentType, @"application/json")
+                                       NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found Content-Type %@ but expected %@.",
+                                           contentType, @"application/json"]
                                    }];
         }
 
@@ -57,8 +56,8 @@
             return [NSError errorWithDomain:OMPromisesHTTPErrorDomain
                                        code:OMPromisesHTTPSerializationError
                                    userInfo:@{
-                                       NSLocalizedDescriptionKey: OMLocalizedString(@"error_http_deserialization_%@%@",
-                                           @"JSON", error),
+                                       NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to deserialize %@ data: %@",
+                                           @"JSON", error],
                                        NSUnderlyingErrorKey: error
                                    }];
         }

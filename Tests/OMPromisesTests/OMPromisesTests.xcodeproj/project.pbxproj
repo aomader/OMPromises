@@ -9,15 +9,12 @@
 /* Begin PBXBuildFile section */
 		2430BA6E99E5F46FEECA0FCD /* libPods-tvos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9890662E8B24AB7641EBE9F7 /* libPods-tvos.a */; };
 		6C006C0B1C284E6700E4D39C /* OMHTTPPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F9144E5A18DF479B004CDFE4 /* OMHTTPPromiseTests.m */; };
-		6C475BAB1C2847C700057B48 /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
 		6C475BAC1C2847C700057B48 /* OMDeferredTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F9144E5718DF479B004CDFE4 /* OMDeferredTests.m */; };
 		6C475BAD1C2847C700057B48 /* OMPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F9144E5818DF479B004CDFE4 /* OMPromiseTests.m */; };
 		6C8EB5871C4199DF00E171C3 /* OMLazyPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */; };
 		6C8EB5881C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */; };
 		6C8EB5891C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */; };
 		9A28AA0FE9C245F4AFB2F173 /* libPods-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F24761EC2240C4940A0E53 /* libPods-ios.a */; };
-		A17BAE7319193F5F00D38B1E /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
-		A1ACB60C19193A0A00E18BF8 /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
 		F9144E3218DF4761004CDFE4 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9144E3118DF4760004CDFE4 /* XCTest.framework */; };
 		F9144E3418DF4761004CDFE4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9144E3318DF4761004CDFE4 /* Foundation.framework */; };
 		F9144E3618DF4761004CDFE4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9144E3518DF4761004CDFE4 /* UIKit.framework */; };
@@ -41,7 +38,6 @@
 		722CB5C725A53732ACA692E2 /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios/Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
 		81EFEB42FE89440C9E267599 /* libPods-osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-osx.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9890662E8B24AB7641EBE9F7 /* libPods-tvos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-tvos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMResourcesTests.m; sourceTree = "<group>"; };
 		D755E1F00CC6C2A0CCA4EA64 /* Pods-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ios/Pods-ios.debug.xcconfig"; sourceTree = "<group>"; };
 		F5F24761EC2240C4940A0E53 /* libPods-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9144E2E18DF4760004CDFE4 /* iOS-Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS-Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,7 +143,6 @@
 			isa = PBXGroup;
 			children = (
 				6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */,
-				A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */,
 				F9144E5718DF479B004CDFE4 /* OMDeferredTests.m */,
 				F9144E5818DF479B004CDFE4 /* OMPromiseTests.m */,
 			);
@@ -430,7 +425,6 @@
 				6C006C0B1C284E6700E4D39C /* OMHTTPPromiseTests.m in Sources */,
 				6C8EB5891C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */,
 				6C475BAD1C2847C700057B48 /* OMPromiseTests.m in Sources */,
-				6C475BAB1C2847C700057B48 /* OMResourcesTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -442,7 +436,6 @@
 				F9144E5F18DF479B004CDFE4 /* OMHTTPPromiseTests.m in Sources */,
 				6C8EB5871C4199DF00E171C3 /* OMLazyPromiseTests.m in Sources */,
 				F9144E5D18DF479B004CDFE4 /* OMPromiseTests.m in Sources */,
-				A1ACB60C19193A0A00E18BF8 /* OMResourcesTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,7 +447,6 @@
 				F9144E6018DF479B004CDFE4 /* OMHTTPPromiseTests.m in Sources */,
 				6C8EB5881C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */,
 				F9144E5E18DF479B004CDFE4 /* OMPromiseTests.m in Sources */,
-				A17BAE7319193F5F00D38B1E /* OMResourcesTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

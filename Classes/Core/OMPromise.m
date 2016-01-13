@@ -27,7 +27,6 @@
 
 #import "CTBlockDescription.h"
 #import "OMDeferred.h"
-#import "OMResources.h"
 
 NSString *const OMPromisesErrorDomain = @"de.reaktor42.OMPromises";
 
@@ -300,7 +299,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         self.error = [NSError errorWithDomain:OMPromisesErrorDomain
                                          code:OMPromisesCancelledError
                                      userInfo:@{
-                                         NSLocalizedDescriptionKey: OMLocalizedString(@"error_cancelled")
+                                         NSLocalizedDescriptionKey: @"The promise has been cancelled."
                                      }];
     }
 
@@ -469,7 +468,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
                 [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
                                                    code:OMPromisesCombinatorAnyNonFulfilledError
                                                userInfo:@{
-                                                   NSLocalizedDescriptionKey: OMLocalizedString(@"error_combinator_any")
+                                                   NSLocalizedDescriptionKey: @"No promise combined with the any combinator has been fulfilled."
                                                }]];
             }
         }] progressed:^(float progress) {
@@ -481,7 +480,7 @@ static dispatch_queue_t globalDefaultQueue = nil;
         [deferred fail:[NSError errorWithDomain:OMPromisesErrorDomain
                                            code:OMPromisesCombinatorAnyNonFulfilledError
                                        userInfo:@{
-                                           NSLocalizedDescriptionKey: OMLocalizedString(@"error_combinator_any")
+                                           NSLocalizedDescriptionKey: @"No promise combined with the any combinator has been fulfilled."
                                        }]];
     }
 
@@ -668,7 +667,9 @@ static dispatch_queue_t globalDefaultQueue = nil;
         next = [NSError errorWithDomain:OMPromisesErrorDomain
                                    code:OMPromisesExceptionError
                                userInfo:@{
-                                   NSLocalizedDescriptionKey: OMLocalizedString(@"error_exception_%@", exception)
+                                   NSLocalizedDescriptionKey:
+                                       [NSString stringWithFormat:@"The supplied then/rescue handler threw an exception during execution: %@",
+                                               exception]
                                }];
     }
     
