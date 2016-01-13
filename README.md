@@ -20,7 +20,6 @@ The main features of OMPromises are listed below.
 * Optional support for cancellation
 * Queue based block execution if needed
 * Various combinators
-* **New:** Promise-based HTTP request API separated from the core
 
 ## Installation
 
@@ -29,14 +28,6 @@ manager.
 
 ```bash
 pod 'OMPromises', '~> 0.4.2'
-```
-
-If you want to make use of the new HTTP request API you also have to include
-the new subspec. Have a look at the corresponding [header](Classes/HTTP)
-files for more information.
-
-```bash
-pod 'OMPromises/HTTP', '~> 0.4.2'
 ```
 
 ## Documentation
@@ -271,43 +262,6 @@ combination assuming an equal distribution of workload over all supplied promise
 * `collect:` - Collects **all** outcomes of the supplied promises, thus it never fails.
 * `relay:` - Relay all promise events to another deferred.
 
-## Demonstration
-
-Assume you want to get [Gravatar] images for a list of email addresses. Additionally
-you prepared a fallback image for addresses that don't resolve to an image. Once all
-images are fetched, you want to use them for further processing.
-
-Here is how you would accomplish such task using OMPromises:
-
-```objc
-#import <OMPromises/OMPromises.h>
-
-// lookup images in parallel
-NSMutableArray *promises = [NSMutableArray array];
-for (NSString *email in @[@"205e460b479e2e5b48aec07710c08d50",
-                          @"9fcf5f5c3f289b330baff283b85f7705",
-                          @"deadc0dedeadc0dedeadc0dedeadc0de"]) {
-    OMPromise *image = [[OMHTTPRequest get:@"http://gravatar.com/avatar/{hash}?d=404"
-                                parameters:@{@"hash": email}
-                                   options:nil]
-        rescue:^id(NSError *error) {
-            // in case the promise failed, we supply a dummy image to use instead
-            return [UIImage imageNamed:@"dummy_image.png"];
-        }];
-    [promises addObject:imagePromise];
-}
-
-// creae a combined promise and bind to its callbacks
-[[[OMPromise all:promises]
-    fulfilled:^(NSArray *images) {
-        NSLog(@"Done. %i images loaded.", images.count);
-        // do something with your images ...
-    }]
-    progressed:^(float progress) {
-        NSLog(@"%.2f%%...", progress * 100.f);
-    }];
-```
-
 ## License
 
 OMPromises is licensed under the terms of the MIT license.
@@ -323,4 +277,3 @@ Please see the [LICENSE](LICENSE) file for full details.
 [here]: http://cocoadocs.org/docsets/OMPromises/
 [blocks]: https://developer.apple.com/library/ios/documentation/cocoa/Conceptual/Blocks/Articles/00_Introduction.html
 [Haskell]: http://www.haskell.org
-[gravatar]: http://www.gravatar.com

@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return The promise yields an id type describing the parsed JSON.
  */
-- (OMPromise *)httpParseJSON;
+- (OMPromise *)httpParseJSON __deprecated;
 
 @end
 

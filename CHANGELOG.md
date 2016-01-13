@@ -18,8 +18,7 @@ _Possible log types_:
 * [added] Add new `OMLazyPromise` type
 * [changed] Generify `OMPromise` and `OMDeferred`
 * [changed] Use composition over inheritance to model `OMDeferred`
-* [deprecated] Use the `alloc/init` or `new` pattern in favor of
-  `[OMDeferred deferred]`
+* [deprecated] The whole HTTP subspec will get removed un the upcoming release
 * ...
 
 ## [v0.4.2] - 2015-11-23

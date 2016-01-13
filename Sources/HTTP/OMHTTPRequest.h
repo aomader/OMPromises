@@ -123,7 +123,7 @@ extern NSString *const OMHTTPAllowInvalidCertificates;
 + (OMPromise<OMHTTPResponse *> *)requestWithMethod:(NSString *)method
                                                url:(NSURL *)url
                                         parameters:(nullable NSDictionary *)parameters
-                                           options:(nullable NSDictionary *)options;
+                                           options:(nullable NSDictionary *)options __deprecated;
 
 ///---------------------------------------------------------------------------------------
 /// @name Convenience Methods
@@ -137,7 +137,7 @@ extern NSString *const OMHTTPAllowInvalidCertificates;
  */
 + (OMPromise<OMHTTPResponse *> *)get:(NSString *)urlString
                           parameters:(nullable NSDictionary *)parameters
-                             options:(nullable NSDictionary *)options;
+                             options:(nullable NSDictionary *)options __deprecated;
 
 /** Convenience method to perform an HTTP POST request.
  
@@ -145,7 +145,7 @@ extern NSString *const OMHTTPAllowInvalidCertificates;
  */
 + (OMPromise<OMHTTPResponse *> *)post:(NSString *)urlString
                            parameters:(nullable NSDictionary *)parameters
-                              options:(nullable NSDictionary *)options;
+                              options:(nullable NSDictionary *)options __deprecated;
 
 /** Convenience method to perform an HTTP PUT request.
  
@@ -153,7 +153,7 @@ extern NSString *const OMHTTPAllowInvalidCertificates;
  */
 + (OMPromise<OMHTTPResponse *> *)put:(NSString *)urlString
                           parameters:(nullable NSDictionary *)parameters
-                             options:(nullable NSDictionary *)options;
+                             options:(nullable NSDictionary *)options __deprecated;
 
 /** Convenience method to perform an HTTP HEAD request.
  
@@ -161,7 +161,7 @@ extern NSString *const OMHTTPAllowInvalidCertificates;
  */
 + (OMPromise<OMHTTPResponse *> *)head:(NSString *)urlString
                            parameters:(nullable NSDictionary *)parameters
-                              options:(nullable NSDictionary *)options;
+                              options:(nullable NSDictionary *)options __deprecated;
 
 /** Convenience method to perform an HTTP DELETE request.
  
@@ -169,7 +169,7 @@ extern NSString *const OMHTTPAllowInvalidCertificates;
  */
 + (OMPromise<OMHTTPResponse *> *)delete:(NSString *)urlString
                              parameters:(nullable NSDictionary *)parameters
-                                options:(nullable NSDictionary *)options;
+                                options:(nullable NSDictionary *)options __deprecated;
 
 @end
 
