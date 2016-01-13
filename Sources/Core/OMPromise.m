@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, OMPromiseHandler) {
     OMPromiseHandlerRescue
 };
 
-static const NSTimeInterval kTestingIntervalPrecision = .1;
+static const NSTimeInterval kTestingIntervalPrecision = .01;
 
 static dispatch_queue_t globalDefaultQueue = nil;
 
