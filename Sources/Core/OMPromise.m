@@ -603,7 +603,8 @@ static dispatch_queue_t globalDefaultQueue = nil;
         
         if (self.state == OMPromiseStateFailed) {
             @throw [NSException exceptionWithName:@"WaitingForFufilledPromise"
-                                           reason:@"The promise failed instead of getting fulfilled."
+                                           reason:[NSString stringWithFormat:@"Instead of getting fulfilled, the promise failed: %@",
+                                                   self.error ? self.error : @"no error provided"]
                                          userInfo:self.error ? @{NSUnderlyingErrorKey: self.error} : nil];
         }
         
@@ -632,7 +633,8 @@ static dispatch_queue_t globalDefaultQueue = nil;
         
         if (self.state == OMPromiseStateFulfilled) {
             @throw [NSException exceptionWithName:@"WaitingForFailedPromise"
-                                           reason:@"The promise got fulfilled instead of failing."
+                                           reason:[NSString stringWithFormat:@"Instead of failing, the promise got fulfilled: %@",
+                                                   self.result]
                                          userInfo:nil];
         }
         
