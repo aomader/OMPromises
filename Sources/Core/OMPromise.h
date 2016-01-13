@@ -25,7 +25,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class OMDeferred;
+@class OMDeferred<ResultType>;
 @class OMLazyPromise<__covariant ResultType>;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -416,7 +416,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param promises A sequence of promises.
  @return A new promise.
  */
-+ (OMPromise *)any:(NSArray *)promises;
++ (OMPromise *)any:(NSArray<OMPromise *> *)promises;
 
 /** Wait for all promises to get fulfilled.
 
@@ -431,7 +431,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param promises A sequence of promises.
  @return A new promise.
  */
-+ (OMPromise *)all:(NSArray *)promises;
++ (OMPromise<NSArray *> *)all:(NSArray<OMPromise *> *)promises;
 
 /** Collects the outcome of all promises.
  
@@ -444,7 +444,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param promises A sequence of promises.
  @return A new promise yielding an array containing all outcomes in order.
  */
-+ (OMPromise *)collect:(NSArray *)promises;
++ (OMPromise<NSArray *> *)collect:(NSArray<OMPromise *> *)promises;
 
 /** Relays all promise events to a deferred.
 
@@ -454,7 +454,7 @@ extern NSString *const OMPromisesErrorDomain;
   @param deferred The deferred to be controlled.
   @return The promise itself.
  */
-- (instancetype)relay:(OMDeferred *)deferred;
+- (instancetype)relay:(OMDeferred<ResultType> *)deferred;
 
 ///---------------------------------------------------------------------------------------
 /// @name Testing
