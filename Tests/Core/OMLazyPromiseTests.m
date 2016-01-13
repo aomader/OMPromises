@@ -58,7 +58,7 @@
     XCTAssertTrue(promise.started);
     XCTAssertEqual(called, 1);
     XCTAssertEqual(promise.state, OMPromiseStateFulfilled, @"Promise should be fulfilled");
-    XCTAssertEqual(promise.result, @1337, @"Promise should have the supplied result");
+    XCTAssertEqualObjects(promise.result, @1337, @"Promise should have the supplied result");
 }
 
 - (void)testForcedStart {
