@@ -5,7 +5,7 @@ env:
   matrix:
     - OPTIONS="-sdk iphonesimulator -scheme iOS-Tests test -parallelize"
     - OPTIONS="-scheme OSX-Tests test -parallelize"
-    - OPTIONS="-scheme tvOS-Tests build-tests CODE_SIGN_IDENTITY='' CODE_SIGNING_REQUIRED=NO"
+    - OPTIONS="-scheme tvOS-Tests build-tests CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
 
 before_script:
   - cd Project/ && pod install
