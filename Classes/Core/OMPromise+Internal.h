@@ -31,13 +31,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OMPromise<__covariant ResultType> (Internal)
 
+@property(nonatomic) NSUInteger depth;
+
 - (void)fulfil:(id)result;
 - (void)fail:(NSError *)error;
 - (void)progress:(float)progress;
+
 - (BOOL)tryFulfil:(id)result;
 - (BOOL)tryFail:(NSError *)error;
 - (BOOL)tryProgress:(float)progress;
+
 - (void)cancelled:(void (^)())cancelHandler;
+
+- (void)cleanup;
+
++ (OMPromise *)bind:(OMDeferred *)deferred
+               with:(id (^)(id))handler
+              using:(id)parameter
+               bias:(float)bias
+           fraction:(float)fraction;
 
 @end
 

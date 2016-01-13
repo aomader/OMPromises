@@ -12,6 +12,9 @@
 		6C475BAB1C2847C700057B48 /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
 		6C475BAC1C2847C700057B48 /* OMDeferredTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F9144E5718DF479B004CDFE4 /* OMDeferredTests.m */; };
 		6C475BAD1C2847C700057B48 /* OMPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F9144E5818DF479B004CDFE4 /* OMPromiseTests.m */; };
+		6C8EB5871C4199DF00E171C3 /* OMLazyPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */; };
+		6C8EB5881C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */; };
+		6C8EB5891C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */; };
 		9A28AA0FE9C245F4AFB2F173 /* libPods-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F24761EC2240C4940A0E53 /* libPods-ios.a */; };
 		A17BAE7319193F5F00D38B1E /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
 		A1ACB60C19193A0A00E18BF8 /* OMResourcesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */; };
@@ -33,6 +36,7 @@
 		168D2FA18C6759E2D6FB1630 /* Pods-tvos.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-tvos.debug.xcconfig"; path = "Pods/Target Support Files/Pods-tvos/Pods-tvos.debug.xcconfig"; sourceTree = "<group>"; };
 		280CDB981C16422006C080F2 /* Pods-osx.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osx.debug.xcconfig"; path = "Pods/Target Support Files/Pods-osx/Pods-osx.debug.xcconfig"; sourceTree = "<group>"; };
 		6C475BA31C2847A800057B48 /* tvOS-Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "tvOS-Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OMLazyPromiseTests.m; sourceTree = "<group>"; };
 		71ACED5EBD634B3BF1D9A57F /* Pods-osx.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osx.release.xcconfig"; path = "Pods/Target Support Files/Pods-osx/Pods-osx.release.xcconfig"; sourceTree = "<group>"; };
 		722CB5C725A53732ACA692E2 /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.release.xcconfig"; path = "Pods/Target Support Files/Pods-ios/Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
 		81EFEB42FE89440C9E267599 /* libPods-osx.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-osx.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -142,6 +146,7 @@
 		F9144E5618DF479B004CDFE4 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				6C8EB5861C4199DF00E171C3 /* OMLazyPromiseTests.m */,
 				A1ACB60B19193A0A00E18BF8 /* OMResourcesTests.m */,
 				F9144E5718DF479B004CDFE4 /* OMDeferredTests.m */,
 				F9144E5818DF479B004CDFE4 /* OMPromiseTests.m */,
@@ -423,6 +428,7 @@
 			files = (
 				6C475BAC1C2847C700057B48 /* OMDeferredTests.m in Sources */,
 				6C006C0B1C284E6700E4D39C /* OMHTTPPromiseTests.m in Sources */,
+				6C8EB5891C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */,
 				6C475BAD1C2847C700057B48 /* OMPromiseTests.m in Sources */,
 				6C475BAB1C2847C700057B48 /* OMResourcesTests.m in Sources */,
 			);
@@ -434,6 +440,7 @@
 			files = (
 				F9144E5B18DF479B004CDFE4 /* OMDeferredTests.m in Sources */,
 				F9144E5F18DF479B004CDFE4 /* OMHTTPPromiseTests.m in Sources */,
+				6C8EB5871C4199DF00E171C3 /* OMLazyPromiseTests.m in Sources */,
 				F9144E5D18DF479B004CDFE4 /* OMPromiseTests.m in Sources */,
 				A1ACB60C19193A0A00E18BF8 /* OMResourcesTests.m in Sources */,
 			);
@@ -445,6 +452,7 @@
 			files = (
 				F9144E5C18DF479B004CDFE4 /* OMDeferredTests.m in Sources */,
 				F9144E6018DF479B004CDFE4 /* OMHTTPPromiseTests.m in Sources */,
+				6C8EB5881C4199E200E171C3 /* OMLazyPromiseTests.m in Sources */,
 				F9144E5E18DF479B004CDFE4 /* OMPromiseTests.m in Sources */,
 				A17BAE7319193F5F00D38B1E /* OMResourcesTests.m in Sources */,
 			);

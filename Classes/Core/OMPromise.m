@@ -129,11 +129,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 #pragma mark - Bind
 
-- (OMPromise *)then:(id (^)(id result))thenHandler {
+- (instancetype)then:(id (^)(id result))thenHandler {
     return [self then:thenHandler on:self.defaultQueue];
 }
 
-- (OMPromise *)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue {
+- (instancetype)then:(id (^)(id result))thenHandler on:(dispatch_queue_t)queue {
     OMDeferred *deferred = [OMDeferred new];
     
     NSUInteger current = self.depth;
@@ -155,11 +155,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
     return deferred.promise;
 }
 
-- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler {
+- (instancetype)rescue:(id (^)(NSError *error))rescueHandler {
     return [self rescue:rescueHandler on:self.defaultQueue];
 }
 
-- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue {
+- (instancetype)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue {
     OMDeferred *deferred = [OMDeferred new];
     deferred.promise.depth = self.depth;
     
@@ -730,12 +730,17 @@ static dispatch_queue_t globalDefaultQueue = nil;
 #pragma mark - NSObject Overrides
 
 - (NSString *)debugDescription {
+    NSString *className = NSStringFromClass(self.class);
+
     if (self.state == OMPromiseStateFulfilled) {
-        return [NSString stringWithFormat:@"<OMPromise: %p; state = fulfilled; result = %@>", self, self.result];
+        return [NSString stringWithFormat:@"<%@: %p; state = fulfilled; result = %@>",
+                        className, self, self.result];
     } else if (self.state == OMPromiseStateFailed) {
-        return [NSString stringWithFormat:@"<OMPromise: %p; state = failed; error = %@>", self, self.error];
+        return [NSString stringWithFormat:@"<%@: %p; state = failed; error = %@>",
+                        className, self, self.error];
     } else {
-        return [NSString stringWithFormat:@"<OMPromise: %p; state = unfulfilled; progress = %.2f>", self, self.progress];
+        return [NSString stringWithFormat:@"<%@: %p; state = unfulfilled; progress = %.2f>",
+                        className, self, self.progress];
     }
 }
 

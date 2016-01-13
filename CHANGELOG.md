@@ -14,11 +14,12 @@ _Possible log types_:
 
 ## [Unreleased]
 
-* [changed] Generify `OMPromise` and `OMDeferred`
 * [added] Support tvOS
+* [added] Add new `OMLazyPromise` type
+* [changed] Generify `OMPromise` and `OMDeferred`
+* [changed] Use composition over inheritance to model `OMDeferred`
 * [deprecated] Use the `alloc/init` or `new` pattern in favor of
   `[OMDeferred deferred]`
-* [changed] Use composition over inheritance to model `OMDeferred`
 * ...
 
 ## [v0.4.2] - 2015-11-23

@@ -23,7 +23,7 @@
 // THE SOFTWARE.
 //
 
-#import "OMDeferred.h"
+#import "OMDeferred+Internal.h"
 
 #import "OMPromise+Internal.h"
 
@@ -31,12 +31,16 @@
 
 #pragma mark - Init
 
-- (id)init {
+- (instancetype)initWithPromise:(OMPromise *)promise {
     self = [super init];
     if (self) {
-        _promise = [(id)[OMPromise alloc] init];
+        _promise = promise;
     }
     return self;
+}
+
+- (instancetype)init {
+    return [self initWithPromise:[(id)[OMPromise alloc] init]];
 }
 
 + (OMDeferred *)deferred {

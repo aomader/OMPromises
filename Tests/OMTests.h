@@ -38,3 +38,6 @@
             [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:.01]]; \
         } \
     }
+
+#define WAIT_FOR(timeout) \
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(timeout)]]

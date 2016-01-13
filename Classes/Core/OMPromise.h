@@ -26,6 +26,7 @@
 #import <Foundation/Foundation.h>
 
 @class OMDeferred;
+@class OMLazyPromise<__covariant ResultType>;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -180,6 +181,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param task The task describing the outcome of the promise.
  @return A new promise.
  @see promiseWithTask:on:
+ @see promiseWithLazyTask:
  */
 + (OMPromise<ResultType> *)promiseWithTask:(id (^)())task;
 
@@ -254,7 +256,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see rescue:
  */
-- (OMPromise *)then:(id (^)(ResultType result))thenHandler;
+- (instancetype)then:(id (^)(ResultType _Nullable result))thenHandler;
 
 /** Similar to then:, but executes the supplied block asynchronously on a specific queue.
  
@@ -263,7 +265,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see then:
  */
-- (OMPromise *)then:(id (^)(ResultType result))thenHandler on:(dispatch_queue_t)queue;
+- (instancetype)then:(id (^)(ResultType _Nullable result))thenHandler on:(dispatch_queue_t)queue;
 
 /** Create a new promise by binding the error reason to another promise.
 
@@ -276,7 +278,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see then:
  */
-- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler;
+- (instancetype)rescue:(id (^)(NSError *_Nullable error))rescueHandler;
 
 /** Similar to rescue:, but executes the supplied block asynchronously on a specific queue.
  
@@ -285,7 +287,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see rescue:
  */
-- (OMPromise *)rescue:(id (^)(NSError *error))rescueHandler on:(dispatch_queue_t)queue;
+- (instancetype)rescue:(id (^)(NSError *_Nullable error))rescueHandler on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
 /// @name Registering callbacks
@@ -298,7 +300,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param fulfilHandler Block to be called.
  @return The promise itself.
  */
-- (instancetype)fulfilled:(void (^)(ResultType result))fulfilHandler;
+- (instancetype)fulfilled:(void (^)(ResultType _Nullable result))fulfilHandler;
 
 /** Similar to fulfilled:, but executes the supplied block asynchronously on a specific
  queue.
@@ -308,7 +310,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see fulfilled:
  */
-- (instancetype)fulfilled:(void (^)(ResultType result))fulfilHandler on:(dispatch_queue_t)queue;
+- (instancetype)fulfilled:(void (^)(ResultType _Nullable result))fulfilHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise fails.
  
@@ -317,7 +319,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param failHandler Block to be called.
  @return The promise itself.
  */
-- (instancetype)failed:(void (^)(NSError *error))failHandler;
+- (instancetype)failed:(void (^)(NSError *_Nullable error))failHandler;
 
 /** Similar to failed:, but executes the supplied block asynchronously on a specific queue.
  
@@ -326,7 +328,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see failed:
  */
-- (instancetype)failed:(void (^)(NSError *error))failHandler on:(dispatch_queue_t)queue;
+- (instancetype)failed:(void (^)(NSError *_Nullable error))failHandler on:(dispatch_queue_t)queue;
 
 /** Register a block to be called when the promise progresses.
  
@@ -357,7 +359,7 @@ extern NSString *const OMPromisesErrorDomain;
  @param alwaysHandler Block to be called.
  @return The promise itself.
  */
-- (instancetype)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler;
+- (instancetype)always:(void (^)(OMPromiseState state, ResultType _Nullable result, NSError *_Nullable error))alwaysHandler;
 
 /** Similar to always:, but executes the supplied block asynchronously on a specific queue.
 
@@ -366,7 +368,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return The promise itself.
  @see always:
  */
-- (instancetype)always:(void (^)(OMPromiseState state, ResultType result, NSError *error))alwaysHandler
+- (instancetype)always:(void (^)(OMPromiseState state, ResultType _Nullable result, NSError *_Nullable error))alwaysHandler
                     on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------

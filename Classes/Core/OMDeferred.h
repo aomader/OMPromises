@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /** Create and return a new deferred.
  */
-+ (OMDeferred *)deferred __deprecated_msg("Use the default alloc/init or new pattern");
++ (OMDeferred *)deferred;
 
 ///---------------------------------------------------------------------------------------
 /// @name Accessing the underlying promise
