@@ -1,13 +1,18 @@
 language: objective-c
 osx_image: xcode7.2
 
+env:
+  matrix:
+    - OPTIONS="-sdk iphonesimulator -scheme iOS-Tests test"
+
 before_script:
   - brew update
   - brew upgrade xctool || true
   - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
-  - cd $TRAVIS_BUILD_DIR/Project && pod install
+  - cd Project/ && pod install
 
-script: cd $TRAVIS_BUILD_DIR/Project && ./run_tests.sh
+script:
+  - cd Project/ && xctool -workspace OMPromises.xcworkspace -parallelize $OPTIONS
 
 notifications:
   email: false
