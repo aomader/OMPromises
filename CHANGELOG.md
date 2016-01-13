@@ -14,16 +14,19 @@ _Possible log types_:
 
 ## [Unreleased]
 
+* ...
+
+## [v0.8.0] - 2016-01-14
+
 * [added] Support tvOS
 * [added] Add new `OMLazyPromise` type
 * [changed] Generify `OMPromise` and `OMDeferred`
 * [changed] Use composition over inheritance to model `OMDeferred`
 * [deprecated] The whole HTTP subspec will get removed un the upcoming release
-* ...
 
 ## [v0.4.2] - 2015-11-23
 
-* [fixed] Possible crashed by overflowed `progress`
+* [fixed] Possible crash due to overflowed `progress`
 
 ## [v0.4.1] - 2015-09-18
 
@@ -94,7 +97,8 @@ _Possible log types_:
 * Initial release
 
 
-[Unreleased]: https://github.com/b52/OMPromises/compare/0.4.2...HEAD
+[Unreleased]: https://github.com/b52/OMPromises/compare/0.8.0...HEAD
+[v0.8.0]: https://github.com/b52/OMPromises/compare/0.4.2...0.8.0
 [v0.4.2]: https://github.com/b52/OMPromises/compare/0.4.1...0.4.2
 [v0.4.1]: https://github.com/b52/OMPromises/compare/0.4.0...0.4.1
 [v0.4.0]: https://github.com/b52/OMPromises/compare/0.3.0...0.4.0
