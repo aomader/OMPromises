@@ -1,6 +1,8 @@
-OMPromises.xcodeproj/xcuserdata
-OMPromises.xcodeproj/project.xcworkspace/xcuserdata
-OMPromises.xcodeproj/project.xcworkspace/xcshareddata
+Project/Pods/
+Project/Podfile.lock
+Project/OMPromises.xcodeproj/xcuserdata
+Project/OMPromises.xcodeproj/project.xcworkspace/
+Project/OMPromises.xcworkspace/xcuserdata/
 .idea
 .DS_Store
 docs

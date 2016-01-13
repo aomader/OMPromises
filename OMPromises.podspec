@@ -14,14 +14,14 @@ Pod::Spec.new do |s|
   s.default_subspec = 'Core'
 
   s.subspec 'Core' do |cs|
-    cs.source_files = 'Classes/OMPromises.h', 'Classes/Core', 'Classes/Core/External'
-    cs.public_header_files = 'Classes/OMPromises.h', 'Classes/Core/{OMPromises,OMPromise,OMDeferred,OMLazyPromise}.h'
+    cs.source_files = 'Sources/OMPromises.h', 'Sources/Core', 'Sources/Core/External'
+    cs.public_header_files = 'Sources/OMPromises.h', 'Sources/Core/{OMPromises,OMPromise,OMDeferred,OMLazyPromise}.h'
   end
 
   s.subspec 'HTTP' do |hs|
     hs.dependency 'OMPromises/Core'
-    hs.source_files = 'Classes/OMHTTP.h', 'Classes/HTTP'
-    hs.public_header_files = 'Classes/OMHTTP.h', 'Classes/HTTP/*.h'
+    hs.source_files = 'Sources/OMHTTP.h', 'Sources/HTTP'
+    hs.public_header_files = 'Sources/OMHTTP.h', 'Sources/HTTP/*.h'
     hs.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => 'OMPROMISES_HTTP_AVAILABLE=1' }
   end
 

@@ -5,22 +5,6 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F9144E2D18DF4760004CDFE4"
-               BuildableName = "iOS-Tests.xctest"
-               BlueprintName = "iOS-Tests"
-               ReferencedContainer = "container:OMPromisesTests.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       buildConfiguration = "Debug"
@@ -32,10 +16,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F9144E2D18DF4760004CDFE4"
-               BuildableName = "iOS-Tests.xctest"
-               BlueprintName = "iOS-Tests"
-               ReferencedContainer = "container:OMPromisesTests.xcodeproj">
+               BlueprintIdentifier = "6C7143DE1C46F0BB005057A0"
+               BuildableName = "tvOS-Tests.xctest"
+               BlueprintName = "tvOS-Tests"
+               ReferencedContainer = "container:OMPromises.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -52,15 +36,6 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F9144E2D18DF4760004CDFE4"
-            BuildableName = "iOS-Tests.xctest"
-            BlueprintName = "iOS-Tests"
-            ReferencedContainer = "container:OMPromisesTests.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

@@ -1,17 +1,17 @@
 target :ios do
   platform :ios, '5.0'
   link_with 'iOS-Tests'
-  pod 'OMPromises/HTTP', :path => '../../'
+  pod 'OMPromises/HTTP', :path => '../'
 end
 
 target :osx do
   platform :osx, '10.7'
-  link_with 'OS-X-Tests'
-  pod 'OMPromises/HTTP', :path => '../../'
+  link_with 'OSX-Tests'
+  pod 'OMPromises/HTTP', :path => '../'
 end
 
 target :tvos do
   platform :tvos, '9.0'
   link_with 'tvOS-Tests'
-  pod 'OMPromises/HTTP', :path => '../../'
+  pod 'OMPromises/HTTP', :path => '../'
 end

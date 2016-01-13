@@ -5,9 +5,9 @@ before_script:
   - brew update
   - brew upgrade xctool || true
   - gem install cocoapods --no-rdoc --no-ri --no-document --quiet
-  - cd $TRAVIS_BUILD_DIR/Tests/OMPromisesTests && pod install
+  - cd $TRAVIS_BUILD_DIR/Project && pod install
 
-script: cd $TRAVIS_BUILD_DIR/Tests/OMPromisesTests && ./run_tests.sh
+script: cd $TRAVIS_BUILD_DIR/Project && ./run_tests.sh
 
 notifications:
   email: false
