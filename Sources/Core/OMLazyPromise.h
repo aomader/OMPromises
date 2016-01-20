@@ -63,6 +63,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic) BOOL started;
 
+- (OMLazyPromise *)then:(id (^)(ResultType _Nullable result))thenHandler;
+- (OMLazyPromise *)then:(id (^)(ResultType _Nullable result))thenHandler on:(dispatch_queue_t)queue;
+- (OMLazyPromise *)rescue:(id (^)(NSError *_Nullable error))rescueHandler;
+- (OMLazyPromise *)rescue:(id (^)(NSError *_Nullable error))rescueHandler on:(dispatch_queue_t)queue;
+
 /** Forces the start of the underlying work.
 
  @return Whether the work has been started or not in case it was started before.

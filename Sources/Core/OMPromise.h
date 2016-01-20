@@ -256,7 +256,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see rescue:
  */
-- (instancetype)then:(id (^)(ResultType _Nullable result))thenHandler;
+- (OMPromise *)then:(id (^)(ResultType _Nullable result))thenHandler;
 
 /** Similar to then:, but executes the supplied block asynchronously on a specific queue.
  
@@ -265,7 +265,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see then:
  */
-- (instancetype)then:(id (^)(ResultType _Nullable result))thenHandler on:(dispatch_queue_t)queue;
+- (OMPromise *)then:(id (^)(ResultType _Nullable result))thenHandler on:(dispatch_queue_t)queue;
 
 /** Create a new promise by binding the error reason to another promise.
 
@@ -278,7 +278,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see then:
  */
-- (instancetype)rescue:(id (^)(NSError *_Nullable error))rescueHandler;
+- (OMPromise *)rescue:(id (^)(NSError *_Nullable error))rescueHandler;
 
 /** Similar to rescue:, but executes the supplied block asynchronously on a specific queue.
  
@@ -287,7 +287,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see rescue:
  */
-- (instancetype)rescue:(id (^)(NSError *_Nullable error))rescueHandler on:(dispatch_queue_t)queue;
+- (OMPromise *)rescue:(id (^)(NSError *_Nullable error))rescueHandler on:(dispatch_queue_t)queue;
 
 ///---------------------------------------------------------------------------------------
 /// @name Registering callbacks
