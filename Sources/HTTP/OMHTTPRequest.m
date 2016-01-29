@@ -71,7 +71,7 @@ NSString *const OMHTTPAllowInvalidCertificates = @"allowinvalidcertificates";
 
         NSURLRequest *request = [self requestForURL:url method:method parameters:parameters options:options];
 
-        _connection  = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+        _connection  = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
 
         // make sure that the feedback queue is available all the time
         // TODO: Switch to NSURLSession and use a custom queue for these events.
