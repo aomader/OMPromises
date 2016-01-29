@@ -32,6 +32,11 @@
 
 - (OMPromise *)httpParseJSON {
     return [self then:^id(OMHTTPResponse *response) {
+        // there is not data contained, ignoring everything
+        if (response.statusCode == 204) {
+            return nil;
+        }
+
         NSString *pattern = @"application/(?:(vnd\\.[0-9a-zA-Z\\.]+)\\+)?json(?:;.*)?";
         NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern
                                                                                options:NSRegularExpressionCaseInsensitive
