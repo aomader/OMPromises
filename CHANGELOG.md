@@ -16,6 +16,12 @@ _Possible log types_:
 
 * ...
 
+## [v0.8.1] - 2016-02-01
+
+* [fixed] Incorrect type of `then:`
+* [fixed] Swallowed request callbacks started on none main threads
+* [changed] Ignore `Content-Type` when parsing 204 responses
+
 ## [v0.8.0] - 2016-01-14
 
 * [added] Support tvOS
@@ -98,6 +104,7 @@ _Possible log types_:
 
 
 [Unreleased]: https://github.com/b52/OMPromises/compare/0.8.0...HEAD
+[v0.8.1]: https://github.com/b52/OMPromises/compare/0.8.0...0.8.1
 [v0.8.0]: https://github.com/b52/OMPromises/compare/0.4.2...0.8.0
 [v0.4.2]: https://github.com/b52/OMPromises/compare/0.4.1...0.4.2
 [v0.4.1]: https://github.com/b52/OMPromises/compare/0.4.0...0.4.1

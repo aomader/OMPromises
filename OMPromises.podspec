@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'OMPromises'
-  s.version      = '0.8.0'
+  s.version      = '0.8.1'
   s.summary      = 'Promises for iOS & Mac OS X'
   s.homepage     = 'http://github.com/b52/OMPromises'
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
