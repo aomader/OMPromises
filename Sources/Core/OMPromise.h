@@ -401,7 +401,7 @@ extern NSString *const OMPromisesErrorDomain;
  The initial value can either be a simple object or a promise.
 
  @param thenHandlers Sequence of then: handler blocks.
- @param initial Initial result supplied to the first handler block.
+ @param result Initial result supplied to the first handler block.
  @return A new promise describing the whole chain.
  */
 + (OMPromise *)chain:(NSArray *)thenHandlers initial:(nullable id)result;
