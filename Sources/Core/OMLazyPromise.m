@@ -49,11 +49,11 @@
     return self;
 }
 
-+ (OMLazyPromise *)promiseWithTask:(id (^)())task {
++ (OMLazyPromise *)promiseWithTask:(id (^)(void))task {
     return [OMLazyPromise promiseWithTask:task on:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
 }
 
-+ (OMLazyPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue {
++ (OMLazyPromise *)promiseWithTask:(id (^)(void))task on:(dispatch_queue_t)queue {
     return [[OMLazyPromise alloc] initWithTask:^(OMDeferred *deferred) {
         id result = task();
 

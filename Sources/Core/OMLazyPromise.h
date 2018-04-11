@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A new _lazy_ promise.
  @see lazyPromiseWithTask:on:
  */
-+ (OMLazyPromise<ResultType> *)promiseWithTask:(id (^)())task;
++ (OMLazyPromise<ResultType> *)promiseWithTask:(id (^)(void))task;
 
 /** Similar to promiseWithTask:, but executes the block on the specified queue.
 
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A new _lazy_ promise.
  @see lazyPromiseWithTask:
  */
-+ (OMLazyPromise<ResultType> *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
++ (OMLazyPromise<ResultType> *)promiseWithTask:(id (^)(void))task on:(dispatch_queue_t)queue;
 
 + (OMLazyPromise<ResultType> *)promiseWithDetailedTask:(void (^)(OMDeferred *deferred))task;
 
