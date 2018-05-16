@@ -91,11 +91,11 @@ static dispatch_queue_t globalDefaultQueue = nil;
 
 #pragma mark - Return
 
-+ (OMPromise *)promiseWithTask:(id (^)())task {
++ (OMPromise *)promiseWithTask:(id (^)(void))task {
     return [OMPromise promiseWithTask:task on:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)];
 }
 
-+ (OMPromise *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue {
++ (OMPromise *)promiseWithTask:(id (^)(void))task on:(dispatch_queue_t)queue {
     return [[OMPromise promiseWithResult:nil]
         then:^(id _) {
             return task();

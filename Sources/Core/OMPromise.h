@@ -183,7 +183,7 @@ extern NSString *const OMPromisesErrorDomain;
  @see promiseWithTask:on:
  @see promiseWithLazyTask:
  */
-+ (OMPromise<ResultType> *)promiseWithTask:(id (^)())task;
++ (OMPromise<ResultType> *)promiseWithTask:(id (^)(void))task;
 
 /** Similar to promiseWithTask:, but executes the block on a specific queue.
  
@@ -192,7 +192,7 @@ extern NSString *const OMPromisesErrorDomain;
  @return A new promise.
  @see promiseWithTask:
  */
-+ (OMPromise<ResultType> *)promiseWithTask:(id (^)())task on:(dispatch_queue_t)queue;
++ (OMPromise<ResultType> *)promiseWithTask:(id (^)(void))task on:(dispatch_queue_t)queue;
 
 /** Create a fulfilled promise.
  
